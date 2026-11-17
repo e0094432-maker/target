@@ -25,7 +25,8 @@ def _post(url, headers, payload, timeout=180, retries=3):
                 return json.loads(r.read())
         except urllib.error.HTTPError as e:
             detail = e.read().decode(errors="replace")[:300]
-            if e.code in (429, 500, 502, 503, 504) and attempt < retries:
+            # an empty balance also comes back as 429; waiting will not help
+            if e.code in (429, 500, 502, 503, 504) and attempt < retries and "insufficient_quota" not in detail:
                 time.sleep(2 ** attempt * 2)
                 continue
             raise ProviderError(f"HTTP {e.code}: {detail}") from None
