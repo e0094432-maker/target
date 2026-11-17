@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kenes AI — реклама в ChatGPT для бизнеса в Казахстане</title>
+<meta name="description" content="Агентство рекламы в ChatGPT в Казахстане: реклама под ключ, AEO и ИИ-агенты. Бесплатный аудит: покажем, что ChatGPT отвечает про ваш бизнес.">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --bg-soft:#f5f5f2; --card:#ffffff; --text:#111113; --muted:#62626b;
+  --line:#e6e6e1; --accent:#ff4d1c; --accent-ink:#ffffff; --accent-soft:#fff0ea;
+  --bubble:#f0f0ec; --shadow:0 1px 2px rgba(17,17,19,.04),0 12px 32px -12px rgba(17,17,19,.14);
+  --r:20px; --r-sm:12px; --max:1120px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e0e10; --bg-soft:#16161a; --card:#18181c; --text:#f4f4f1; --muted:#a0a0aa;
+    --line:#2a2a31; --accent:#ff6a3d; --accent-ink:#140600; --accent-soft:#2a1710;
+    --bubble:#222228; --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 40px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e0e10; --bg-soft:#16161a; --card:#18181c; --text:#f4f4f1; --muted:#a0a0aa;
+  --line:#2a2a31; --accent:#ff6a3d; --accent-ink:#140600; --accent-soft:#2a1710;
+  --bubble:#222228; --shadow:0 1px 2px rgba(0,0,0,.4),0 16px 40px -16px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.55 "Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(34px,8.6vw,64px);line-height:1.04;letter-spacing:-.035em;font-weight:800;text-wrap:balance}
+h2{font-size:clamp(27px,6vw,44px);line-height:1.1;letter-spacing:-.03em;font-weight:700;text-wrap:balance}
+h3{font-size:19px;line-height:1.25;letter-spacing:-.01em;font-weight:600}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 16px}
+section{padding:64px 0}
+.eyebrow{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.lead{color:var(--muted);font-size:17px;margin-top:14px;max-width:60ch}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:999px;border:1px solid transparent;font-weight:600;font-size:16px;transition:transform .15s,background .15s,border-color .15s;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{filter:brightness(1.06)}
+.btn-ghost{border-color:var(--line);background:transparent}
+.btn-ghost:hover{border-color:var(--text)}
+.btn-sm{min-height:40px;padding:0 16px;font-size:14px}
+.btn-block{width:100%}
+
+/* header */
+header{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:10px;height:60px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;letter-spacing:-.03em;margin-right:auto}
+.logo svg{width:28px;height:28px;flex:none}
+.logo span span{color:var(--accent)}
+nav.menu{display:none;gap:26px;font-size:15px;color:var(--muted);margin-right:18px}
+nav.menu a:hover{color:var(--text)}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;font-size:13px;font-weight:600}
+.seg button{border:0;background:none;padding:5px 9px;border-radius:999px;color:var(--muted);min-height:30px}
+.seg button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.icon-btn{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:none;flex:none}
+.icon-btn svg{width:18px;height:18px}
+.bar .btn-primary{display:none}
+.drawer{display:none;border-top:1px solid var(--line);padding:8px 16px 18px}
+.drawer.open{display:block}
+.drawer a{display:block;padding:13px 0;font-size:17px;font-weight:500;border-bottom:1px solid var(--line)}
+.drawer .btn{margin-top:16px;border-bottom:0}
+
+/* hero */
+.hero{padding:40px 0 56px}
+.hero-grid{display:grid;gap:40px}
+.hero .lead{font-size:18px}
+.hero-cta{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.hero-note{font-size:14px;color:var(--muted);margin-top:14px}
+.chatmock{position:relative;background:var(--bg-soft);border:1px solid var(--line);border-radius:28px;padding:18px 14px 14px;box-shadow:var(--shadow)}
+.mock-top{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:14px;padding:0 4px}
+.dots{display:flex;gap:5px;margin-right:4px}.dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.tag{margin-left:auto;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:3px 9px;background:var(--bg)}
+.msg{width:fit-content;max-width:88%;padding:11px 15px;border-radius:20px;font-size:15px;line-height:1.45;margin-bottom:10px}
+.msg.user{margin-left:auto;background:var(--text);color:var(--bg);border-bottom-right-radius:6px}
+.msg.bot{background:var(--card);border:1px solid var(--line);border-bottom-left-radius:6px}
+.msg.bot b{font-weight:600}
+.adcard{background:var(--card);border:1.5px solid var(--accent);border-radius:18px;padding:14px;margin-top:4px;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center}
+.adcard .ava{width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:800;font-size:18px}
+.adcard small{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.adcard strong{display:block;font-size:15px;line-height:1.3}
+.adcard span{font-size:13px;color:var(--muted)}
+.adcard .btn{grid-column:1/-1}
+
+/* stats */
+.stats{display:grid;gap:12px;margin-top:32px}
+.stat{background:var(--bg-soft);border-radius:var(--r);padding:24px}
+.stat b{display:block;font-size:clamp(40px,11vw,56px);line-height:1;letter-spacing:-.04em;font-weight:800}
+.stat b em{font-style:normal;color:var(--accent)}
+.stat p{color:var(--muted);margin-top:10px;font-size:15px}
+
+/* cards */
+.grid{display:grid;gap:14px;margin-top:32px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.card p{color:var(--muted);margin-top:8px;font-size:15px}
+.ico{width:48px;height:48px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;margin-bottom:18px}
+.ico svg{width:24px;height:24px}
+.card ul{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:8px;font-size:15px}
+.card li{padding-left:26px;position:relative}
+.card li::before{content:"";position:absolute;left:0;top:.42em;width:14px;height:8px;border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(-45deg) scale(.8)}
+.soft{background:var(--bg-soft)}
+
+/* steps */
+.steps{counter-reset:s;display:grid;gap:12px;margin-top:32px}
+.step{counter-increment:s;display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:22px 22px 22px 6px;padding:18px}
+.step::before{content:counter(s);width:44px;height:44px;border-radius:50%;background:var(--text);color:var(--bg);display:grid;place-items:center;font-weight:700}
+.step p{color:var(--muted);font-size:15px;margin-top:4px}
+
+/* audit */
+.audit{background:var(--text);color:var(--bg);border-radius:28px;padding:32px 20px}
+.audit .eyebrow{color:var(--accent)}
+.audit .lead{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.audit form{display:grid;gap:10px;margin-top:24px}
+.audit input{min-height:56px;border-radius:999px;border:1px solid color-mix(in srgb,var(--bg) 25%,transparent);background:color-mix(in srgb,var(--bg) 8%,transparent);padding:0 22px;color:var(--bg);width:100%}
+.audit input::placeholder{color:color-mix(in srgb,var(--bg) 55%,transparent)}
+.audit .btn{min-height:56px;white-space:normal;text-align:center;line-height:1.2;padding:10px 22px}
+
+/* pricing */
+.price{display:flex;flex-direction:column}
+.price .amt{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-top:14px;line-height:1.1}
+.price .amt small{font-size:15px;font-weight:500;color:var(--muted);letter-spacing:0}
+.price .amt{white-space:nowrap}.price .amt small:first-child{display:block;margin-bottom:2px}
+.price .sub{font-size:14px;color:var(--muted);margin-top:4px}
+.price .btn{margin-top:22px}
+.price ul{flex:1}
+.price.hot{border:1.5px solid var(--accent);background:var(--accent-soft)}
+.badge{display:inline-block;align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 10px;margin-bottom:12px}
+.fine{font-size:13px;color:var(--muted);margin-top:16px}
+
+/* cases */
+.case{position:relative;min-height:220px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.case .soon{position:absolute;top:20px;right:20px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--muted);color:var(--muted);border-radius:999px;padding:4px 10px}
+.case .big{font-size:34px;font-weight:800;letter-spacing:-.03em}
+.case .skel{display:grid;gap:8px;margin:0 0 22px;max-width:70%}
+.case .skel i{height:10px;border-radius:99px;background:var(--bubble)}
+.case .skel i:nth-child(2){width:70%}.case .skel i:nth-child(3){width:45%}
+
+/* faq */
+.faq{margin-top:28px;border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:center;padding:20px 0;font-size:17px;font-weight:600;cursor:pointer}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:26px;font-weight:400;line-height:1;color:var(--accent);flex:none;transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{color:var(--muted);padding:0 0 22px;max-width:70ch}
+
+/* lead form */
+.lead-grid{display:grid;gap:28px}
+.form{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:22px 18px;box-shadow:var(--shadow);display:grid;gap:16px}
+.field{display:grid;gap:6px}
+.field>label,.field>span{font-size:14px;font-weight:600}
+.field input[type=text],.field input[type=tel],.field select{min-height:52px;border-radius:14px;border:1px solid var(--line);background:var(--bg);padding:0 16px;width:100%}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{position:relative;cursor:pointer}
+.chips input{position:absolute;opacity:0;inset:0}
+.chips span{display:inline-flex;align-items:center;min-height:42px;padding:0 15px;border:1px solid var(--line);border-radius:999px;font-size:14px;font-weight:500;background:var(--bg)}
+.chips input:checked+span{background:var(--text);color:var(--bg);border-color:var(--text)}
+.chips input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.form-msg{display:none;font-size:14px;border-radius:14px;padding:12px 14px;background:var(--accent-soft)}
+.form-msg.show{display:block}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:40px 0 110px;font-size:14px;color:var(--muted)}
+.foot{display:grid;gap:24px}
+.foot a:hover{color:var(--text)}
+.foot .links{display:grid;gap:8px}
+.disc{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);font-size:12px}
+
+/* chat widget */
+.fab{position:fixed;right:16px;bottom:16px;z-index:60;width:60px;height:60px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 10px 30px -8px color-mix(in srgb,var(--accent) 70%,transparent)}
+.fab svg{width:26px;height:26px}
+.fab .dot{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;background:#22c55e;border:3px solid var(--bg)}
+.chat{position:fixed;z-index:61;inset:auto 0 0 0;height:min(82dvh,620px);background:var(--card);border:1px solid var(--line);border-radius:24px 24px 0 0;box-shadow:0 -20px 60px -20px rgba(0,0,0,.35);display:none;flex-direction:column;overflow:hidden}
+.chat.open{display:flex}
+.chat-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.chat-head .ava{width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800}
+.chat-head b{display:block;font-size:15px;line-height:1.2}
+.chat-head small{font-size:12px;color:var(--muted)}
+.chat-head button{margin-left:auto}
+.chat-body{flex:1;overflow-y:auto;padding:16px;background:var(--bg-soft)}
+.chat-body .msg{font-size:14.5px}
+.quick{display:flex;gap:8px;overflow-x:auto;padding:10px 16px;border-top:1px solid var(--line);scrollbar-width:none}
+.quick::-webkit-scrollbar{display:none}
+.quick button{flex:none;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:500}
+.chat-form{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.chat-form input{flex:1;min-width:0;min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--bg);padding:0 16px;font-size:16px}
+.chat-form button{width:44px;height:44px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none}
+.chat-form svg{width:18px;height:18px}
+
+@media (min-width:560px){
+  .hero-cta{flex-direction:row}
+  .audit form{grid-template-columns:1fr auto}
+  .audit{padding:48px 40px}
+  .chat{inset:auto 16px 88px auto;width:380px;border-radius:24px}
+  .bar .btn-primary{display:inline-flex}
+}
+@media (min-width:760px){
+  section{padding:96px 0}
+  .wrap{padding:0 28px}
+  .stats,.grid.g3{grid-template-columns:repeat(3,1fr)}
+  .grid.g2{grid-template-columns:repeat(2,1fr)}
+  .grid.g4{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .foot{grid-template-columns:1.4fr 1fr 1fr}
+  .form{padding:32px}
+}
+@media (min-width:980px){
+  nav.menu{display:flex}
+  #burger,.drawer{display:none!important}
+  .hero{padding:72px 0 88px}
+  .hero-grid{grid-template-columns:1.1fr .9fr;align-items:center;gap:56px}
+  .grid.g4{grid-template-columns:repeat(4,1fr)}
+  .steps{grid-template-columns:repeat(4,1fr)}
+  .step{grid-template-columns:1fr}
+  .lead-grid{grid-template-columns:.85fr 1.15fr;align-items:start;gap:56px}
+  .bar{height:68px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a href="#top" class="logo" aria-label="Kenes AI">
+      <svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M4 9a6 6 0 0 1 6-6h8a6 6 0 0 1 6 6v6a6 6 0 0 1-6 6h-5.5L7 25.5V20.3A6 6 0 0 1 4 15V9Z" fill="var(--accent)"/><path d="M11 8v8M11 12l5-4M11 12l5 4" stroke="var(--accent-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Kenes<span> AI</span></span>
+    </a>
+    <nav class="menu" aria-label="Меню">
+      <a href="#services" data-i="m1">Услуги</a>
+      <a href="#how" data-i="m2">Как работаем</a>
+      <a href="#pricing" data-i="m3">Цены</a>
+      <a href="#cases" data-i="m4">Кейсы</a>
+      <a href="#faq" data-i="m5">Вопросы</a>
+    </nav>
+    <div class="seg" role="group" aria-label="Язык / Тіл">
+      <button type="button" data-lang="ru" aria-pressed="true">RU</button>
+      <button type="button" data-lang="kz" aria-pressed="false">KZ</button>
+    </div>
+    <button class="icon-btn" id="theme" type="button" aria-label="Тема">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg>
+    </button>
+    <a href="#audit" class="btn btn-primary btn-sm" data-i="cta">Бесплатный аудит</a>
+    <button class="icon-btn" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="drawer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h16M4 16h16"/></svg>
+    </button>
+  </div>
+  <div class="drawer" id="drawer">
+    <a href="#services" data-i="m1">Услуги</a>
+    <a href="#how" data-i="m2">Как работаем</a>
+    <a href="#pricing" data-i="m3">Цены</a>
+    <a href="#cases" data-i="m4">Кейсы</a>
+    <a href="#faq" data-i="m5">Вопросы</a>
+    <a href="#audit" class="btn btn-primary btn-block" data-i="cta">Бесплатный аудит</a>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow" data-i="h_eye">Реклама в ChatGPT · Казахстан</span>
+      <h1 data-i="h_title">Ваши клиенты уже спрашивают ChatGPT. Пусть он советует вас</h1>
+      <p class="lead" data-i="h_lead">Запускаем рекламу в ChatGPT под ключ, помогаем попасть в его ответы и ставим ИИ-агента на сайт и в мессенджеры. Всю настройку делаем сами.</p>
+      <div class="hero-cta">
+        <a href="#audit" class="btn btn-primary" data-i="h_btn">Получить бесплатный аудит</a>
+        <a href="#services" class="btn btn-ghost" data-i="h_btn2">Что мы делаем</a>
+      </div>
+      <p class="hero-note" data-i="h_note">Казахстанское ТОО · договор по законам РК · оплата в тенге</p>
+    </div>
+
+    <div class="chatmock" aria-label="Пример переписки">
+      <div class="mock-top"><span class="dots"><i></i><i></i><i></i></span><span data-i="mk_title">Чат с ИИ</span><span class="tag" data-i="mk_tag">пример</span></div>
+      <div class="msg user" data-i="mk_q">Посоветуй детскую стоматологию в Алматы, чтобы ребёнок не боялся</div>
+      <div class="msg bot" data-i="mk_a">Вот на что стоит смотреть: отдельный детский врач, адаптационный приём и отзывы родителей. В Алматы хорошие оценки у нескольких клиник — например, <b>«Тіс Kids»</b> на Абая.</div>
+      <div class="adcard">
+        <div class="ava">Т</div>
+        <div>
+          <small data-i="mk_ad">Реклама</small>
+          <strong data-i="mk_adt">«Тіс Kids» — детская стоматология</strong>
+          <span data-i="mk_ads">Первый приём-знакомство бесплатно</span>
+        </div>
+        <span class="btn btn-primary btn-sm" data-i="mk_adb">Записаться</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="soft" id="why">
+  <div class="wrap">
+    <span class="eyebrow" data-i="w_eye">Почему сейчас</span>
+    <h2 data-i="w_title">Окно, пока конкуренты ещё не пришли</h2>
+    <div class="stats">
+      <div class="stat" style="background:var(--card);border:1px solid var(--line)"><b>1,2 <em data-i="w1_u">млрд</em></b><p data-i="w1">человек пользуются ChatGPT каждую неделю</p></div>
+      <div class="stat" style="background:var(--card);border:1px solid var(--line)"><b><em>10</em>.2026</b><p data-i="w2">реклама в ChatGPT запустилась в Казахстане</p></div>
+      <div class="stat" style="background:var(--card);border:1px solid var(--line)"><b data-i="w3_b">Мало</b><p data-i="w3">конкурентов: кто зайдёт первым, получит клиентов дешевле</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <span class="eyebrow" data-i="s_eye">Услуги</span>
+    <h2 data-i="s_title">Три способа получать клиентов из ИИ</h2>
+    <div class="grid g3">
+      <article class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1Z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></svg></div>
+        <h3 data-i="s1_t">Реклама в ChatGPT под ключ</h3>
+        <p data-i="s1_p">Ваша карточка появляется под ответом, когда человек ищет то, что вы продаёте.</p>
+        <ul><li data-i="s1_a">Создаём рекламный кабинет</li><li data-i="s1_b">Пишем объявления</li><li data-i="s1_c">Запускаем и ведём рекламу</li><li data-i="s1_d">Отчёт каждый месяц</li></ul>
+      </article>
+      <article class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M8.5 11l2 2 3.5-4"/></svg></div>
+        <h3 data-i="s2_t">AEO: ChatGPT сам советует вас</h3>
+        <p data-i="s2_p">Бесплатные упоминания в ответах ChatGPT, без оплаты рекламы.</p>
+        <ul><li data-i="s2_a">Дорабатываем сайт</li><li data-i="s2_b">Работаем с отзывами</li><li data-i="s2_c">Упоминания бизнеса в интернете</li></ul>
+      </article>
+      <article class="card">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 8V4M9 13v1.5M15 13v1.5M2 13v2M22 13v2"/></svg></div>
+        <h3 data-i="s3_t">ИИ-агент для сайта, WhatsApp и Instagram</h3>
+        <p data-i="s3_p">Отвечает клиентам сразу, даже ночью и в выходные.</p>
+        <ul><li data-i="s3_a">Работает 24/7</li><li data-i="s3_b">Собирает заявки</li><li data-i="s3_c">Передаёт их менеджеру</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="soft" id="how">
+  <div class="wrap">
+    <span class="eyebrow" data-i="p_eye">Как работаем</span>
+    <h2 data-i="p_title">Четыре шага от заявки до отчёта</h2>
+    <div class="steps">
+      <div class="step"><div><h3 data-i="p1_t">Заявка</h3><p data-i="p1_p">Оставляете название бизнеса и WhatsApp. Это занимает минуту.</p></div></div>
+      <div class="step"><div><h3 data-i="p2_t">Бесплатный аудит</h3><p data-i="p2_p">Показываем, что ChatGPT отвечает про вас и про конкурентов.</p></div></div>
+      <div class="step"><div><h3 data-i="p3_t">Запуск</h3><p data-i="p3_p">Подписываем договор, настраиваем всё сами и запускаем.</p></div></div>
+      <div class="step"><div><h3 data-i="p4_t">Отчёт</h3><p data-i="p4_p">Каждый месяц: показы, клики, заявки и что делаем дальше.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="audit">
+  <div class="wrap">
+    <div class="audit">
+      <span class="eyebrow" data-i="a_eye">Бесплатный аудит</span>
+      <h2 data-i="a_title">Что ChatGPT говорит о вашем бизнесе?</h2>
+      <p class="lead" data-i="a_lead">Зададим ChatGPT вопросы ваших клиентов и пришлём разбор: упоминает ли он вас, кого советует вместо вас и что с этим делать.</p>
+      <form id="auditForm">
+        <input type="text" id="auditInput" required aria-label="Название бизнеса или сайт" placeholder="Название бизнеса или сайт" data-ph="a_ph">
+        <button class="btn btn-primary" data-i="a_btn">Проверить, что ChatGPT о вас знает</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="soft" id="pricing">
+  <div class="wrap">
+    <span class="eyebrow" data-i="c_eye">Цены</span>
+    <h2 data-i="c_title">Понятные тарифы в тенге</h2>
+    <div class="grid g4">
+      <article class="card price">
+        <h3 data-i="c1_t">Реклама</h3>
+        <div class="amt"><small data-i="from">от</small> 100 000 ₸<small data-i="mo">/мес</small></div>
+        <div class="sub" data-i="c1_s">+ рекламный бюджет</div>
+        <ul><li data-i="c1_a">1 кампания</li><li data-i="c1_b">Ведение</li><li data-i="c1_c">Ежемесячный отчёт</li></ul>
+        <a href="#lead" class="btn btn-ghost btn-block" data-pick="ads" data-i="choose">Выбрать</a>
+      </article>
+      <article class="card price">
+        <h3>AEO</h3>
+        <div class="amt"><small data-i="from">от</small> 150 000 ₸<small data-i="mo">/мес</small></div>
+        <div class="sub" data-i="c2_s">без рекламного бюджета</div>
+        <ul><li data-i="c2_a">Аудит</li><li data-i="c2_b">Работа над видимостью в ChatGPT</li></ul>
+        <a href="#lead" class="btn btn-ghost btn-block" data-pick="aeo" data-i="choose">Выбрать</a>
+      </article>
+      <article class="card price">
+        <h3 data-i="c3_t">ИИ-агент</h3>
+        <div class="amt"><small data-i="from">от</small> 200 000 ₸</div>
+        <div class="sub" data-i="c3_s">разово + от 30 000 ₸/мес</div>
+        <ul><li data-i="c3_a">Настройка</li><li data-i="c3_b">Поддержка</li></ul>
+        <a href="#lead" class="btn btn-ghost btn-block" data-pick="agent" data-i="choose">Выбрать</a>
+      </article>
+      <article class="card price hot">
+        <span class="badge" data-i="c4_badge">Выгодно</span>
+        <h3 data-i="c4_t">Всё вместе</h3>
+        <div class="amt" data-i="c4_amt">Со скидкой</div>
+        <div class="sub" data-i="c4_s">посчитаем под ваш бизнес</div>
+        <ul><li data-i="c4_a">Реклама в ChatGPT</li><li>AEO</li><li data-i="c3_t">ИИ-агент</li></ul>
+        <a href="#lead" class="btn btn-primary btn-block" data-pick="ads,aeo,agent" data-i="c4_btn">Узнать цену</a>
+      </article>
+    </div>
+    <p class="fine" data-i="c_fine">Цены примерные. Точную стоимость назовём после бесплатного аудита.</p>
+  </div>
+</section>
+
+<section id="cases">
+  <div class="wrap">
+    <span class="eyebrow" data-i="k_eye">Кейсы</span>
+    <h2 data-i="k_title">Сначала проверяем на своих проектах</h2>
+    <div class="grid g2">
+      <article class="card case"><span class="soon" data-i="soon">Скоро</span><div class="skel"><i></i><i></i><i></i></div><div class="big">Invest Komek</div><p data-i="k_p">Запускаем кампанию. Цифры появятся здесь, как только будут результаты.</p></article>
+      <article class="card case"><span class="soon" data-i="soon">Скоро</span><div class="skel"><i></i><i></i><i></i></div><div class="big">Vegi</div><p data-i="k_p">Запускаем кампанию. Цифры появятся здесь, как только будут результаты.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="soft" id="faq">
+  <div class="wrap">
+    <span class="eyebrow" data-i="f_eye">Вопросы и ответы</span>
+    <h2 data-i="f_title">Коротко о главном</h2>
+    <div class="faq">
+      <details><summary data-i="f1_q">Что такое реклама в ChatGPT?</summary><p data-i="f1_a">Когда человек спрашивает ChatGPT о товаре или услуге, под ответом может появиться рекламная карточка бизнеса с пометкой «Реклама». Мы настраиваем, по каким запросам показывается ваша.</p></details>
+      <details><summary data-i="f2_q">Нужен ли мне сайт?</summary><p data-i="f2_a">Для рекламы нужна страница, куда придёт клиент: подойдёт сайт или простой лендинг. Если сайта нет, подскажем, как быстро его сделать. Для ИИ-агента хватит WhatsApp или Instagram.</p></details>
+      <details><summary data-i="f3_q">Сколько это стоит?</summary><p data-i="f3_a">Ведение рекламы от 100 000 ₸ в месяц плюс рекламный бюджет. AEO от 150 000 ₸ в месяц. ИИ-агент от 200 000 ₸ разово и от 30 000 ₸ в месяц за поддержку.</p></details>
+      <details><summary data-i="f4_q">Есть ли гарантии?</summary><p data-i="f4_a">Количество заявок честно гарантировать не может никто. Мы гарантируем объём работ по договору, прозрачный отчёт каждый месяц и то, что вы видите, на что уходит бюджет.</p></details>
+      <details><summary data-i="f5_q">Чем AEO отличается от рекламы?</summary><p data-i="f5_a">Реклама — платные показы, которые работают сразу. AEO — работа над тем, чтобы ChatGPT упоминал вас в самом ответе бесплатно. Это дольше, но эффект остаётся.</p></details>
+      <details><summary data-i="f6_q">Как проходит оплата?</summary><p data-i="f6_a">Мы казахстанское ТОО. Заключаем договор по законам РК, выставляем счёт в тенге, даём закрывающие документы.</p></details>
+      <details><summary data-i="f7_q">Вы официальный партнёр OpenAI?</summary><p data-i="f7_a">Нет. Мы независимое агентство и работаем с рекламным кабинетом на общих условиях.</p></details>
+    </div>
+  </div>
+</section>
+
+<section id="lead">
+  <div class="wrap lead-grid">
+    <div>
+      <span class="eyebrow" data-i="l_eye">Заявка</span>
+      <h2 data-i="l_title">Расскажите о бизнесе — начнём с бесплатного аудита</h2>
+      <p class="lead" data-i="l_lead">Напишем в WhatsApp в течение рабочего дня и пришлём разбор.</p>
+    </div>
+    <form class="form" id="leadForm" novalidate>
+      <div class="field"><label for="f_name" data-i="l_name">Имя</label><input type="text" id="f_name" name="name" autocomplete="name" required></div>
+      <div class="field"><label for="f_biz" data-i="l_biz">Название бизнеса</label><input type="text" id="f_biz" name="business" autocomplete="organization" required></div>
+      <div class="field"><label for="f_site" data-i="l_site">Сайт или Instagram</label><input type="text" id="f_site" name="site" inputmode="url" placeholder="site.kz / @instagram"></div>
+      <div class="field"><span data-i="l_srv">Какие услуги нужны</span>
+        <div class="chips">
+          <label><input type="checkbox" name="services" value="ads"><span data-i="l_s1">Реклама в ChatGPT</span></label>
+          <label><input type="checkbox" name="services" value="aeo"><span>AEO</span></label>
+          <label><input type="checkbox" name="services" value="agent"><span data-i="c3_t">ИИ-агент</span></label>
+        </div>
+      </div>
+      <div class="field"><span data-i="l_bud">Бюджет в месяц</span>
+        <div class="chips">
+          <label><input type="radio" name="budget" value="до 200 000 ₸"><span data-i="b1">до 200 000 ₸</span></label>
+          <label><input type="radio" name="budget" value="200–500 тыс. ₸"><span data-i="b2">200–500 тыс. ₸</span></label>
+          <label><input type="radio" name="budget" value="500 тыс. – 1 млн ₸"><span data-i="b3">500 тыс. – 1 млн ₸</span></label>
+          <label><input type="radio" name="budget" value="больше 1 млн ₸"><span data-i="b4">больше 1 млн ₸</span></label>
+          <label><input type="radio" name="budget" value="пока не знаю"><span data-i="b5">пока не знаю</span></label>
+        </div>
+      </div>
+      <div class="field"><label for="f_wa">WhatsApp</label><input type="tel" id="f_wa" name="whatsapp" autocomplete="tel" inputmode="tel" placeholder="+7 7__ ___ __ __" required></div>
+      <button class="btn btn-primary btn-block" data-i="l_btn">Отправить заявку</button>
+      <div class="form-msg" id="leadMsg" role="status"></div>
+      <p class="fine" style="margin:0" data-i="l_fine">Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности.</p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <div class="logo" style="color:var(--text);margin-bottom:10px"><span>Kenes<span> AI</span></span></div>
+        <div>ТОО «Название»</div>
+        <div>БИН 000000000000</div>
+      </div>
+      <div class="links">
+        <a href="https://wa.me/" rel="noopener">WhatsApp: +7 700 000 00 00</a>
+        <a href="mailto:hello@example.kz">hello@example.kz</a>
+        <span data-i="ft_city">Алматы, Казахстан</span>
+      </div>
+      <div class="links">
+        <a href="#" data-i="ft_contract">Договор</a>
+        <a href="#" data-i="ft_privacy">Политика конфиденциальности</a>
+      </div>
+    </div>
+    <p class="disc" data-i="ft_disc">Мы независимое агентство и не являемся официальным партнёром OpenAI. Примеры переписки на сайте — иллюстрации.</p>
+  </div>
+</footer>
+
+<button class="fab" id="fab" type="button" aria-label="Открыть чат" aria-expanded="false" aria-controls="chat">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 4v-4a3 3 0 0 1-3-3V6Z"/></svg>
+  <span class="dot"></span>
+</button>
+<div class="chat" id="chat" role="dialog" aria-label="Чат с ИИ-агентом">
+  <div class="chat-head">
+    <div class="ava">K</div>
+    <div><b data-i="ch_name">ИИ-агент Kenes</b><small data-i="ch_sub">Так же он будет работать у вас</small></div>
+    <button class="icon-btn" id="chatClose" type="button" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="chat-body" id="chatBody" aria-live="polite"></div>
+  <div class="quick" id="quick"></div>
+  <form class="chat-form" id="chatForm">
+    <input type="text" id="chatInput" autocomplete="off" aria-label="Сообщение" placeholder="Напишите вопрос…" data-ph="ch_ph">
+    <button aria-label="Отправить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+  </form>
+</div>
+
+<script>
+/* ---------- Настройки: заполнить перед запуском ---------- */
+const CONFIG = {
+  whatsapp: '',  // номер без «+», например 77001234567 — заявка откроется в WhatsApp
+  endpoint: ''   // или URL, куда отправлять заявку POST-запросом (JSON)
+};
+
+/* ---------- Переводы (RU берётся из разметки) ---------- */
+const KZ = {
+  m1:'Қызметтер', m2:'Қалай жұмыс істейміз', m3:'Бағалар', m4:'Кейстер', m5:'Сұрақтар', cta:'Тегін аудит',
+  h_eye:'ChatGPT-дегі жарнама · Қазақстан',
+  h_title:'Клиенттеріңіз ChatGPT-ден сұрап жатыр. Ол сізді ұсынсын',
+  h_lead:'ChatGPT-де жарнаманы толық өзіміз іске қосамыз, оның жауаптарына кіруге көмектесеміз және сайт пен мессенджерлерге ЖИ-агент орнатамыз. Барлық баптауды өзіміз жасаймыз.',
+  h_btn:'Тегін аудит алу', h_btn2:'Не істейміз',
+  h_note:'Қазақстандық ЖШС · ҚР заңдары бойынша шарт · теңгемен төлем',
+  mk_title:'ЖИ-мен чат', mk_tag:'мысал',
+  mk_q:'Алматыда бала қорықпайтын балалар стоматологиясын ұсыншы',
+  mk_a:'Мыналарға назар аударыңыз: бөлек балалар дәрігері, бейімделу қабылдауы және ата-аналардың пікірлері. Алматыда бірнеше клиниканың бағасы жоғары — мысалы, Абай даңғылындағы <b>«Тіс Kids»</b>.',
+  mk_ad:'Жарнама', mk_adt:'«Тіс Kids» — балалар стоматологиясы', mk_ads:'Алғашқы танысу қабылдауы тегін', mk_adb:'Жазылу',
+  w_eye:'Неге қазір', w_title:'Бәсекелестер әлі келмеген кез',
+  w1_u:'млрд', w1:'адам апта сайын ChatGPT қолданады', w2:'Қазақстанда ChatGPT-де жарнама іске қосылды',
+  w3_b:'Аз', w3:'бәсекелес: бірінші кірген клиентті арзанырақ алады',
+  s_eye:'Қызметтер', s_title:'ЖИ-ден клиент алудың үш жолы',
+  s1_t:'ChatGPT-дегі жарнама — толық қызмет', s1_p:'Адам сіз сататын нәрсені іздегенде, жауаптың астында сіздің карточкаңыз шығады.',
+  s1_a:'Жарнама кабинетін ашамыз', s1_b:'Хабарландыруларды жазамыз', s1_c:'Жарнаманы іске қосып, жүргіземіз', s1_d:'Ай сайын есеп',
+  s2_t:'AEO: ChatGPT сізді өзі ұсынады', s2_p:'ChatGPT жауаптарындағы тегін аталулар, жарнамаға төлемей.',
+  s2_a:'Сайтты жетілдіреміз', s2_b:'Пікірлермен жұмыс істейміз', s2_c:'Бизнестің интернеттегі аталуы',
+  s3_t:'Сайт, WhatsApp және Instagram үшін ЖИ-агент', s3_p:'Клиенттерге бірден жауап береді, түнде де, демалыста да.',
+  s3_a:'24/7 жұмыс істейді', s3_b:'Өтінімдерді жинайды', s3_c:'Оларды менеджерге береді',
+  p_eye:'Қалай жұмыс істейміз', p_title:'Өтінімнен есепке дейін төрт қадам',
+  p1_t:'Өтінім', p1_p:'Бизнес атауы мен WhatsApp нөмірін қалдырасыз. Бір минут кетеді.',
+  p2_t:'Тегін аудит', p2_p:'ChatGPT сіз туралы және бәсекелестер туралы не айтатынын көрсетеміз.',
+  p3_t:'Іске қосу', p3_p:'Шарт жасасамыз, бәрін өзіміз баптап, іске қосамыз.',
+  p4_t:'Есеп', p4_p:'Ай сайын: көрсетілімдер, өтулер, өтінімдер және келесі қадамдар.',
+  a_eye:'Тегін аудит', a_title:'ChatGPT сіздің бизнесіңіз туралы не айтады?',
+  a_lead:'ChatGPT-ге клиенттеріңіздің сұрақтарын қойып, талдау жібереміз: ол сізді атай ма, орныңызға кімді ұсынады және не істеу керек.',
+  a_ph:'Бизнес атауы немесе сайт', a_btn:'ChatGPT сіз туралы не білетінін тексеру',
+  c_eye:'Бағалар', c_title:'Теңгемен түсінікті тарифтер', from:'бастап', mo:'/ай', choose:'Таңдау',
+  c1_t:'Жарнама', c1_s:'+ жарнама бюджеті', c1_a:'1 науқан', c1_b:'Жүргізу', c1_c:'Ай сайынғы есеп',
+  c2_s:'жарнама бюджетінсіз', c2_a:'Аудит', c2_b:'ChatGPT-дегі көрінуді арттыру',
+  c3_t:'ЖИ-агент', c3_s:'бір рет + айына 30 000 ₸ бастап', c3_a:'Баптау', c3_b:'Қолдау',
+  c4_badge:'Тиімді', c4_t:'Бәрі бірге', c4_amt:'Жеңілдікпен', c4_s:'бизнесіңізге қарай есептейміз', c4_a:'ChatGPT-дегі жарнама', c4_btn:'Бағасын білу',
+  c_fine:'Бағалар шамамен берілген. Нақты құнын тегін аудиттен кейін айтамыз.',
+  k_eye:'Кейстер', k_title:'Алдымен өз жобаларымызда тексереміз', soon:'Жақында',
+  k_p:'Науқанды іске қосып жатырмыз. Нәтиже шыққан бойда сандар осы жерде пайда болады.',
+  f_eye:'Сұрақ-жауап', f_title:'Ең маңыздысы қысқаша',
+  f1_q:'ChatGPT-дегі жарнама деген не?', f1_a:'Адам ChatGPT-ден тауар немесе қызмет туралы сұрағанда, жауаптың астында «Жарнама» белгісі бар бизнес карточкасы шығуы мүмкін. Сіздікі қандай сұраныстар бойынша көрсетілетінін біз баптаймыз.',
+  f2_q:'Маған сайт керек пе?', f2_a:'Жарнама үшін клиент келетін бет керек: сайт немесе қарапайым лендинг жарайды. Сайт болмаса, оны қалай тез жасауға болатынын айтамыз. ЖИ-агентке WhatsApp немесе Instagram жеткілікті.',
+  f3_q:'Бұл қанша тұрады?', f3_a:'Жарнаманы жүргізу айына 100 000 ₸ бастап, оған қоса жарнама бюджеті. AEO айына 150 000 ₸ бастап. ЖИ-агент бір рет 200 000 ₸ бастап және қолдауға айына 30 000 ₸ бастап.',
+  f4_q:'Кепілдік бар ма?', f4_a:'Өтінім санына ешкім шынайы кепілдік бере алмайды. Біз шарттағы жұмыс көлеміне, ай сайынғы ашық есепке және бюджеттің қайда кеткенін көретініңізге кепілдік береміз.',
+  f5_q:'AEO-ның жарнамадан айырмашылығы неде?', f5_a:'Жарнама — бірден жұмыс істейтін ақылы көрсетілімдер. AEO — ChatGPT сізді жауаптың өзінде тегін атауы үшін жасалатын жұмыс. Ұзағырақ, бірақ әсері сақталады.',
+  f6_q:'Төлем қалай жүреді?', f6_a:'Біз қазақстандық ЖШС-міз. ҚР заңдары бойынша шарт жасасамыз, теңгемен шот ұсынамыз, жабу құжаттарын береміз.',
+  f7_q:'Сіздер OpenAI-дың ресми серіктесісіздер ме?', f7_a:'Жоқ. Біз тәуелсіз агенттікпіз және жарнама кабинетімен жалпы шарттарда жұмыс істейміз.',
+  l_eye:'Өтінім', l_title:'Бизнесіңіз туралы айтыңыз — тегін аудиттен бастаймыз',
+  l_lead:'Жұмыс күні ішінде WhatsApp-қа жазып, талдау жібереміз.',
+  l_name:'Атыңыз', l_biz:'Бизнес атауы', l_site:'Сайт немесе Instagram', l_srv:'Қандай қызметтер керек', l_s1:'ChatGPT-дегі жарнама',
+  l_bud:'Айлық бюджет', b1:'200 000 ₸ дейін', b2:'200–500 мың ₸', b3:'500 мың – 1 млн ₸', b4:'1 млн ₸ артық', b5:'әзірге білмеймін',
+  l_btn:'Өтінім жіберу', l_fine:'Батырманы басу арқылы құпиялылық саясатымен келісесіз.',
+  ft_city:'Алматы, Қазақстан', ft_contract:'Шарт', ft_privacy:'Құпиялылық саясаты',
+  ft_disc:'Біз тәуелсіз агенттікпіз және OpenAI-дың ресми серіктесі емеспіз. Сайттағы хат алмасу мысалдары — иллюстрация.',
+  ch_name:'Kenes ЖИ-агенті', ch_sub:'Сізде де дәл осылай жұмыс істейді', ch_ph:'Сұрағыңызды жазыңыз…'
+};
+const T = {
+  ru:{
+    required:'Заполните имя, название бизнеса и WhatsApp.',
+    sent:'Спасибо! Заявка отправлена. Напишем в WhatsApp в течение рабочего дня.',
+    wa:'Открываем WhatsApp — отправьте сообщение, и мы ответим.',
+    demo:'Демо-режим: форма ещё не подключена к приёму заявок, данные никуда не отправлены.',
+    fail:'Не получилось отправить. Напишите нам в WhatsApp.',
+    hello:'Здравствуйте! Я ИИ-агент Kenes AI. Отвечу на вопросы про рекламу в ChatGPT и запишу вас на бесплатный аудит. Что интересно?',
+    q:['Цены','Что такое реклама в ChatGPT?','Бесплатный аудит','Есть ли гарантии?'],
+    a_price:'Реклама — от 100 000 ₸/мес + рекламный бюджет. AEO — от 150 000 ₸/мес. ИИ-агент — от 200 000 ₸ разово + от 30 000 ₸/мес. Если брать всё вместе, будет скидка. Точную цену назовём после бесплатного аудита.',
+    a_what:'Когда человек спрашивает ChatGPT о товаре или услуге, под ответом показывается карточка бизнеса с пометкой «Реклама». Мы создаём кабинет, пишем объявления, ведём кампанию и присылаем отчёт каждый месяц.',
+    a_audit:'Аудит бесплатный: показываем, что ChatGPT отвечает про ваш бизнес и про конкурентов. Напишите название бизнеса и номер WhatsApp — передам менеджеру.',
+    a_guar:'Гарантировать число заявок честно не может никто. Мы гарантируем объём работ по договору и прозрачный отчёт каждый месяц.',
+    a_aeo:'AEO — это работа над тем, чтобы ChatGPT сам упоминал ваш бизнес в ответах, бесплатно. Работаем с сайтом, отзывами и упоминаниями в интернете. От 150 000 ₸/мес.',
+    a_agent:'ИИ-агент отвечает клиентам на сайте, в WhatsApp и Instagram 24/7, собирает заявки и передаёт менеджеру. Вы сейчас общаетесь с таким же. От 200 000 ₸ разово + от 30 000 ₸/мес.',
+    a_pay:'Мы казахстанское ТОО: договор по законам РК, счёт в тенге, закрывающие документы.',
+    a_phone:'Спасибо, записал номер! Менеджер напишет вам в WhatsApp в течение рабочего дня.',
+    a_phone_demo:'Спасибо! Это демо-версия чата, номер пока никуда не передаётся. Оставьте заявку в форме ниже на странице.',
+    a_else:'Хороший вопрос — на него лучше ответит менеджер. Оставьте номер WhatsApp, и мы напишем. Или спросите про цены, аудит или услуги.'
+  },
+  kz:{
+    required:'Атыңызды, бизнес атауын және WhatsApp нөмірін толтырыңыз.',
+    sent:'Рақмет! Өтінім жіберілді. Жұмыс күні ішінде WhatsApp-қа жазамыз.',
+    wa:'WhatsApp ашылып жатыр — хабарламаны жіберіңіз, біз жауап береміз.',
+    demo:'Демо-режим: форма әлі өтінім қабылдауға қосылмаған, деректер ешқайда жіберілген жоқ.',
+    fail:'Жіберу мүмкін болмады. Бізге WhatsApp-қа жазыңыз.',
+    hello:'Сәлеметсіз бе! Мен Kenes AI ЖИ-агентімін. ChatGPT-дегі жарнама туралы сұрақтарға жауап беріп, тегін аудитке жазамын. Не қызықтырады?',
+    q:['Бағалар','ChatGPT-дегі жарнама деген не?','Тегін аудит','Кепілдік бар ма?'],
+    a_price:'Жарнама — айына 100 000 ₸ бастап + жарнама бюджеті. AEO — айына 150 000 ₸ бастап. ЖИ-агент — бір рет 200 000 ₸ бастап + айына 30 000 ₸ бастап. Бәрін бірге алсаңыз, жеңілдік болады. Нақты бағаны тегін аудиттен кейін айтамыз.',
+    a_what:'Адам ChatGPT-ден тауар немесе қызмет туралы сұрағанда, жауаптың астында «Жарнама» белгісі бар бизнес карточкасы көрсетіледі. Біз кабинет ашамыз, хабарландыру жазамыз, науқанды жүргіземіз және ай сайын есеп жібереміз.',
+    a_audit:'Аудит тегін: ChatGPT сіздің бизнесіңіз және бәсекелестер туралы не айтатынын көрсетеміз. Бизнес атауы мен WhatsApp нөмірін жазыңыз — менеджерге беремін.',
+    a_guar:'Өтінім санына ешкім шынайы кепілдік бере алмайды. Біз шарттағы жұмыс көлеміне және ай сайынғы ашық есепке кепілдік береміз.',
+    a_aeo:'AEO — ChatGPT сіздің бизнесіңізді жауаптарында өзі, тегін атауы үшін жасалатын жұмыс. Сайтпен, пікірлермен және интернеттегі аталулармен жұмыс істейміз. Айына 150 000 ₸ бастап.',
+    a_agent:'ЖИ-агент сайтта, WhatsApp пен Instagram-да клиенттерге 24/7 жауап береді, өтінімдерді жинап, менеджерге береді. Қазір дәл сондаймен сөйлесіп отырсыз. Бір рет 200 000 ₸ бастап + айына 30 000 ₸ бастап.',
+    a_pay:'Біз қазақстандық ЖШС-міз: ҚР заңдары бойынша шарт, теңгемен шот, жабу құжаттары.',
+    a_phone:'Рақмет, нөмірді жазып алдым! Менеджер жұмыс күні ішінде WhatsApp-қа жазады.',
+    a_phone_demo:'Рақмет! Бұл чаттың демо нұсқасы, нөмір әзірге ешқайда берілмейді. Беттің төменгі жағындағы формада өтінім қалдырыңыз.',
+    a_else:'Жақсы сұрақ — оған менеджер жақсырақ жауап береді. WhatsApp нөміріңізді қалдырыңыз, біз жазамыз. Немесе бағалар, аудит не қызметтер туралы сұраңыз.'
+  }
+};
+
+const $ = (s, r=document) => r.querySelector(s), $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const store = { get(k){ try{ return localStorage.getItem(k) }catch(e){ return null } }, set(k,v){ try{ localStorage.setItem(k,v) }catch(e){} } };
+let lang = 'ru';
+
+/* язык */
+const RU = {};
+$$('[data-i]').forEach(el => { if(!(el.dataset.i in RU)) RU[el.dataset.i] = el.innerHTML });
+$$('[data-ph]').forEach(el => RU[el.dataset.ph] = el.placeholder);
+function setLang(l){
+  lang = l; const d = l === 'kz' ? KZ : RU;
+  document.documentElement.lang = l === 'kz' ? 'kk' : 'ru';
+  $$('[data-i]').forEach(el => { const v = d[el.dataset.i] ?? RU[el.dataset.i]; if(v != null) el.innerHTML = v });
+  $$('[data-ph]').forEach(el => el.placeholder = d[el.dataset.ph] ?? RU[el.dataset.ph]);
+  $$('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === l));
+  store.set('lang', l); renderQuick();
+  if(chatBody.children.length === 1) { chatBody.innerHTML = ''; say(T[lang].hello) }
+}
+$$('[data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+
+/* тема */
+$('#theme').addEventListener('click', () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next; store.set('theme', next);
+});
+const savedTheme = store.get('theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme;
+
+/* меню */
+const burger = $('#burger'), drawer = $('#drawer');
+burger.addEventListener('click', () => burger.setAttribute('aria-expanded', drawer.classList.toggle('open')));
+$$('a', drawer).forEach(a => a.addEventListener('click', () => { drawer.classList.remove('open'); burger.setAttribute('aria-expanded', false) }));
+
+/* аудит → форма заявки */
+$('#auditForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = $('#auditInput').value.trim();
+  const isSite = /\.|@|\//.test(v);
+  $(isSite ? '#f_site' : '#f_biz').value = v;
+  $('#lead').scrollIntoView(); setTimeout(() => $('#f_name').focus({preventScroll:true}), 500);
+});
+/* тариф → отметить услуги */
+$$('[data-pick]').forEach(a => a.addEventListener('click', () => {
+  const pick = a.dataset.pick.split(',');
+  $$('input[name=services]').forEach(c => c.checked = pick.includes(c.value));
+}));
+
+/* заявка */
+const leadMsg = $('#leadMsg');
+$('#leadForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, t = T[lang];
+  const show = m => { leadMsg.textContent = m; leadMsg.classList.add('show') };
+  if(!f.name.value.trim() || !f.business.value.trim() || !f.whatsapp.value.trim()) return show(t.required);
+  const data = {
+    name: f.name.value.trim(), business: f.business.value.trim(), site: f.site.value.trim(),
+    services: $$('input[name=services]:checked', f).map(c => c.value),
+    budget: (f.budget.value || ''), whatsapp: f.whatsapp.value.trim(), lang
+  };
+  if(CONFIG.endpoint){
+    try{
+      const r = await fetch(CONFIG.endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+      if(!r.ok) throw 0; f.reset(); show(t.sent);
+    }catch(err){ show(t.fail) }
+  } else if(CONFIG.whatsapp){
+    const text = `Заявка с сайта\nИмя: ${data.name}\nБизнес: ${data.business}\nСайт/Instagram: ${data.site || '—'}\nУслуги: ${data.services.join(', ') || '—'}\nБюджет: ${data.budget || '—'}\nWhatsApp: ${data.whatsapp}`;
+    window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(text), '_blank', 'noopener'); show(t.wa);
+  } else show(t.demo);
+});
+
+/* чат (демо на сценариях; подключить настоящего агента — заменить reply()) */
+const chat = $('#chat'), fab = $('#fab'), chatBody = $('#chatBody'), quick = $('#quick');
+function say(text, who='bot'){
+  const d = document.createElement('div'); d.className = 'msg ' + who; d.textContent = text;
+  chatBody.appendChild(d); chatBody.scrollTop = chatBody.scrollHeight;
+}
+function reply(q){
+  const t = T[lang], s = q.toLowerCase();
+  if((s.match(/\d/g) || []).length >= 10) return CONFIG.endpoint || CONFIG.whatsapp ? t.a_phone : t.a_phone_demo;
+  if(/цен|стои|сколько|тариф|баға|қанша|тұрады/.test(s)) return t.a_price;
+  if(/аудит|провер|тексер/.test(s)) return t.a_audit;
+  if(/гарант|кепіл/.test(s)) return t.a_guar;
+  if(/aeo|аео|упомина|советовал|атау/.test(s)) return t.a_aeo;
+  if(/агент|бот|whatsapp|instagram|ватсап|инстаграм/.test(s)) return t.a_agent;
+  if(/оплат|договор|счет|счёт|тоо|төлем|шарт|жшс/.test(s)) return t.a_pay;
+  if(/реклам|жарнама|chatgpt|что такое|деген не/.test(s)) return t.a_what;
+  return t.a_else;
+}
+function ask(q){ say(q, 'user'); setTimeout(() => say(reply(q)), 450) }
+function renderQuick(){
+  quick.innerHTML = '';
+  T[lang].q.forEach(q => { const b = document.createElement('button'); b.type = 'button'; b.textContent = q; b.onclick = () => ask(q); quick.appendChild(b) });
+}
+function toggleChat(open){
+  chat.classList.toggle('open', open); fab.setAttribute('aria-expanded', open);
+  if(open){ if(!chatBody.children.length) say(T[lang].hello); if(matchMedia('(min-width:560px)').matches) $('#chatInput').focus() }
+}
+fab.addEventListener('click', () => toggleChat(!chat.classList.contains('open')));
+$('#chatClose').addEventListener('click', () => toggleChat(false));
+document.addEventListener('keydown', e => { if(e.key === 'Escape') toggleChat(false) });
+$('#chatForm').addEventListener('submit', e => {
+  e.preventDefault(); const i = $('#chatInput'), v = i.value.trim(); if(!v) return; i.value = ''; ask(v);
+});
+
+renderQuick();
+if(store.get('lang') === 'kz') setLang('kz');
+</script>
+</body>
+</html>
