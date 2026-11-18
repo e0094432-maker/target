@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# OpenAI ad review and search crawlers must be able to read the landing page
+User-agent: OAI-AdsBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
