@@ -25,7 +25,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--bod
 body::before{content:"";position:fixed;inset:0;z-index:-1;background-image:radial-gradient(var(--hair) 1px,transparent 1.2px);background-size:22px 22px;opacity:.7;pointer-events:none}
 h1,h2,h3,p{margin:0}
 h1,h2,h3{font-family:var(--disp);overflow-wrap:break-word}
-h1{font-size:clamp(29px,8.3vw,74px);line-height:1.06;letter-spacing:-.035em;font-weight:900}
+h1{font-size:clamp(27px,7.6vw,64px);line-height:1.06;letter-spacing:-.035em;font-weight:900}
 h2{font-size:clamp(24px,6.3vw,50px);line-height:1.1;letter-spacing:-.03em;font-weight:700}
 h3{font-size:17px;line-height:1.25;letter-spacing:-.02em;font-weight:700}
 mark{background:var(--accent);color:var(--on-accent);padding:.02em .16em;margin:0 -.06em;border-radius:.14em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
@@ -74,13 +74,14 @@ nav.menu a:hover::after{transform:scaleX(1)}
 
 /* hero */
 .hero{padding:36px 0 0;overflow:hidden}
-.hero-grid{display:grid;gap:44px}
+.hero-grid{display:grid;gap:40px}
+.h-cta{margin-top:14px}.h-cta .btn{min-height:64px;font-size:14.5px}
 .hero .lead{font-size:18px}
 .hero-cta{display:flex;flex-direction:column;gap:14px;margin-top:28px}
 .hero-note{display:flex;flex-wrap:wrap;gap:6px;margin-top:26px;font:500 11.5px var(--mono);text-transform:uppercase;letter-spacing:.03em}
 .hero-note span{border:1px dashed var(--ink);border-radius:8px;padding:6px 9px}
 .stage{position:relative;padding:8px 6px 0 0}
-.sun{position:absolute;right:-150px;top:-70px;width:440px;aspect-ratio:1;pointer-events:none}
+.sun{position:absolute;right:-170px;top:-18px;width:400px;aspect-ratio:1;pointer-events:none}
 .sun i{position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(var(--accent) 0 4.5deg,transparent 4.5deg 11.25deg);-webkit-mask:radial-gradient(circle,transparent 0 37%,#000 37.5% 69%,transparent 69.5%);mask:radial-gradient(circle,transparent 0 37%,#000 37.5% 69%,transparent 69.5%);animation:spin 90s linear infinite}
 .sun b{position:absolute;inset:33%;border-radius:50%;background:var(--accent)}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -277,7 +278,8 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
   nav.menu{display:flex}
   #burger,.drawer{display:none!important}
   .hero{padding:70px 0 0}
-  .hero-grid{grid-template-columns:1.2fr .8fr;align-items:center;gap:64px}
+  .hero-grid{grid-template-columns:1.15fr .85fr;grid-template-areas:"text stage" "cta stage";align-items:center;gap:28px 64px}
+  .h-text{grid-area:text;align-self:end}.stage{grid-area:stage}.h-cta{grid-area:cta;align-self:start;margin-top:0;max-width:520px}
   .sun{width:600px;right:-230px;top:-120px}
   .ticker{margin-top:96px}
   .prices{grid-template-columns:repeat(4,1fr)}
@@ -303,13 +305,6 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
       <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M3 9a6 6 0 0 1 6-6h14a6 6 0 0 1 6 6v9a6 6 0 0 1-6 6h-8l-7 5.5V24a6 6 0 0 1-5-6V9Z" fill="#ffc800" stroke="var(--ink)" stroke-width="1.8"/><path d="M12.5 8.5v10M12.5 13.5l6.5-5M12.5 13.5l6.5 5" stroke="#0d0d0c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>KENES AI</span>
     </a>
-    <nav class="menu" aria-label="Меню">
-      <a href="#services" data-i="m1">Услуги</a>
-      <a href="#how" data-i="m2">Как работаем</a>
-      <a href="#pricing" data-i="m3">Цены</a>
-      <a href="#cases" data-i="m4">Кейсы</a>
-      <a href="#faq" data-i="m5">Вопросы</a>
-    </nav>
     <div class="seg" role="group" aria-label="Язык / Тіл">
       <button type="button" data-lang="ru" aria-pressed="true">RU</button>
       <button type="button" data-lang="kz" aria-pressed="false">KZ</button>
@@ -317,18 +312,7 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
     <button class="icon-btn" id="theme" type="button" aria-label="Тема">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/></svg>
     </button>
-    <a href="#audit" class="btn btn-primary btn-sm" data-i="cta">Бесплатный аудит</a>
-    <button class="icon-btn" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="drawer">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8h16M4 16h16"/></svg>
-    </button>
-  </div>
-  <div class="drawer" id="drawer">
-    <a href="#services" data-i="m1">Услуги</a>
-    <a href="#how" data-i="m2">Как работаем</a>
-    <a href="#pricing" data-i="m3">Цены</a>
-    <a href="#cases" data-i="m4">Кейсы</a>
-    <a href="#faq" data-i="m5">Вопросы</a>
-    <a href="#audit" class="btn btn-primary btn-block" data-i="cta">Бесплатный аудит</a>
+    <a href="#lead" class="btn btn-primary btn-sm" data-i="cta">Оставить заявку</a>
   </div>
 </header>
 
@@ -336,15 +320,10 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
 
 <section class="hero">
   <div class="wrap hero-grid">
-    <div>
+    <div class="h-text">
       <span class="eyebrow rv" data-i="h_eye">Реклама в ChatGPT · Казахстан</span>
-      <h1 class="rv" style="--d:.08s" data-i="h_title">Ваши клиенты уже спрашивают ChatGPT. <mark>Пусть он советует вас</mark></h1>
-      <p class="lead rv" style="--d:.16s" data-i="h_lead">Запускаем рекламу в ChatGPT под ключ, помогаем попасть в его ответы и ставим ИИ-агента на сайт и в мессенджеры. Всю настройку делаем сами.</p>
-      <div class="hero-cta rv" style="--d:.24s">
-        <a href="#audit" class="btn btn-primary"><span data-i="h_btn">Получить бесплатный аудит</span><span class="arrow">→</span></a>
-        <a href="#services" class="btn" data-i="h_btn2">Что мы делаем</a>
-      </div>
-      <div class="hero-note rv" style="--d:.32s"><span data-i="hn1">Казахстанское ТОО</span><span data-i="hn2">Договор по законам РК</span><span data-i="hn3">Оплата в тенге</span></div>
+      <h1 class="rv" style="--d:.08s" data-i="h_title">Клиент спрашивает ChatGPT — <mark>под ответом ваша реклама</mark></h1>
+      <p class="lead rv" style="--d:.16s" data-i="h_lead">Запускаем рекламу в ChatGPT под ключ: кабинет, объявления, ведение и отчёт. Вам остаётся принимать заявки.</p>
     </div>
 
     <div class="stage rv" style="--d:.2s">
@@ -364,7 +343,11 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
           <span class="go" data-i="mk_adb">Записаться</span>
         </div>
       </div>
-      <div class="sticker" data-i="mk_stick">← это ваша карточка</div>
+      <div class="sticker" data-i="mk_stick">← так выглядит реклама</div>
+    </div>
+
+    <div class="h-cta rv" style="--d:.3s">
+      <a href="#lead" class="btn btn-primary btn-block"><span data-i="h_btn">Хотите так же? Оставьте заявку</span><span class="arrow">→</span></a>
     </div>
   </div>
 
@@ -373,139 +356,16 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
   </div></div>
 </section>
 
-<section id="why">
-  <div class="wrap">
-    <span class="eyebrow rv" data-i="w_eye">Почему сейчас</span>
-    <h2 class="rv" data-i="w_title">Окно, пока конкуренты ещё не пришли</h2>
-    <div class="stats">
-      <div class="stat rv"><span class="n">/01</span><b>1,2<em data-i="w1_u">млрд</em></b><p data-i="w1">человек пользуются ChatGPT каждую неделю</p></div>
-      <div class="stat rv" style="--d:.1s"><span class="n">/02</span><b>10<em>.26</em></b><p data-i="w2">реклама в ChatGPT запустилась в Казахстане</p></div>
-      <div class="stat rv" style="--d:.2s"><span class="n">/03</span><b data-i="w3_b">Мало</b><p data-i="w3">конкурентов: кто зайдёт первым, получит клиентов дешевле</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="tintbg" id="services">
-  <div class="wrap">
-    <span class="eyebrow rv" data-i="s_eye">Услуги</span>
-    <h2 class="rv" data-i="s_title">Три способа получать клиентов из ИИ</h2>
-    <div class="svc">
-      <article class="card y rv">
-        <span class="num">01</span>
-        <h3 data-i="s1_t">Реклама в ChatGPT под ключ</h3>
-        <p data-i="s1_p">Ваша карточка появляется под ответом, когда человек ищет то, что вы продаёте.</p>
-        <ul class="tags"><li data-i="s1_a">Создаём рекламный кабинет</li><li data-i="s1_b">Пишем объявления</li><li data-i="s1_c">Запускаем и ведём рекламу</li><li data-i="s1_d">Отчёт каждый месяц</li></ul>
-      </article>
-      <article class="card rv" style="--d:.1s">
-        <span class="num">02</span>
-        <h3 data-i="s2_t">AEO: ChatGPT сам советует вас</h3>
-        <p data-i="s2_p">Бесплатные упоминания в ответах ChatGPT, без оплаты рекламы.</p>
-        <ul class="tags"><li data-i="s2_a">Дорабатываем сайт</li><li data-i="s2_b">Работаем с отзывами</li><li data-i="s2_c">Упоминания бизнеса в интернете</li></ul>
-      </article>
-      <article class="card k rv" style="--d:.2s">
-        <span class="num">03</span>
-        <h3 data-i="s3_t">ИИ-агент для сайта, WhatsApp и Instagram</h3>
-        <p data-i="s3_p">Отвечает клиентам сразу, даже ночью и в выходные.</p>
-        <ul class="tags"><li data-i="s3_a">Работает 24/7</li><li data-i="s3_b">Собирает заявки</li><li data-i="s3_c">Передаёт их менеджеру</li></ul>
-      </article>
-    </div>
-  </div>
-</section>
-
 <section id="how">
   <div class="wrap how-grid">
     <div>
       <span class="eyebrow rv" data-i="p_eye">Как работаем</span>
-      <h2 class="rv" data-i="p_title">Четыре шага от заявки до отчёта</h2>
+      <h2 class="rv" data-i="p_title">Три шага до запуска</h2>
     </div>
     <div class="thread">
       <div class="step rv"><div class="who"><i>01</i><span data-i="p_you">Вы</span></div><h3 data-i="p1_t">Заявка</h3><p data-i="p1_p">Оставляете название бизнеса и WhatsApp. Это занимает минуту.</p></div>
-      <div class="step rv"><div class="who"><i>02</i><span>Kenes AI</span></div><h3 data-i="p2_t">Бесплатный аудит</h3><p data-i="p2_p">Показываем, что ChatGPT отвечает про вас и про конкурентов.</p></div>
-      <div class="step rv"><div class="who"><i>03</i><span data-i="p_you">Вы</span> + <span>Kenes AI</span></div><h3 data-i="p3_t">Запуск</h3><p data-i="p3_p">Подписываем договор, настраиваем всё сами и запускаем.</p></div>
-      <div class="step rv"><div class="who"><i>04</i><span>Kenes AI</span></div><h3 data-i="p4_t">Отчёт</h3><p data-i="p4_p">Каждый месяц: показы, клики, заявки и что делаем дальше.</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="audit" style="padding-top:0">
-  <div class="wrap">
-    <div class="audit rv">
-      <span class="eyebrow" data-i="a_eye">Бесплатный аудит</span>
-      <h2 data-i="a_title">Что ChatGPT говорит о вашем бизнесе?</h2>
-      <p class="lead" data-i="a_lead">Зададим ChatGPT вопросы ваших клиентов и пришлём разбор: упоминает ли он вас, кого советует вместо вас и что с этим делать.</p>
-      <form id="auditForm">
-        <label class="prompt"><input type="text" id="auditInput" required aria-label="Название бизнеса или сайт" placeholder="Название бизнеса или сайт" data-ph="a_ph"></label>
-        <button class="btn" data-i="a_btn">Проверить, что ChatGPT о вас знает</button>
-      </form>
-    </div>
-  </div>
-</section>
-
-<section class="tintbg" id="pricing">
-  <div class="wrap">
-    <span class="eyebrow rv" data-i="c_eye">Цены</span>
-    <h2 class="rv" data-i="c_title">Понятные тарифы в тенге</h2>
-    <div class="prices">
-      <article class="ticket rv"><div class="ticket-in">
-        <div class="no">№ 01</div>
-        <h3 data-i="c1_t">Реклама</h3>
-        <div class="amt"><small data-i="from">от</small>100 000 ₸<small data-i="mo">/мес</small></div>
-        <div class="sub" data-i="c1_s">+ рекламный бюджет</div>
-        <ul><li data-i="c1_a">1 кампания</li><li data-i="c1_b">Ведение</li><li data-i="c1_c">Ежемесячный отчёт</li></ul>
-        <a href="#lead" class="btn btn-block" data-pick="ads" data-i="choose">Выбрать</a>
-      </div></article>
-      <article class="ticket rv" style="--d:.08s"><div class="ticket-in">
-        <div class="no">№ 02</div>
-        <h3>AEO</h3>
-        <div class="amt"><small data-i="from">от</small>150 000 ₸<small data-i="mo">/мес</small></div>
-        <div class="sub" data-i="c2_s">без рекламного бюджета</div>
-        <ul><li data-i="c2_a">Аудит</li><li data-i="c2_b">Работа над видимостью в ChatGPT</li></ul>
-        <a href="#lead" class="btn btn-block" data-pick="aeo" data-i="choose">Выбрать</a>
-      </div></article>
-      <article class="ticket rv" style="--d:.16s"><div class="ticket-in">
-        <div class="no">№ 03</div>
-        <h3 data-i="c3_t">ИИ-агент</h3>
-        <div class="amt"><small data-i="from">от</small>200 000 ₸</div>
-        <div class="sub" data-i="c3_s">разово + от 30 000 ₸/мес</div>
-        <ul><li data-i="c3_a">Настройка</li><li data-i="c3_b">Поддержка</li></ul>
-        <a href="#lead" class="btn btn-block" data-pick="agent" data-i="choose">Выбрать</a>
-      </div></article>
-      <article class="ticket hot rv" style="--d:.24s"><div class="ticket-in">
-        <div class="no">№ 01+02+03 · <span data-i="c4_badge">Выгодно</span></div>
-        <h3 data-i="c4_t">Всё вместе</h3>
-        <div class="amt"><small>&nbsp;</small><span data-i="c4_amt">Со скидкой</span></div>
-        <div class="sub" data-i="c4_s">посчитаем под ваш бизнес</div>
-        <ul><li data-i="c4_a">Реклама в ChatGPT</li><li>AEO</li><li data-i="c3_t">ИИ-агент</li></ul>
-        <a href="#lead" class="btn btn-block" data-pick="ads,aeo,agent" data-i="c4_btn">Узнать цену</a>
-      </div></article>
-    </div>
-    <p class="fine" data-i="c_fine">Цены примерные. Точную стоимость назовём после бесплатного аудита.</p>
-  </div>
-</section>
-
-<section id="cases">
-  <div class="wrap">
-    <span class="eyebrow rv" data-i="k_eye">Кейсы</span>
-    <h2 class="rv" data-i="k_title">Сначала проверяем на своих проектах</h2>
-    <div class="cases">
-      <article class="card case rv"><span class="stamp" data-i="soon">Скоро</span><div class="big">Invest Komek</div><p data-i="k_p">Запускаем кампанию. Цифры появятся здесь, как только будут результаты.</p></article>
-      <article class="card case rv" style="--d:.1s"><span class="stamp" data-i="soon">Скоро</span><div class="big">Vegi</div><p data-i="k_p">Запускаем кампанию. Цифры появятся здесь, как только будут результаты.</p></article>
-    </div>
-  </div>
-</section>
-
-<section class="tintbg" id="faq">
-  <div class="wrap">
-    <span class="eyebrow rv" data-i="f_eye">Вопросы и ответы</span>
-    <h2 class="rv" data-i="f_title">Коротко о главном</h2>
-    <div class="faq">
-      <details><summary data-i="f1_q">Что такое реклама в ChatGPT?</summary><p data-i="f1_a">Когда человек спрашивает ChatGPT о товаре или услуге, под ответом может появиться рекламная карточка бизнеса с пометкой «Реклама». Мы настраиваем, по каким запросам показывается ваша.</p></details>
-      <details><summary data-i="f2_q">Нужен ли мне сайт?</summary><p data-i="f2_a">Для рекламы нужна страница, куда придёт клиент: подойдёт сайт или простой лендинг. Если сайта нет, подскажем, как быстро его сделать. Для ИИ-агента хватит WhatsApp или Instagram.</p></details>
-      <details><summary data-i="f3_q">Сколько это стоит?</summary><p data-i="f3_a">Ведение рекламы от 100 000 ₸ в месяц плюс рекламный бюджет. AEO от 150 000 ₸ в месяц. ИИ-агент от 200 000 ₸ разово и от 30 000 ₸ в месяц за поддержку.</p></details>
-      <details><summary data-i="f4_q">Есть ли гарантии?</summary><p data-i="f4_a">Количество заявок честно гарантировать не может никто. Мы гарантируем объём работ по договору, прозрачный отчёт каждый месяц и то, что вы видите, на что уходит бюджет.</p></details>
-      <details><summary data-i="f5_q">Чем AEO отличается от рекламы?</summary><p data-i="f5_a">Реклама — платные показы, которые работают сразу. AEO — работа над тем, чтобы ChatGPT упоминал вас в самом ответе бесплатно. Это дольше, но эффект остаётся.</p></details>
-      <details><summary data-i="f6_q">Как проходит оплата?</summary><p data-i="f6_a">Мы казахстанское ТОО. Заключаем договор по законам РК, выставляем счёт в тенге, даём закрывающие документы.</p></details>
-      <details><summary data-i="f7_q">Вы официальный партнёр OpenAI?</summary><p data-i="f7_a">Нет. Мы независимое агентство и работаем с рекламным кабинетом на общих условиях.</p></details>
+      <div class="step rv"><div class="who"><i>02</i><span data-i="p_you">Вы</span> + <span>Kenes AI</span></div><h3 data-i="p3_t">Запуск</h3><p data-i="p3_p">Подписываем договор, настраиваем всё сами и запускаем.</p></div>
+      <div class="step rv"><div class="who"><i>03</i><span>Kenes AI</span></div><h3 data-i="p4_t">Отчёт</h3><p data-i="p4_p">Каждый месяц: показы, клики, заявки и что делаем дальше.</p></div>
     </div>
   </div>
 </section>
@@ -514,29 +374,12 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
   <div class="wrap lead-grid">
     <div>
       <span class="eyebrow rv" data-i="l_eye">Заявка</span>
-      <h2 class="rv" data-i="l_title">Расскажите о бизнесе — начнём с бесплатного аудита</h2>
-      <p class="lead rv" data-i="l_lead">Напишем в WhatsApp в течение рабочего дня и пришлём разбор.</p>
+      <h2 class="rv" data-i="l_title">Хотите так же?</h2>
+      <p class="lead rv" data-i="l_lead">Оставьте контакты — напишем в WhatsApp в течение рабочего дня.</p>
     </div>
     <form class="form rv" id="leadForm" novalidate>
       <div class="field"><label for="f_name" data-i="l_name">Имя</label><input type="text" id="f_name" name="name" autocomplete="name" required></div>
-      <div class="field"><label for="f_biz" data-i="l_biz">Название бизнеса</label><input type="text" id="f_biz" name="business" autocomplete="organization" required></div>
-      <div class="field"><label for="f_site" data-i="l_site">Сайт или Instagram</label><input type="text" id="f_site" name="site" inputmode="url" placeholder="site.kz / @instagram"></div>
-      <div class="field"><span data-i="l_srv">Какие услуги нужны</span>
-        <div class="chips">
-          <label><input type="checkbox" name="services" value="ads"><span data-i="l_s1">Реклама в ChatGPT</span></label>
-          <label><input type="checkbox" name="services" value="aeo"><span>AEO</span></label>
-          <label><input type="checkbox" name="services" value="agent"><span data-i="c3_t">ИИ-агент</span></label>
-        </div>
-      </div>
-      <div class="field"><span data-i="l_bud">Бюджет в месяц</span>
-        <div class="chips">
-          <label><input type="radio" name="budget" value="до 200 000 ₸"><span data-i="b1">до 200 000 ₸</span></label>
-          <label><input type="radio" name="budget" value="200–500 тыс. ₸"><span data-i="b2">200–500 тыс. ₸</span></label>
-          <label><input type="radio" name="budget" value="500 тыс. – 1 млн ₸"><span data-i="b3">500 тыс. – 1 млн ₸</span></label>
-          <label><input type="radio" name="budget" value="больше 1 млн ₸"><span data-i="b4">больше 1 млн ₸</span></label>
-          <label><input type="radio" name="budget" value="пока не знаю"><span data-i="b5">пока не знаю</span></label>
-        </div>
-      </div>
+      <div class="field"><label for="f_biz" data-i="l_biz">Название бизнеса или сайт</label><input type="text" id="f_biz" name="business" autocomplete="organization" required></div>
       <div class="field"><label for="f_wa">WhatsApp</label><input type="tel" id="f_wa" name="whatsapp" autocomplete="tel" inputmode="tel" placeholder="+7 7__ ___ __ __" required></div>
       <button class="btn btn-primary btn-block"><span data-i="l_btn">Отправить заявку</span><span class="arrow">→</span></button>
       <div class="form-msg" id="leadMsg" role="status"></div>
@@ -600,12 +443,12 @@ const CONFIG = {
 
 /* ---------- Переводы (RU берётся из разметки) ---------- */
 const KZ = {
-  m1:'Қызметтер', m2:'Қалай жұмыс істейміз', m3:'Бағалар', m4:'Кейстер', m5:'Сұрақтар', cta:'Тегін аудит',
+  m1:'Қызметтер', m2:'Қалай жұмыс істейміз', m3:'Бағалар', m4:'Кейстер', m5:'Сұрақтар', cta:'Өтінім қалдыру',
   h_eye:'ChatGPT-дегі жарнама · Қазақстан',
-  h_title:'Клиенттеріңіз ChatGPT-ден сұрап жатыр. <mark>Ол сізді ұсынсын</mark>',
-  h_lead:'ChatGPT-де жарнаманы толық өзіміз іске қосамыз, оның жауаптарына кіруге көмектесеміз және сайт пен мессенджерлерге ЖИ-агент орнатамыз. Барлық баптауды өзіміз жасаймыз.',
-  h_btn:'Тегін аудит алу', h_btn2:'Не істейміз',
-  hn1:'Қазақстандық ЖШС', hn2:'ҚР заңдары бойынша шарт', hn3:'Теңгемен төлем', mk_stick:'← бұл сіздің карточкаңыз', p_you:'Сіз', ft_h1:'Компания', ft_h2:'Байланыс', ft_h3:'Құжаттар',
+  h_title:'Клиент ChatGPT-ден сұрайды — <mark>жауаптың астында сіздің жарнамаңыз</mark>',
+  h_lead:'ChatGPT-де жарнаманы толық өзіміз іске қосамыз: кабинет, хабарландырулар, жүргізу және есеп. Сізге тек өтінімдерді қабылдау қалады.',
+  h_btn:'Дәл осылай қалайсыз ба? Өтінім қалдырыңыз', h_btn2:'Не істейміз',
+  hn1:'Қазақстандық ЖШС', hn2:'ҚР заңдары бойынша шарт', hn3:'Теңгемен төлем', mk_stick:'← жарнама осылай көрінеді', p_you:'Сіз', ft_h1:'Компания', ft_h2:'Байланыс', ft_h3:'Құжаттар',
   mk_title:'ЖИ-мен чат', mk_tag:'мысал',
   mk_q:'Алматыда бала қорықпайтын балалар стоматологиясын ұсыншы',
   mk_a:'Мыналарға назар аударыңыз: бөлек балалар дәрігері, бейімделу қабылдауы және ата-аналардың пікірлері. Алматыда бірнеше клиниканың бағасы жоғары — мысалы, Абай даңғылындағы <b>«Тіс Kids»</b>.',
@@ -620,7 +463,7 @@ const KZ = {
   s2_a:'Сайтты жетілдіреміз', s2_b:'Пікірлермен жұмыс істейміз', s2_c:'Бизнестің интернеттегі аталуы',
   s3_t:'Сайт, WhatsApp және Instagram үшін ЖИ-агент', s3_p:'Клиенттерге бірден жауап береді, түнде де, демалыста да.',
   s3_a:'24/7 жұмыс істейді', s3_b:'Өтінімдерді жинайды', s3_c:'Оларды менеджерге береді',
-  p_eye:'Қалай жұмыс істейміз', p_title:'Өтінімнен есепке дейін төрт қадам',
+  p_eye:'Қалай жұмыс істейміз', p_title:'Іске қосуға дейін үш қадам',
   p1_t:'Өтінім', p1_p:'Бизнес атауы мен WhatsApp нөмірін қалдырасыз. Бір минут кетеді.',
   p2_t:'Тегін аудит', p2_p:'ChatGPT сіз туралы және бәсекелестер туралы не айтатынын көрсетеміз.',
   p3_t:'Іске қосу', p3_p:'Шарт жасасамыз, бәрін өзіміз баптап, іске қосамыз.',
@@ -644,9 +487,9 @@ const KZ = {
   f5_q:'AEO-ның жарнамадан айырмашылығы неде?', f5_a:'Жарнама — бірден жұмыс істейтін ақылы көрсетілімдер. AEO — ChatGPT сізді жауаптың өзінде тегін атауы үшін жасалатын жұмыс. Ұзағырақ, бірақ әсері сақталады.',
   f6_q:'Төлем қалай жүреді?', f6_a:'Біз қазақстандық ЖШС-міз. ҚР заңдары бойынша шарт жасасамыз, теңгемен шот ұсынамыз, жабу құжаттарын береміз.',
   f7_q:'Сіздер OpenAI-дың ресми серіктесісіздер ме?', f7_a:'Жоқ. Біз тәуелсіз агенттікпіз және жарнама кабинетімен жалпы шарттарда жұмыс істейміз.',
-  l_eye:'Өтінім', l_title:'Бизнесіңіз туралы айтыңыз — тегін аудиттен бастаймыз',
-  l_lead:'Жұмыс күні ішінде WhatsApp-қа жазып, талдау жібереміз.',
-  l_name:'Атыңыз', l_biz:'Бизнес атауы', l_site:'Сайт немесе Instagram', l_srv:'Қандай қызметтер керек', l_s1:'ChatGPT-дегі жарнама',
+  l_eye:'Өтінім', l_title:'Дәл осылай қалайсыз ба?',
+  l_lead:'Байланыс деректерін қалдырыңыз — жұмыс күні ішінде WhatsApp-қа жазамыз.',
+  l_name:'Атыңыз', l_biz:'Бизнес атауы немесе сайт', l_site:'Сайт немесе Instagram', l_srv:'Қандай қызметтер керек', l_s1:'ChatGPT-дегі жарнама',
   l_bud:'Айлық бюджет', b1:'200 000 ₸ дейін', b2:'200–500 мың ₸', b3:'500 мың – 1 млн ₸', b4:'1 млн ₸ артық', b5:'әзірге білмеймін',
   l_btn:'Өтінім жіберу', l_fine:'Батырманы басу арқылы құпиялылық саясатымен келісесіз.',
   ft_city:'Алматы, Қазақстан', ft_contract:'Шарт', ft_privacy:'Құпиялылық саясаты',
@@ -721,25 +564,6 @@ $('#theme').addEventListener('click', () => {
 });
 const savedTheme = store.get('theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme;
 
-/* меню */
-const burger = $('#burger'), drawer = $('#drawer');
-burger.addEventListener('click', () => burger.setAttribute('aria-expanded', drawer.classList.toggle('open')));
-$$('a', drawer).forEach(a => a.addEventListener('click', () => { drawer.classList.remove('open'); burger.setAttribute('aria-expanded', false) }));
-
-/* аудит → форма заявки */
-$('#auditForm').addEventListener('submit', e => {
-  e.preventDefault();
-  const v = $('#auditInput').value.trim();
-  const isSite = /\.|@|\//.test(v);
-  $(isSite ? '#f_site' : '#f_biz').value = v;
-  $('#lead').scrollIntoView(); setTimeout(() => $('#f_name').focus({preventScroll:true}), 500);
-});
-/* тариф → отметить услуги */
-$$('[data-pick]').forEach(a => a.addEventListener('click', () => {
-  const pick = a.dataset.pick.split(',');
-  $$('input[name=services]').forEach(c => c.checked = pick.includes(c.value));
-}));
-
 /* заявка */
 const leadMsg = $('#leadMsg');
 $('#leadForm').addEventListener('submit', async e => {
@@ -748,9 +572,7 @@ $('#leadForm').addEventListener('submit', async e => {
   const show = m => { leadMsg.textContent = m; leadMsg.classList.add('show') };
   if(!f.name.value.trim() || !f.business.value.trim() || !f.whatsapp.value.trim()) return show(t.required);
   const data = {
-    name: f.name.value.trim(), business: f.business.value.trim(), site: f.site.value.trim(),
-    services: $$('input[name=services]:checked', f).map(c => c.value),
-    budget: (f.budget.value || ''), whatsapp: f.whatsapp.value.trim(), lang
+    name: f.name.value.trim(), business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang
   };
   if(CONFIG.endpoint){
     try{
@@ -758,7 +580,7 @@ $('#leadForm').addEventListener('submit', async e => {
       if(!r.ok) throw 0; f.reset(); show(t.sent);
     }catch(err){ show(t.fail) }
   } else if(CONFIG.whatsapp){
-    const text = `Заявка с сайта\nИмя: ${data.name}\nБизнес: ${data.business}\nСайт/Instagram: ${data.site || '—'}\nУслуги: ${data.services.join(', ') || '—'}\nБюджет: ${data.budget || '—'}\nWhatsApp: ${data.whatsapp}`;
+    const text = `Заявка с сайта\nИмя: ${data.name}\nБизнес: ${data.business}\nWhatsApp: ${data.whatsapp}`;
     window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(text), '_blank', 'noopener'); show(t.wa);
   } else show(t.demo);
 });
