@@ -175,7 +175,7 @@ footer{padding:32px 0 48px;font-size:13.5px;color:var(--muted)}
   <div class="wrap bar">
     <a class="logo" href="#top"><i></i>Körin</a>
     <nav aria-label="Меню"><a href="#demo">Демо</a><a href="#how">Как работает</a><a href="#what">Что измеряем</a><a href="#price">Тарифы</a></nav>
-    <a class="btn btn-blue btn-sm" href="#start">Получить отчёт</a>
+    <a class="btn btn-blue btn-sm" href="app/">Открыть кабинет</a>
   </div>
 </header>
 
@@ -188,9 +188,9 @@ footer{padding:32px 0 48px;font-size:13.5px;color:var(--muted)}
     <form class="check rv" style="--d:.18s" id="checkForm">
       <label class="field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg>
         <input id="company" type="text" maxlength="40" required placeholder="Название вашей компании" aria-label="Название вашей компании"></label>
-      <button class="btn btn-blue">Посмотреть пример отчёта</button>
+      <button class="btn btn-blue">Попробовать бесплатно</button>
     </form>
-    <p class="note rv" style="--d:.22s">Покажем демо-отчёт с вашим названием. Настоящие цифры — после заявки.</p>
+    <p class="note rv" style="--d:.22s">Откроется демо-кабинет: вы сами добавите конкурентов и посмотрите отчёт. Цифры в демо условные.</p>
     <div class="engines rv" style="--d:.26s"><span>ChatGPT</span><span>Gemini</span><span>Perplexity</span><span>Русский и казахский</span></div>
 
     <div class="window rv" style="--d:.3s;text-align:left" id="demo">
@@ -342,7 +342,7 @@ $$('[data-eng]').forEach(b => b.addEventListener('click', () => {
 }));
 $('#checkForm').addEventListener('submit', e => {
   e.preventDefault(); const v = $('#company').value.trim(); if (!v) return;
-  company = v; render(); $('#demo').scrollIntoView(); $('#leadForm').business.value = v;
+  location.href = 'app/?company=' + encodeURIComponent(v);
 });
 $('#leadForm').addEventListener('submit', async e => {
   e.preventDefault(); const f = e.target, m = $('#leadMsg');
