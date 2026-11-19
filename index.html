@@ -398,14 +398,13 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
     <div class="foot">
       <div class="links">
         <h4 data-i="ft_h1">Компания</h4>
-        <div>ТОО «Название»</div>
-        <div>БИН 000000000000</div>
-        <span data-i="ft_city">Алматы, Казахстан</span>
+        <div>ТОО «FORGE THE FUTURE»</div>
+        <div>БИН 250640005875</div>
+        <span data-i="ft_city">г. Алматы, пр. Абая, 60</span>
       </div>
       <div class="links">
         <h4 data-i="ft_h2">Контакты</h4>
-        <a href="https://wa.me/" rel="noopener">WhatsApp: +7 700 000 00 00</a>
-        <a href="mailto:hello@example.kz">hello@example.kz</a>
+        <a href="https://wa.me/77076234637" rel="noopener">WhatsApp: +7 707 623 46 37</a>
       </div>
       <div class="links">
         <h4 data-i="ft_h3">Документы</h4>
@@ -440,7 +439,7 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
 <script>
 /* ---------- Настройки: заполнить перед запуском ---------- */
 const CONFIG = {
-  whatsapp: '',  // номер без «+», например 77001234567 — заявка откроется в WhatsApp
+  whatsapp: '77076234637',  // номер без «+», например 77001234567 — заявка откроется в WhatsApp
   endpoint: ''   // или URL, куда отправлять заявку POST-запросом (JSON)
 };
 
@@ -495,7 +494,7 @@ const KZ = {
   l_name:'Атыңыз', l_biz:'Бизнес атауы немесе сайт', l_site:'Сайт немесе Instagram', l_srv:'Қандай қызметтер керек', l_s1:'ChatGPT-дегі жарнама',
   l_bud:'Айлық бюджет', b1:'200 000 ₸ дейін', b2:'200–500 мың ₸', b3:'500 мың – 1 млн ₸', b4:'1 млн ₸ артық', b5:'әзірге білмеймін',
   l_btn:'Өтінім жіберу', l_fine:'Батырманы басу арқылы құпиялылық саясатымен келісесіз.',
-  ft_city:'Алматы, Қазақстан', ft_contract:'Шарт', ft_privacy:'Құпиялылық саясаты',
+  ft_city:'Алматы қ., Абай даңғылы, 60', ft_contract:'Шарт', ft_privacy:'Құпиялылық саясаты',
   ft_disc:'Біз тәуелсіз агенттікпіз және OpenAI-дың ресми серіктесі емеспіз. Сайттағы хат алмасу мысалдары — иллюстрация.',
   ch_name:'Kenes ЖИ-агенті', ch_sub:'Сізде де дәл осылай жұмыс істейді', ch_ph:'Сұрағыңызды жазыңыз…'
 };
@@ -596,7 +595,7 @@ function say(text, who='bot'){
 }
 function reply(q){
   const t = T[lang], s = q.toLowerCase();
-  if((s.match(/\d/g) || []).length >= 10) return CONFIG.endpoint || CONFIG.whatsapp ? t.a_phone : t.a_phone_demo;
+  if((s.match(/\d/g) || []).length >= 10) return CONFIG.endpoint ? t.a_phone : t.a_phone_demo;
   if(/цен|стои|сколько|тариф|баға|қанша|тұрады/.test(s)) return t.a_price;
   if(/аудит|провер|тексер/.test(s)) return t.a_audit;
   if(/гарант|кепіл/.test(s)) return t.a_guar;
