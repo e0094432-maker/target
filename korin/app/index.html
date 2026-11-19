@@ -141,6 +141,8 @@ tr.me td{background:var(--soft);font-weight:700}
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KEY = 'korin-demo-v1';
+const API = '';  // адрес сервера Körin (server/app.py). Пусто — кабинет работает в демо-режиме.
+async function call(path, body){ const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Ошибка сервера'); return d }
 const store = { load(){ try{ return JSON.parse(localStorage.getItem(KEY)) }catch(e){ return null } }, save(v){ try{ localStorage.setItem(KEY, JSON.stringify(v)) }catch(e){} }, clear(){ try{ localStorage.removeItem(KEY) }catch(e){} } };
 
 const ENGINES = [['chatgpt','ChatGPT'],['gemini','Gemini'],['perplexity','Perplexity']];
@@ -226,7 +228,7 @@ function onboarding(){
 }
 
 /* ---------- App ---------- */
-const NAV = [['overview','Обзор'],['questions','Вопросы'],['rivals','Конкуренты'],['sources','Источники'],['site','Сайт для ИИ'],['tasks','Что сделать'],['connectors','Подключения'],['settings','Настройки']];
+const NAV = [['overview','Обзор'],['questions','Вопросы'],['rivals','Конкуренты'],['sources','Источники'],['site','Сайт для ИИ'],['tasks','Что сделать'],['agents','ИИ-агенты'],['connectors','Подключения'],['settings','Настройки']];
 const segHtml = () => `<div class="seg" role="group" aria-label="Нейросеть">${ENGINES.map(([id, n]) => `<button type="button" data-eng="${id}" aria-pressed="${id === engine}">${n}</button>`).join('')}</div>`;
 const E = () => data.eng[engine];
 const ranked = () => data.names.map((n, i) => [n, E().vis[i], i === 0]).sort((a, b) => b[1] - a[1]);
@@ -286,8 +288,9 @@ function viewSite(){
   const checks = [['Файл robots.txt найден и читается', ok()],['Главные страницы открываются без входа и капчи', ok()],['Текст виден без JavaScript', ok()],['Есть страница с ценами', ok()],['Адрес и телефон на сайте совпадают с карточками на картах', ok()],['Страницы открываются быстрее трёх секунд', ok()]];
   const pill = v => v ? '<span class="pill ok">в порядке</span>' : '<span class="pill no">исправить</span>';
   return `<div class="head"><div><h1>Сайт для ИИ</h1><p>Могут ли нейросети прочитать ваш сайт</p></div></div>
-  <div class="banner">Демо-режим. Сайт не проверялся: статусы ниже условные. Настоящая проверка появится после подключения сайта.</div>
-  <div class="cols eq"><div class="box"><h4>Доступ ботов <small>robots.txt</small></h4><div class="tw"><table>${bots.map(b => `<tr><td><b>${b[0]}</b><div class="muted" style="font-size:13px">${b[1]}</div></td><td class="n">${b[2] ? '<span class="pill ok">открыт</span>' : '<span class="pill no">закрыт</span>'}</td></tr>`).join('')}</table></div></div>
+  <form class="add" id="audit" style="margin:0 0 14px"><input class="inp" maxlength="200" value="${esc(st.site || '')}" placeholder="Адрес сайта, например example.kz" aria-label="Адрес сайта" required><button class="btn btn-blue">Проверить сайт</button></form>
+  <div class="banner" id="auditNote">${API ? 'Введите адрес и нажмите «Проверить сайт». Ниже пока условные статусы.' : 'Демо-режим. Сервер проверки ещё не подключён: статусы ниже условные.'}</div>
+  <div class="cols eq" id="auditOut"><div class="box"><h4>Доступ ботов <small>robots.txt</small></h4><div class="tw"><table>${bots.map(b => `<tr><td><b>${b[0]}</b><div class="muted" style="font-size:13px">${b[1]}</div></td><td class="n">${b[2] ? '<span class="pill ok">открыт</span>' : '<span class="pill no">закрыт</span>'}</td></tr>`).join('')}</table></div></div>
   <div class="box"><h4>Проверка страниц</h4><div class="tw"><table>${checks.map(c => `<tr><td>${c[0]}</td><td class="n">${pill(c[1])}</td></tr>`).join('')}</table></div></div></div>`;
 }
 function viewTasks(){
@@ -308,7 +311,31 @@ function viewSettings(){
   <div class="box"><h4>Тариф</h4><p><b>Демо</b> <span class="pill demo">данные условные</span></p><p class="muted" style="margin-top:6px">Настоящие ответы нейросетей появятся после запуска сервиса.</p>
   <h4 style="margin-top:20px">Начать заново</h4><p class="muted" style="margin-bottom:10px">Удалит компанию и конкурентов из этого браузера.</p><button class="btn" id="reset">Сбросить демо</button></div></div>`;
 }
-const VIEWS = { overview: viewOverview, questions: viewQuestions, rivals: viewRivals, sources: viewSources, site: viewSite, tasks: viewTasks, connectors: viewConnectors, settings: viewSettings };
+const AGENT_LIST = [
+  ['why', 'Аналитик', 'Объясняет, почему вас называют реже конкурентов, и даёт три первых шага.'],
+  ['plan', 'Планировщик', 'Составляет план работ на четыре недели по данным кабинета.'],
+  ['faq', 'Редактор сайта', 'Пишет страницу «Вопросы и ответы» под вопросы, на которых вас не называют.'],
+  ['review', 'Менеджер отзывов', 'Готовит сообщения клиентам с просьбой оставить отзыв на нужной площадке.'],
+  ['bio', 'SMM-агент', 'Переписывает описание профиля в Instagram так, чтобы нейросеть понимала нишу и город.'],
+  ['compare', 'Агент сравнения', 'Составляет страницу сравнения с лидером ниши без оценок конкурента.']
+];
+function viewAgents(){
+  const runs = st.runs || [];
+  return `<div class="head"><div><h1>ИИ-агенты</h1><p>Каждый агент видит данные кабинета и делает одну работу</p></div></div>
+  <div class="banner">${API ? 'Агенты подключены к серверу. Результат — черновик: проверьте его перед публикацией.' : 'Демо-режим. Сервер с нейросетью ещё не подключён: агенты отвечают по шаблонам.'}</div>
+  <div class="conns">${AGENT_LIST.map(a => `<div class="conn"><div class="ic">${a[1].slice(0, 1)}</div><div><h4>${a[1]}</h4><p>${a[2]}</p><button class="btn btn-sm btn-blue" data-agent="${a[0]}">Запустить</button></div></div>`).join('')}</div>
+  <div class="box" style="margin-top:12px"><h4>История запусков <small>${runs.length}</small></h4>${runs.length ? runs.slice(0, 8).map(r => `<div class="q" style="padding:9px 0;border-top:1px solid var(--line)">${esc(r.n)}<small>${new Date(r.t).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })} · ${r.live ? 'нейросеть' : 'шаблон'}</small></div>`).join('') : '<p class="muted">Пока ни одного запуска.</p>'}</div>`;
+}
+function context(){
+  const g = gaps().slice(0, 3).map(x => ({ question: x.q, named_instead: x.who }));
+  return { company: st.company, niche: st.niche, city: st.city, engine, demo_numbers: true, visibility: ranked().map(x => ({ name: x[0], percent: x[1], me: x[2] })), not_named_on: g, top_sources: E().src.slice(0, 3).map(x => x[0]) };
+}
+function renderAudit(d){
+  $('#auditNote').textContent = 'Проверено: ' + d.url;
+  $('#auditOut').innerHTML = `<div class="box"><h4>Доступ ботов <small>robots.txt</small></h4><div class="tw"><table>${d.bots.map(b => `<tr><td><b>${esc(b.bot)}</b><div class="muted" style="font-size:13px">${esc(b.what)}</div></td><td class="n">${b.allowed ? '<span class="pill ok">открыт</span>' : '<span class="pill no">закрыт</span>'}</td></tr>`).join('')}</table></div></div>
+  <div class="box"><h4>Проверка страниц</h4><div class="tw"><table>${d.checks.map(c => `<tr><td>${esc(c.label)}<div class="muted" style="font-size:13px">${esc(c.detail)}</div></td><td class="n">${c.ok ? '<span class="pill ok">в порядке</span>' : '<span class="pill no">исправить</span>'}</td></tr>`).join('')}</table></div></div>`;
+}
+const VIEWS = { overview: viewOverview, questions: viewQuestions, rivals: viewRivals, sources: viewSources, site: viewSite, tasks: viewTasks, agents: viewAgents, connectors: viewConnectors, settings: viewSettings };
 
 function app(){
   const route = (location.hash.replace('#/', '') || 'overview'), cur = VIEWS[route] ? route : 'overview';
@@ -329,6 +356,11 @@ function bind(){
   const aq = $('#addq'); if (aq) aq.onsubmit = e => { e.preventDefault(); const v = aq.querySelector('input').value.trim(); if (!v || data.qs.includes(v)) return; st.custom.push(v); store.save(st); data = build(st); app() };
   const ar = $('#addrv'); if (ar) ar.onsubmit = e => { e.preventDefault(); const v = ar.querySelector('input').value.trim(); if (!v || st.rivals.length >= 5 || [st.company, ...st.rivals].some(x => x.toLowerCase() === v.toLowerCase())) return; st.rivals.push(v); store.save(st); data = build(st); app() };
   const rs = $('#reset'); if (rs) rs.onclick = () => { store.clear(); location.href = location.pathname };
+  $$('[data-agent]').forEach(b => b.onclick = () => { openDrawer(); ask(AI[b.dataset.agent].q) });
+  const au = $('#audit'); if (au) au.onsubmit = async e => { e.preventDefault(); const v = au.querySelector('input').value.trim(); st.site = v; store.save(st);
+    if (!API) { $('#auditNote').textContent = 'Демо-режим. Сервер проверки ещё не подключён, поэтому сайт ' + v + ' не проверялся: статусы ниже условные.'; return }
+    $('#auditNote').textContent = 'Проверяем ' + v + '…';
+    try { renderAudit(await call('/api/site-audit', { url: v })) } catch (err) { $('#auditNote').textContent = 'Не получилось проверить: ' + err.message } };
   $('#fab').onclick = openDrawer; $('#dclose').onclick = () => $('#drawer').classList.remove('open');
   $('#dform').onsubmit = e => { e.preventDefault(); const v = $('#dinp').value.trim(); if (v) { $('#dinp').value = ''; ask(v) } };
   $('#quick').innerHTML = Object.values(AI).map(a => `<button type="button">${esc(a.q)}</button>`).join('');
@@ -341,6 +373,7 @@ const AI = {
   faq: { q: 'Напиши ответы на вопросы для сайта', a: () => `Черновик для страницы «Вопросы и ответы»:\n\n1. Чем занимается ${st.company}?\n${st.company} — ${st.niche} в городе ${st.city}. [добавьте, сколько лет работаете и для кого]\n\n2. Сколько это стоит?\n[впишите цены или диапазон — нейросеть называет компании, у которых цены указаны]\n\n3. Где вы находитесь и как записаться?\n[адрес, телефон, часы работы]\n\nКвадратные скобки заполните своими фактами.` },
   review: { q: 'Как попросить клиентов оставить отзыв', a: () => `Сообщение клиенту:\n\n«Здравствуйте! Спасибо, что выбрали ${st.company}. Если вам всё понравилось, оставьте, пожалуйста, короткий отзыв на ${E().src[0][0]} — это занимает минуту и очень нам помогает. [ссылка на карточку]»\n\nОтправляйте сразу после оказания услуги.` },
   bio: { q: 'Перепиши описание для Instagram', a: () => `Вариант описания профиля:\n\n${st.company} · ${st.niche}\n📍 ${st.city}, [адрес]\n[главное отличие в 4–6 словах]\nЗапись: [телефон или ссылка]\n\nВажно, чтобы ниша и город были написаны словами, а не только в хэштегах.` },
+  plan: { q: 'Составь план на четыре недели', a: () => `План для «${st.company}»:\n\nНеделя 1. Открыть сайт ботам нейросетей и выровнять адрес, телефон и часы работы на всех площадках.\nНеделя 2. Переписать главные страницы: вопрос в заголовке, ответ в первом абзаце, цены и факты.\nНеделя 3. Собрать отзывы на ${E().src[0][0]} и попасть на ${E().src[1][0]}.\nНеделя 4. Повторить замер и сравнить с конкурентами.` },
   compare: { q: 'Чем мы отличаемся от лидера', a: () => { const r = ranked().find(x => !x[2]); return `План страницы «${st.company} и ${r[0]}: в чём разница»:\n\n1. Для кого подходим мы, для кого они.\n2. Цены и что входит.\n3. Чем мы объективно отличаемся: [3 факта].\n4. Отзывы клиентов.\n\nПишите только проверяемые факты и без оценок конкурента.` } }
 };
 function openDrawer(){ $('#drawer').classList.add('open'); if (!$('#db').children.length) say(`Здравствуйте! Я вижу данные кабинета «${st.company}» и могу объяснить цифры или подготовить текст. Это демо: ответы собраны по шаблонам.`) }
@@ -348,7 +381,10 @@ function say(t, u){ const d = document.createElement('div'); d.className = 'm' +
 function ask(q){
   say(q, true); const s = q.toLowerCase();
   const k = Object.keys(AI).find(k => AI[k].q === q) || (/почему|не назыв/.test(s) ? 'why' : /faq|вопрос|сайт/.test(s) ? 'faq' : /отзыв/.test(s) ? 'review' : /инст|описан|bio/.test(s) ? 'bio' : /отлич|сравн|лидер|конкурент/.test(s) ? 'compare' : null);
-  setTimeout(() => say(k ? AI[k].a() : 'В демо я отвечаю на пять тем: почему вас не называют, ответы на вопросы для сайта, отзывы, описание для Instagram и отличия от лидера. Выберите одну из кнопок ниже.'), 400);
+  const demo = () => say(k ? AI[k].a() : 'В демо я отвечаю на шесть тем. Выберите одну из кнопок ниже.');
+  const log = live => { if (!k) return; st.runs = [{ n: AI[k].q, t: Date.now(), live }, ...(st.runs || [])].slice(0, 30); store.save(st) };
+  if (!API || !k) { setTimeout(() => { demo(); log(false) }, 400); return }
+  call('/api/agent', { task: k, question: q, context: context() }).then(d => { say(d.text); log(true) }).catch(err => { say('Нейросеть сейчас недоступна (' + err.message + '). Показываю ответ по шаблону.'); demo(); log(false) });
 }
 
 addEventListener('hashchange', () => { if (st.ready) app() });

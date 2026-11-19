@@ -63,3 +63,16 @@ SQLite в `data/aiintel.db`. Таблицы повторяют сущности 
 ```bash
 python3 -m unittest discover -s tests
 ```
+
+## Körin: приложение и сервер
+
+- `korin/` — сайт продукта, `korin/app/` — кабинет. Без сервера кабинет работает в демо-режиме на условных цифрах.
+- `server/app.py` — сервер без сторонних пакетов. Три адреса: `/api/site-audit` (настоящая проверка сайта: robots.txt для ботов нейросетей и главная страница), `/api/check` (опрос нейросети по вопросам) и `/api/agent` (ИИ-агенты). Два последних требуют `OPENAI_API_KEY` с положительным балансом.
+
+Запуск:
+
+```bash
+PORT=8000 KORIN_ORIGINS=https://kenesai.asia python3 -m server.app
+```
+
+Чтобы кабинет ходил на сервер, впишите его адрес в `const API` в начале скрипта `korin/app/index.html`.
