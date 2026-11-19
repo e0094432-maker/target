@@ -226,7 +226,7 @@ function onboarding(){
 }
 
 /* ---------- App ---------- */
-const NAV = [['overview','Обзор'],['questions','Вопросы'],['rivals','Конкуренты'],['sources','Источники'],['tasks','Что сделать'],['connectors','Подключения'],['settings','Настройки']];
+const NAV = [['overview','Обзор'],['questions','Вопросы'],['rivals','Конкуренты'],['sources','Источники'],['site','Сайт для ИИ'],['tasks','Что сделать'],['connectors','Подключения'],['settings','Настройки']];
 const segHtml = () => `<div class="seg" role="group" aria-label="Нейросеть">${ENGINES.map(([id, n]) => `<button type="button" data-eng="${id}" aria-pressed="${id === engine}">${n}</button>`).join('')}</div>`;
 const E = () => data.eng[engine];
 const ranked = () => data.names.map((n, i) => [n, E().vis[i], i === 0]).sort((a, b) => b[1] - a[1]);
@@ -244,7 +244,7 @@ function viewOverview(){
   <div class="cols"><div class="box"><h4>Кого называет нейросеть <small>доля ответов</small></h4>${r.map(x => `<div class="row${x[2] ? ' me' : ''}"><span>${esc(x[0])}</span><u><i style="width:${x[1]}%"></i></u><em>${x[1]}%</em></div>`).join('')}</div>
   <div class="box"><h4>Ваша видимость <small>6 месяцев</small></h4><svg class="trend" viewBox="0 0 320 150" preserveAspectRatio="none" role="img" aria-label="График видимости"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2355ff" stop-opacity=".22"/><stop offset="1" stop-color="#2355ff" stop-opacity="0"/></linearGradient></defs><path d="${line} L${pts[5][0]} 118 L${pts[0][0]} 118 Z" fill="url(#g)"/><path d="${line}" fill="none" stroke="#2355ff" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>${pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1].toFixed(1)}" r="3.5" fill="#fff" stroke="#2355ff" stroke-width="2"/><text x="${p[0]}" y="${(p[1] - 10).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0b1437">${t[i]}%</text><text x="${p[0]}" y="140" text-anchor="middle" font-size="10.5" fill="#5d6785">${mo[i]}</text>`).join('')}</svg></div></div>
   <div class="cols eq"><div class="box"><h4>Где вас не называют <small><a href="#/questions" style="color:var(--blue);font-weight:700">все вопросы</a></small></h4>${g.length ? g.slice(0, 3).map(x => `<div class="q" style="padding:9px 0">${esc(x.q)}<small>вместо вас: <b>${esc(x.who.join(', '))}</b></small></div>`).join('') : '<p class="muted">Таких вопросов нет.</p>'}</div>
-  <div class="box"><h4>Что сделать сначала <small><a href="#/tasks" style="color:var(--blue);font-weight:700">все задачи</a></small></h4>${tasks().slice(0, 2).map(t => `<div class="q" style="padding:9px 0"><b>${esc(t.t)}</b><small>${esc(t.d)}</small></div>`).join('')}</div></div>`;
+  <div class="box"><h4>Что сделать сначала <small><a href="#/tasks" style="color:var(--blue);font-weight:700">все задачи</a></small></h4>${tasks().slice(0, 3).map(t => `<div class="q" style="padding:9px 0"><b>${esc(t.t)}</b><small>${esc(t.d)}</small></div>`).join('')}</div></div>`;
 }
 function viewQuestions(){
   return `<div class="head"><div><h1>Вопросы</h1><p>Что спрашивают клиенты и называет ли вас нейросеть</p></div></div>
@@ -267,17 +267,31 @@ function viewSources(){
   <p class="muted" style="font-size:13.5px">Хорошо ${e.tone[0]}% · нейтрально ${e.tone[1]}% · плохо ${e.tone[2]}%</p><p style="font-size:14px;margin-top:14px">Чем больше о вас написано на сайтах слева, тем чаще нейросеть вас называет. Начните с первого в списке.</p></div></div>`;
 }
 function tasks(){
-  const top = E().src[0][0], g = gaps()[0], lead = ranked().find(x => !x[2]);
+  const src = E().src, g = gaps()[0], lead = ranked().find(x => !x[2]);
   return [
-    { id: 'faq', t: 'Добавить на сайт страницу с ответами на вопросы клиентов', d: g ? `Нейросеть не называет вас на вопрос «${g.q}». Ей не из чего взять ответ.` : 'Так нейросети проще найти факты о вас.', ai: 'faq' },
-    { id: 'src', t: `Обновить карточку и собрать отзывы на ${top}`, d: 'Отсюда нейросеть берёт больше всего ответов в вашей нише.', ai: 'review' },
+    { id: 'bots', t: 'Открыть сайт для ботов нейросетей', d: 'Если бот закрыт в robots.txt, нейросеть не может прочитать ваши страницы. Проверка — в разделе «Сайт для ИИ».', ai: null },
+    { id: 'faq', t: 'Переписать главные страницы: вопрос в заголовке, ответ в первом абзаце', d: g ? `Нейросеть не называет вас на вопрос «${g.q}». Ей не из чего взять ответ.` : 'Так нейросети проще найти ответ на вашем сайте.', ai: 'faq' },
+    { id: 'facts', t: 'Добавить цифры с источником и датой, кейсы и отзывы с именами', d: 'В исследованиях это даёт самый большой прирост видимости. Ключевые слова набивать не нужно.', ai: null },
+    { id: 'nap', t: 'Выровнять название, адрес, телефон и часы работы на всех площадках', d: 'Если данные расходятся, нейросеть может назвать устаревшие.', ai: null },
+    { id: 'src', t: `Обновить карточку и собрать отзывы на ${src[0][0]}`, d: 'Отсюда нейросеть берёт больше всего ответов в вашей нише.', ai: 'review' },
+    { id: 'out', t: `Попасть на площадки, которые цитирует нейросеть: ${src[1][0]}, ${src[2][0]}`, d: 'Обзоры, рейтинги и комментарии экспертов там, где уже есть конкуренты.', ai: null },
     { id: 'ig', t: 'Переписать описание профиля в Instagram', d: 'В описании должно быть прямо сказано, чем вы занимаетесь и в каком городе.', ai: 'bio' },
     { id: 'cmp', t: lead ? `Сделать страницу «Чем мы отличаемся от ${lead[0]}»` : 'Сделать страницу с вашими отличиями', d: 'На вопросы со сравнением нейросеть отвечает по таким страницам.', ai: 'compare' },
-    { id: 'nap', t: 'Проверить адрес, телефон и часы работы на всех площадках', d: 'Если данные расходятся, нейросеть может назвать устаревшие.', ai: null }
+    { id: 'again', t: 'Повторять замер каждую неделю', d: 'Сравнивайте с конкурентами: если выросли все, это движение рынка, а не ваш результат.', ai: null }
   ];
 }
+function viewSite(){
+  const r = rng('site' + st.company), ok = () => r() > .35;
+  const bots = [['OAI-SearchBot','поиск в ChatGPT'],['GPTBot','обучение моделей OpenAI'],['ChatGPT-User','когда человек просит ChatGPT открыть страницу'],['PerplexityBot','Perplexity'],['Google-Extended','Gemini'],['ClaudeBot','Claude']].map(b => [...b, ok()]);
+  const checks = [['Файл robots.txt найден и читается', ok()],['Главные страницы открываются без входа и капчи', ok()],['Текст виден без JavaScript', ok()],['Есть страница с ценами', ok()],['Адрес и телефон на сайте совпадают с карточками на картах', ok()],['Страницы открываются быстрее трёх секунд', ok()]];
+  const pill = v => v ? '<span class="pill ok">в порядке</span>' : '<span class="pill no">исправить</span>';
+  return `<div class="head"><div><h1>Сайт для ИИ</h1><p>Могут ли нейросети прочитать ваш сайт</p></div></div>
+  <div class="banner">Демо-режим. Сайт не проверялся: статусы ниже условные. Настоящая проверка появится после подключения сайта.</div>
+  <div class="cols eq"><div class="box"><h4>Доступ ботов <small>robots.txt</small></h4><div class="tw"><table>${bots.map(b => `<tr><td><b>${b[0]}</b><div class="muted" style="font-size:13px">${b[1]}</div></td><td class="n">${b[2] ? '<span class="pill ok">открыт</span>' : '<span class="pill no">закрыт</span>'}</td></tr>`).join('')}</table></div></div>
+  <div class="box"><h4>Проверка страниц</h4><div class="tw"><table>${checks.map(c => `<tr><td>${c[0]}</td><td class="n">${pill(c[1])}</td></tr>`).join('')}</table></div></div></div>`;
+}
 function viewTasks(){
-  return `<div class="head"><div><h1>Что сделать</h1><p>Действия, которые повышают шанс, что нейросеть вас назовёт</p></div></div>
+  return `<div class="head"><div><h1>Что сделать</h1><p>План по шагам. Отмечайте, что уже готово</p></div></div>
   <div class="box">${tasks().map(t => `<div class="task${st.done[t.id] ? ' done' : ''}"><input type="checkbox" data-task="${t.id}" ${st.done[t.id] ? 'checked' : ''} aria-label="Готово"><div><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p>${t.ai ? `<button class="btn btn-sm" data-ai="${t.ai}">Сделать с помощником</button>` : ''}</div></div>`).join('')}</div>
   <div class="agency"><div><h2>Нет времени делать самим?</h2><p>Агентство Kenes AI выполнит эти задачи за вас и запустит рекламу в ChatGPT.</p></div><a class="btn btn-blue" href="https://kenesai.asia/#lead">Позвать агентство</a></div>`;
 }
@@ -294,7 +308,7 @@ function viewSettings(){
   <div class="box"><h4>Тариф</h4><p><b>Демо</b> <span class="pill demo">данные условные</span></p><p class="muted" style="margin-top:6px">Настоящие ответы нейросетей появятся после запуска сервиса.</p>
   <h4 style="margin-top:20px">Начать заново</h4><p class="muted" style="margin-bottom:10px">Удалит компанию и конкурентов из этого браузера.</p><button class="btn" id="reset">Сбросить демо</button></div></div>`;
 }
-const VIEWS = { overview: viewOverview, questions: viewQuestions, rivals: viewRivals, sources: viewSources, tasks: viewTasks, connectors: viewConnectors, settings: viewSettings };
+const VIEWS = { overview: viewOverview, questions: viewQuestions, rivals: viewRivals, sources: viewSources, site: viewSite, tasks: viewTasks, connectors: viewConnectors, settings: viewSettings };
 
 function app(){
   const route = (location.hash.replace('#/', '') || 'overview'), cur = VIEWS[route] ? route : 'overview';

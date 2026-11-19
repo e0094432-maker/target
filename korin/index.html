@@ -129,7 +129,7 @@ svg.trend{width:100%;height:150px;display:block}
 .steps .card::before{content:counter(s);width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;margin-bottom:16px}
 .white{background:var(--white);border-block:1px solid var(--line)}
 .price{display:flex;flex-direction:column}
-.price b{display:block;font-size:44px;line-height:1;letter-spacing:-.05em;font-weight:900;margin-top:14px}
+.price b{display:block;font-size:34px;line-height:1;letter-spacing:-.05em;font-weight:900;margin-top:14px}
 .price b small{font-size:15px;font-weight:500;color:var(--muted);letter-spacing:0}
 .price ul{list-style:none;padding:0;margin:20px 0 24px;display:grid;gap:10px;font-size:15px;flex:1}
 .price li{padding-left:26px;position:relative}
@@ -259,14 +259,26 @@ footer{padding:32px 0 48px;font-size:13.5px;color:var(--muted)}
   </div>
 </section>
 
-<section id="price">
+<section id="why">
+  <div class="wrap center">
+    <span class="tag rv">Почему Körin</span>
+    <h2 class="rv">Сделан для Казахстана, а не переведён</h2>
+    <div class="grid g3">
+      <div class="card rv"><div class="ico">KZ</div><h3>Русский и казахский</h3><p>Вопросы, отчёты и кабинет на двух языках. Зарубежные сервисы про Казахстан не пишут ничего.</p></div>
+      <div class="card rv" style="--d:.08s"><div class="ico">₸</div><h3>Цены и оплата в тенге</h3><p>Счёт для ТОО и ИП, без долларовой карты.</p></div>
+      <div class="card rv" style="--d:.16s"><div class="ico">2G</div><h3>Местные площадки</h3><p>2ГИС, Instagram и казахстанские сайты: именно оттуда нейросети берут ответы про местный бизнес.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="price" style="padding-top:0">
   <div class="wrap center">
     <span class="tag rv">Тарифы</span>
     <h2 class="rv">Подписка на месяц</h2>
     <div class="grid g3">
-      <div class="card price rv"><h3>Старт</h3><b>$99<small> /мес</small></b><ul><li>1 компания</li><li>Одна нейросеть</li><li>Отчёт раз в месяц</li></ul><a class="btn" href="#start">Выбрать</a></div>
-      <div class="card price hot rv" style="--d:.08s"><h3>Профи</h3><b>$299<small> /мес</small></b><ul><li>1 компания и 5 конкурентов</li><li>ChatGPT, Gemini, Perplexity</li><li>Источники и рекомендации</li><li>Отчёт каждую неделю</li></ul><a class="btn btn-blue" href="#start">Выбрать</a></div>
-      <div class="card price rv" style="--d:.16s"><h3>Компания</h3><b>$799<small>+ /мес</small></b><ul><li>Несколько брендов</li><li>Выгрузка данных и API</li><li>Личный аналитик</li></ul><a class="btn" href="#start">Обсудить</a></div>
+      <div class="card price rv"><h3>Старт</h3><b>49 000 ₸<small> /мес</small></b><ul><li>1 компания</li><li>Одна нейросеть</li><li>Помощник и план действий</li><li>Отчёт раз в месяц</li></ul><a class="btn" href="#start">Выбрать</a></div>
+      <div class="card price hot rv" style="--d:.08s"><h3>Профи</h3><b>149 000 ₸<small> /мес</small></b><ul><li>1 компания и 5 конкурентов</li><li>ChatGPT, Gemini, Perplexity</li><li>Источники и проверка сайта для ИИ</li><li>Подключения: Instagram, 2ГИС, карты</li><li>Отчёт каждую неделю</li></ul><a class="btn btn-blue" href="#start">Выбрать</a></div>
+      <div class="card price rv" style="--d:.16s"><h3>Компания</h3><b>от 399 000 ₸<small> /мес</small></b><ul><li>Несколько брендов</li><li>Выгрузка данных и API</li><li>Личный аналитик</li></ul><a class="btn" href="#start">Обсудить</a></div>
     </div>
     <p class="note">Цены предварительные. Сервис в разработке, первые отчёты готовим вручную.</p>
   </div>
@@ -342,7 +354,7 @@ $$('[data-eng]').forEach(b => b.addEventListener('click', () => {
 }));
 $('#checkForm').addEventListener('submit', e => {
   e.preventDefault(); const v = $('#company').value.trim(); if (!v) return;
-  location.href = 'app/?company=' + encodeURIComponent(v);
+  location.href = 'app/index.html?company=' + encodeURIComponent(v);
 });
 $('#leadForm').addEventListener('submit', async e => {
   e.preventDefault(); const f = e.target, m = $('#leadMsg');
