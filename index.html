@@ -568,6 +568,9 @@ $('#theme').addEventListener('click', () => {
 });
 const savedTheme = store.get('theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme;
 
+/* откуда пришёл посетитель: метка из рекламной ссылки, иначе сайт-источник */
+const SOURCE = (new URLSearchParams(location.search).get('utm_source') || (document.referrer ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
+
 /* заявка */
 const leadMsg = $('#leadMsg');
 $('#leadForm').addEventListener('submit', async e => {
@@ -576,7 +579,7 @@ $('#leadForm').addEventListener('submit', async e => {
   const show = m => { leadMsg.textContent = m; leadMsg.classList.add('show') };
   if(!f.name.value.trim() || !f.business.value.trim() || !f.whatsapp.value.trim()) return show(t.required);
   const data = {
-    name: f.name.value.trim(), business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang
+    name: f.name.value.trim(), business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang: lang + ' · ' + SOURCE
   };
   if(CONFIG.sheet){
     // text/plain без своих заголовков: иначе браузер шлёт предварительный запрос, который Apps Script не принимает
