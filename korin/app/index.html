@@ -476,7 +476,7 @@ const gaps = () => data.qs.map((q, qi) => { const who = new Set(), me = engs().s
 const sources = () => { const m = {}; engs().forEach(e => data.eng[e].src.forEach(([d, n]) => m[d] = (m[d] || 0) + n)); return Object.entries(m).sort((a, b) => b[1] - a[1]) };
 const meta = () => data.sample ? 'пример · вымышленные компании' : `${total()} ответов · ${data.qs.length} вопросов · ${new Date(data.at).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
 const segHtml = () => data.engines.length < 2 ? '' : `<div class="seg" role="group" aria-label="Нейросеть">${['all', ...data.engines].map(e => `<button type="button" data-eng="${e}" aria-pressed="${e === engine}">${e === 'all' ? 'Все' : ENG[e]}</button>`).join('')}</div>`;
-const banner = () => data.sample ? `<div class="note">Пример кабинета на вымышленной школе «Hello Kids». ${st.company ? `Замер для «${esc(st.company)}» появится, когда сервис начнёт опрашивать нейросети.` : ''}</div>` : '';
+const banner = () => data.sample ? `<div class="note">Пример кабинета на вымышленной школе «Hello Kids». ${AI ? `Нейросеть подключена: можно сделать настоящий замер для «${esc(st.company)}». <button class="btn btn-p" data-run="watch" style="margin-left:8px">Запустить настоящий замер</button>` : st.company ? `Замер для «${esc(st.company)}» появится, когда сервис начнёт опрашивать нейросети.` : ''}</div>` : '';
 const me = () => data.sample ? (st.company || 'Ваша компания') : data.label;
 const agentOn = id => st.agents[id] !== false;
 const connected = id => !!st.conn[id];
@@ -655,6 +655,7 @@ async function doAudit(step, pause){
 async function doWatch(step, pause){
   if (!AI) { step('Нейросеть ещё не подключена к серверу', false); await pause(); return { kind: 'tpl', text: 'Замер — это 10 вопросов ваших клиентов, которые я задаю нейросети и считаю, кого она назвала.\n\nЗапущу его, как только к серверу подключат нейросеть. Выдумывать цифры для вашей компании я не буду, поэтому сейчас в кабинете пример.' } }
   step(`Задаю нейросети 10 вопросов про «${st.niche}», ${st.city}`);
+  step('Это занимает одну–три минуты, не закрывайте страницу');
   const r = await call('/api/check', { company: st.company, rivals: st.rivals, city: st.city, questions: questionsFor() });
   st.real = { ...r, at: Date.now() }; store.save(st); load();
   step('Считаю, кого назвали в ответах');
