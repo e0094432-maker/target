@@ -329,6 +329,66 @@ main.fx .in{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:cal
   .mate{flex:none}
   .head h1{font-size:32px}
 }
+
+/* ---------- agents: a working chat ---------- */
+.desk{display:grid;gap:16px;min-width:0}
+.roster{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 10px;margin:-6px -2px 0;min-width:0}
+.ro{flex:none;display:flex;align-items:center;gap:12px;padding:8px 14px 8px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:border-color .2s,background .2s}
+.ro b{display:block;font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap}
+.ro small{display:none;font-size:12px;color:var(--muted)}
+.ro:hover{border-color:var(--line2)}
+.ro.on{border-color:transparent;background:var(--hero);box-shadow:inset 0 0 0 1px var(--line2),0 16px 40px -24px rgba(124,92,255,.9)}
+.chat{display:flex;flex-direction:column;min-width:0;min-height:calc(100dvh - 260px)}
+.ch{display:flex;align-items:center;gap:16px;padding:4px 2px 18px;border-bottom:1px solid var(--line)}
+.ch>div{flex:1;min-width:0}
+.ch h1{font-size:20px}
+.ch p{font-size:13.5px;color:var(--muted);margin-top:4px}
+.thread{flex:1;display:grid;gap:22px;align-content:start;padding:24px 0}
+.hello{display:grid;justify-items:center;text-align:center;gap:14px;padding:5vh 0 2vh}
+.hello .orb{width:92px;height:92px;animation:obr 4.5s ease-in-out infinite}.hello .orb::before{inset:-11px;animation-duration:6s}.hello .orb svg.i{width:36px;height:36px;stroke-width:1.5}
+.hello h2{font-size:19px;margin-top:10px}
+.hello p{max-width:440px;color:var(--muted);font-size:15px}
+.msg{display:flex;gap:14px;min-width:0;animation:rise .45s both}
+.msg.u{justify-content:flex-end}
+.msg.u p{max-width:min(560px,86%);background:var(--g);color:#fff;border-radius:18px 18px 4px 18px;padding:11px 16px;font-size:15px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 12px 30px -16px var(--glow)}
+.msg.a .orb{margin-top:6px}
+.bub{flex:1;min-width:0;max-width:720px;display:grid;gap:12px;border:1px solid var(--line);border-radius:4px 18px 18px 18px;background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);padding:16px 18px}
+.txt{font-size:15px;line-height:1.6;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+.steps{list-style:none;margin:0;padding:0 0 12px;display:grid;gap:7px;font:400 12.5px var(--mono);color:var(--muted);border-bottom:1px dashed var(--line)}
+.steps li{display:flex;gap:9px;align-items:baseline;animation:rise .4s both}
+.steps li::before{content:"✓";color:#4cc9ff;flex:none}
+.steps li.no::before{content:"!";color:var(--warn)}
+.bub.live .steps{border:0;padding:0}
+.dots3{display:flex;gap:5px;align-items:center;height:18px}
+.dots3 i{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:blink 1.2s infinite}
+.dots3 i:nth-child(2){animation-delay:.2s}.dots3 i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1.15)}}
+.msg.a.work .orb{animation:obr 1.2s ease-in-out infinite}.msg.a.work .orb::before{animation-duration:1s}
+.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.meta .btn{height:30px;font-size:13px;padding:0 10px}
+.chk{display:grid;gap:8px;font-size:14.5px}
+.chk h4{font-size:13px;color:var(--muted);font-weight:500;margin-top:4px}
+.chk div{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line)}
+.chk small{display:block;font-size:12.5px;color:var(--muted)}
+.asks{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:12px}
+.asks button{border:1px solid var(--line2);background:var(--sub);color:var(--ink);border-radius:999px;padding:8px 14px;font-size:13.5px;font-weight:500;text-align:left;transition:border-color .2s,transform .2s}
+.asks button:hover{border-color:var(--acc);transform:translateY(-1px)}
+.composer{position:sticky;bottom:74px;z-index:5;display:flex;gap:10px;align-items:flex-end;border:1px solid var(--line2);border-radius:20px;padding:10px 10px 10px 18px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 24px 60px -30px rgba(124,92,255,.95);transition:border-color .2s,box-shadow .2s}
+.composer:focus-within{border-color:var(--acc);box-shadow:0 0 0 4px var(--acc-bg),0 24px 60px -30px rgba(124,92,255,.95)}
+.composer textarea,.composer input{flex:1;min-width:0;border:0;background:none;outline:none;resize:none;font-size:15.5px;line-height:1.5;padding:7px 0;max-height:160px;color:var(--ink)}
+.composer textarea::placeholder,.composer input::placeholder{color:var(--dim)}
+.composer .btn{height:40px;border-radius:13px;flex:none}
+.composer.home{position:static;margin-top:14px}
+.stat{font:400 12px var(--mono);color:var(--muted);padding:10px 4px 0;display:flex;gap:8px;align-items:center}
+@media (min-width:1000px){
+  .desk{grid-template-columns:270px minmax(0,1fr);gap:28px;align-items:start}
+  .roster{position:sticky;top:88px;flex-direction:column;overflow:visible;gap:4px;padding:0;margin:0}
+  .ro{border-radius:16px;border-color:transparent;background:none;backdrop-filter:none;padding:10px 12px}
+  .ro small{display:block;margin-top:2px}
+  .ro:hover{background:var(--sub);border-color:transparent}
+  .composer{bottom:18px}
+  .chat{min-height:calc(100dvh - 130px)}
+}
 </style>
 </head>
 <body>
@@ -340,7 +400,8 @@ main.fx .in{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:cal
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const KEY = 'korin-v3';
-const API = '';  // адрес сервера Körin (server/app.py). Пусто — кабинет показывает пример.
+const API = 'https://korin-api.onrender.com';  // сервер Körin (server/app.py)
+let AI = false, SRV = false;  // SRV: сервер ответил; AI: на сервере есть ключ нейросети
 const store = { load(){ try{ return JSON.parse(localStorage.getItem(KEY)) }catch(e){ return null } }, save(v){ try{ localStorage.setItem(KEY, JSON.stringify(v)) }catch(e){} }, clear(){ try{ localStorage.removeItem(KEY) }catch(e){} } };
 async function call(path, body){ const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Ошибка сервера'); return d }
 
@@ -401,6 +462,7 @@ function sample(){
 function fromReal(r){ return { names: r.names, qs: r.questions, engines: ['chatgpt'], sample: false, label: r.names[0], at: r.at, eng: { chatgpt: { grid: r.grid.map(g => g || r.names.map(() => false)), answers: r.answers || [], src: r.sources || [], model: r.model || 'ChatGPT' } } } }
 
 let st = store.load(), engine = 'all', data;
+fetch(API + '/api/health').then(r => r.json()).then(d => { SRV = true; AI = !!d.ai; if (st && st.ready) render() }).catch(() => {});
 const param = new URLSearchParams(location.search).get('company');
 if (!st) st = { company: param ? param.slice(0, 40) : '', niche: '', city: 'Алматы', rivals: [], conn: {}, notify: {}, agents: {}, runs: [], done: {}, ready: false, step: 1 };
 const load = () => { data = st.real ? fromReal(st.real) : sample(); if (engine !== 'all' && !data.engines.includes(engine)) engine = 'all'; if (data.engines.length < 2) engine = data.engines[0] };
@@ -433,7 +495,7 @@ function onboarding(){
     <div class="field"><label for="o4">Название конкурента</label><div class="add"><input class="inp" id="o4" maxlength="40" placeholder="Например, Lingua Plus"><button class="btn" id="addr" style="height:38px">Добавить</button></div></div>
     <div class="chips">${st.rivals.map((r, i) => `<span>${esc(r)}<button data-del="${i}" aria-label="Убрать">×</button></span>`).join('')}</div>
     <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="next">Дальше</button></div>`;
-  if (s === 3) b = API ? `<h1>Запускаем первый замер</h1><p class="muted" style="margin-top:8px">Зададим ChatGPT 10 вопросов про «${esc(st.niche)}» в городе ${esc(st.city)}. Это займёт пару минут.</p>
+  if (s === 3) b = AI ? `<h1>Запускаем первый замер</h1><p class="muted" style="margin-top:8px">Зададим нейросети 10 вопросов про «${esc(st.niche)}» в городе ${esc(st.city)}. Это займёт пару минут.</p>
     <div class="prog"><i id="pg"></i></div><p class="muted" id="pgt">Готово к запуску</p>
     <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="run">Запустить замер</button></div>`
     : `<h1>Замер пока не запущен</h1><p style="margin-top:10px">Сервис ещё не опрашивает нейросети, поэтому настоящих цифр для «${esc(st.company)}» нет. Выдумывать их мы не будем.</p><p class="muted" style="margin-top:10px">Покажем пример кабинета на вымышленной школе: агенты, коннекторы и отчёт выглядят так же.</p>
@@ -451,8 +513,8 @@ function onboarding(){
   }
   if (s === 3) $('#run').onclick = async () => {
     const done = () => { st.ready = true; store.save(st); load(); location.hash = '#/overview'; app() };
-    if (!API) return done();
-    $('#run').disabled = true; $('#pg').style.width = '35%'; $('#pgt').textContent = 'Спрашиваем ChatGPT…';
+    if (!AI) return done();
+    $('#run').disabled = true; $('#pg').style.width = '35%'; $('#pgt').textContent = 'Спрашиваем нейросеть…';
     try { const r = await call('/api/check', { company: st.company, rivals: st.rivals, city: st.city, questions: questionsFor() }); st.real = { ...r, at: Date.now() }; $('#pg').style.width = '100%'; done() }
     catch (e) { $('#run').disabled = false; $('#pg').style.width = '0'; $('#pgt').textContent = ''; err('Замер не удался: ' + e.message + ' Можно открыть пример кабинета.'); $('#run').textContent = 'Открыть кабинет'; $('#run').onclick = done }
   };
@@ -476,8 +538,9 @@ function viewOverview(){
   const sug = todos().filter(t => t.agent && !st.done[t.id]).slice(0, 3);
   return `${banner()}<section class="stage in"><div class="core"><i></i><i></i><span class="orb xl">${ic('bot')}</span></div>
     <div class="stage-t"><small>Вас назвали</small><div class="frac"><b data-count="${mine}">${mine}</b><span>из ${total()} ответов</span></div><p class="diag">${diag}</p><div class="stage-b">${segHtml()}<span class="mono">${esc(meta())}</span></div></div></section>
+  <form class="composer home" id="homeask"><input id="hq" maxlength="500" placeholder="Поручите задачу агентам: например, «напиши просьбу об отзыве»" aria-label="Задача для агентов"><button class="btn btn-p">${ic('send')}Поручить</button></form>
   <div class="sect"><h2>Ваша команда агентов</h2><a href="#/agents">Все агенты</a></div>
-  <div class="team">${AGENTS.map((a, i) => `<button type="button" class="mate in" style="--i:${i + 1}" data-run="${a[0]}">${orb(a)}<b>${a[1]}</b><small>${agentOn(a[0]) ? a[3] : 'на паузе'}</small></button>`).join('')}</div>
+  <div class="team">${AGENTS.map((a, i) => `<a class="mate in" style="--i:${i + 1}" href="#/agents/${a[0]}">${orb(a)}<b>${a[1]}</b><small>${agentOn(a[0]) ? a[3] : 'на паузе'}</small></a>`).join('')}</div>
   ${sug.length ? `<div class="sect"><h2>Агенты предлагают</h2><a href="#/tasks">Все задачи</a></div>
   <div class="sugs">${sug.map((t, i) => { const a = AGENTS.find(x => x[0] === t.agent); return `<article class="sug in" style="--i:${i + 4}"><header>${orb(a, 'sm')}<span>${a[1]}</span></header><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p><button class="btn btn-p" data-run="${t.agent}">${ic('play')}Запустить</button></article>` }).join('')}</div>` : ''}
   <div class="sect"><h2>Что отвечают нейросети</h2><a href="#/serp/questions">Все ответы</a></div>
@@ -494,21 +557,36 @@ function viewSerp(tab){
   if (tab === 'sources') { const s = sources(), max = s[0] ? s[0][1] : 1; body = `<div class="box"><h2>Сайты, на которые ссылаются нейросети</h2>${s.length ? s.map(x => `<div class="rank"><span>${esc(x[0])}</span><u><i style="width:${x[1] / max * 100}%;background:var(--acc)"></i></u><em>${x[1]}</em></div>`).join('') : '<p class="muted">В этом замере нейросеть не дала ссылок.</p>'}<p class="muted" style="margin-top:12px;font-size:13.5px">Чем больше о вас написано на сайтах сверху списка, тем чаще нейросеть вас называет. Это наблюдение, а не гарантия.</p></div>` }
   return `${banner()}<div class="head"><div><h1>Ответы нейросетей</h1><p>${esc(meta())}</p></div><span class="sp"></span>${tab === 'rivals' ? '' : segHtml()}</div>${tabs}${body}`;
 }
-function viewAgents(){
-  return `<div class="head"><div><h1>Команда из ${AGENTS.length} агентов</h1><p class="lead">Каждый делает одну работу, чтобы нейросети чаще называли вашу компанию.</p></div></div>
-  ${API ? '' : '<div class="note">Сервер с нейросетью ещё не запущен: агенты отвечают по шаблонам, расписание не выполняется.</div>'}
-  <div class="cards">${AGENTS.map((a, i) => { const miss = a[4].filter(c => !connected(c)); return `<article class="agent in" style="--i:${i}"><header>${orb(a)}<div><h4>${a[1]}</h4><p class="mono">${a[3]}</p></div><label class="sw" title="Включить или поставить на паузу"><input type="checkbox" data-agent="${a[0]}" ${agentOn(a[0]) ? 'checked' : ''} aria-label="${a[1]}: включён"><i></i></label></header><p>${a[5]}</p>
-  <footer><div class="needs">${a[4].length ? a[4].map(c => `<span class="tag ${connected(c) ? 'ok' : ''}">${cById(c)[2]}${connected(c) ? ' ✓' : ''}</span>`).join('') : '<span class="tag">коннекторы не нужны</span>'}</div><button class="btn btn-p" data-run="${a[0]}">${ic('play')}Запустить</button></footer>${miss.length ? `<p class="mono">точнее с коннектором: ${miss.map(c => cById(c)[2]).join(', ')}</p>` : ''}</article>` }).join('')}</div>
-  <div class="box" style="margin-top:12px"><h2>Журнал запусков <span class="mono">${st.runs.length}</span></h2>${st.runs.length ? st.runs.slice(0, 10).map(r => `<div class="log"><span class="av" style="width:28px;height:28px">${ic((AGENTS.find(a => a[0] === r.a) || [0, 0, 'bot'])[2])}</span><span><b style="font-weight:500;color:var(--ink)">${esc(r.n)}</b> <span class="muted">· ${esc(r.what)}</span></span><span class="mono">${when(r.t)}</span></div>`).join('') : '<p class="muted">Пока ни одного запуска. Нажмите «Запустить» у любого агента.</p>'}</div>`;
+const CHAT = ['chat', 'Ассистент', 'bot', 'Любая задача', [], 'Спросите что угодно: текст, письмо, план, разбор сайта. Читает ваши подключённые страницы.'];
+const TEAM = [CHAT, ...AGENTS];
+const ASK = { chat: ['Что сделать в первую очередь?', 'Составь план на 4 недели', 'Что улучшить на моём сайте?'], watch: ['Запусти новый замер'], why: ['Почему меня называют реже конкурентов?'], audit: ['Проверь мой сайт'], reviews: ['Напиши просьбу об отзыве для клиента'], faq: ['Напиши страницу вопросов и ответов'], pitch: ['Напиши письмо автору подборки'], bio: ['Перепиши описание профиля Instagram'] };
+const TASK = { chat: 'chat', why: 'why', reviews: 'review', faq: 'faq', pitch: 'pitch', bio: 'bio' };
+const KIND = { live: 'ответ нейросети', tpl: 'заготовка, без нейросети', audit: 'настоящая проверка сайта', err: 'ошибка', need: 'нужно подключение' };
+const md = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+const stepsHtml = list => list && list.length ? `<ul class="steps">${list.map(x => `<li class="${x.ok === false ? 'no' : ''}">${esc(x.text)}</li>`).join('')}</ul>` : '';
+const auditHtml = d => `<div class="chk"><p class="mono">${esc(d.url)}</p><h4>Доступ ботов нейросетей</h4>${d.bots.map(b => `<div><span>${esc(b.bot)}<small>${esc(b.what)}</small></span><span class="tag ${b.allowed ? 'ok' : 'no'}">${b.allowed ? 'открыт' : 'закрыт'}</span></div>`).join('')}<h4>Главная страница</h4>${d.checks.map(c => `<div><span>${esc(c.label)}<small>${esc(c.detail)}</small></span><span class="tag ${c.ok ? 'ok' : 'no'}">${c.ok ? 'в порядке' : 'исправить'}</span></div>`).join('')}</div>`;
+let busy = null, typeLast = false;
+function viewAgents(sel){
+  const a = TEAM.find(x => x[0] === sel) || CHAT, id = a[0], th = (st.threads || {})[id] || [], work = busy && busy.id === id;
+  const msgs = th.map((m, i) => m.r === 'u' ? `<div class="msg u"><p>${esc(m.text)}</p></div>` : `<div class="msg a">${orb(a, 'sm')}<div class="bub">${stepsHtml(m.steps)}${m.kind === 'audit' ? auditHtml(m.audit) : `<div class="txt">${md(m.text)}</div>`}${m.hint ? `<p class="muted" style="font-size:13.5px">${esc(m.hint)}</p>` : ''}<div class="meta"><span class="tag ${m.kind === 'live' || m.kind === 'audit' ? 'acc' : m.kind === 'err' ? 'no' : 'warn'}">${KIND[m.kind]}${m.model ? ' · ' + esc(m.model) : ''}</span>${m.kind === 'need' ? `<button class="btn" data-conn="${m.need}">Подключить</button>` : m.kind === 'audit' || m.kind === 'err' ? '' : `<button class="btn" data-copy="${i}">Скопировать</button>${id === 'reviews' ? `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(m.text)}">В WhatsApp</a>` : ''}`}</div></div></div>`).join('');
+  const live = work ? `<div class="msg a work">${orb(a, 'sm')}<div class="bub live"><ul class="steps" id="live">${busy.steps.map(x => `<li class="${x.ok === false ? 'no' : ''}">${esc(x.text)}</li>`).join('')}</ul><div class="dots3" aria-label="Агент работает"><i></i><i></i><i></i></div></div></div>` : '';
+  const hello = `<div class="hello">${orb(a)}<h2>${a[1]}</h2><p>${a[5]}</p>${a[4].length ? `<div class="needs" style="justify-content:center">${a[4].map(c => `<button class="tag ${connected(c) ? 'ok' : ''}" data-conn="${c}">${cById(c)[2]}${connected(c) ? ' ✓' : ' · подключить'}</button>`).join('')}</div>` : ''}</div>`;
+  return `<div class="desk"><nav class="roster" aria-label="Агенты">${TEAM.map(x => `<a class="ro${x[0] === id ? ' on' : ''}" href="#/agents/${x[0]}" ${x[0] === id ? 'aria-current="page"' : ''}>${orb(x, 'sm')}<span><b>${x[1]}</b><small>${x[3]}</small></span></a>`).join('')}</nav>
+  <section class="chat"><header class="ch">${orb(a)}<div><h1>${a[1]}</h1><p>${a[3]}</p></div>${th.length && !work ? `<button class="btn" data-clear="${id}">Очистить</button>` : ''}</header>
+  <div class="thread" id="thread">${th.length || work ? msgs + live : hello}</div>
+  ${work ? '' : `<div class="asks">${ASK[id].map(q => `<button type="button" data-ask="${esc(q)}">${esc(q)}</button>`).join('')}</div>`}
+  <form class="composer" id="composer" data-id="${id}"><textarea id="q" rows="1" maxlength="1000" placeholder="Напишите задачу для агента «${a[1]}»" aria-label="Задача" ${work ? 'disabled' : ''}></textarea><button class="btn btn-p ib" aria-label="Отправить" ${work ? 'disabled' : ''}>${ic('send')}</button></form>
+  <p class="stat"><span class="dot${SRV ? ' on' : ''}"></span>${AI ? 'нейросеть подключена: агенты читают ваши страницы и пишут сами' : SRV ? 'сервер работает, нейросеть ещё не подключена: проверка сайта и подключений настоящая, тексты по заготовкам' : 'сервер не ответил: показываю заготовки'}</p></section></div>`;
 }
 function viewTasks(){
   return `${banner()}<div class="head"><div><h1>Задачи</h1><p>Что повышает шанс, что нейросеть вас назовёт</p></div></div>
   <div class="box">${todos().map(t => `<div class="rowi" style="align-items:start"><span class="av">${ic(t.icon)}</span><div><h4 style="${st.done[t.id] ? 'text-decoration:line-through;color:var(--muted)' : ''}">${esc(t.t)}</h4><p>${esc(t.d)}</p><label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);margin-top:8px"><input type="checkbox" data-task="${t.id}" ${st.done[t.id] ? 'checked' : ''} style="accent-color:var(--acc)">Сделано</label></div>${t.agent ? `<button class="btn" data-run="${t.agent}">${ic('play')}Поручить агенту</button>` : '<span></span>'}</div>`).join('')}</div>`;
 }
+const cstat = id => { const i = (st.cinfo || {})[id]; return !i || i.err ? '<span class="tag ok">подключён</span><span class="tag">не проверен</span>' : i.ok ? '<span class="tag ok">подключён</span><span class="tag acc">проверен</span>' : `<span class="tag warn">страница не открылась${i.status ? ' · код ' + i.status : ''}</span>` };
 function viewConnectors(){
   const cats = [...new Set(CONNECTORS.map(c => c[0]))];
   return `<div class="head"><div><h1>Коннекторы</h1><p>Подключите площадки, чтобы агенты работали с вашими данными</p></div></div>
-  ${cats.map(cat => `<p class="cat">${cat}</p><div class="cards">${CONNECTORS.filter(c => c[0] === cat).map(c => `<div class="conn">${logo(c)}<div><h4>${c[2]} ${connected(c[1]) ? '<span class="tag ok">подключён</span>' : c[5] === 'soon' ? '<span class="tag">скоро</span>' : ''}</h4><p>${c[6]}</p>${c[5] === 'link' ? `<button class="btn${connected(c[1]) ? '' : ' btn-p'}" data-conn="${c[1]}">${connected(c[1]) ? 'Изменить ссылку' : 'Подключить'}</button>` : `<button class="btn" data-notify="${c[1]}">${st.notify[c[1]] ? 'Сообщим, когда появится ✓' : 'Сообщить, когда появится'}</button>`}</div></div>`).join('')}</div>`).join('')}
+  ${cats.map(cat => `<p class="cat">${cat}</p><div class="cards">${CONNECTORS.filter(c => c[0] === cat).map(c => `<div class="conn">${logo(c)}<div><h4>${c[2]} ${connected(c[1]) ? cstat(c[1]) : c[5] === 'soon' ? '<span class="tag">скоро</span>' : ''}</h4><p>${connected(c[1]) && (st.cinfo || {})[c[1]] && st.cinfo[c[1]].title ? 'Прочитано: «' + esc(st.cinfo[c[1]].title) + '»' : c[6]}</p>${c[5] === 'link' ? `<button class="btn${connected(c[1]) ? '' : ' btn-p'}" data-conn="${c[1]}">${connected(c[1]) ? 'Изменить ссылку' : 'Подключить'}</button>` : `<button class="btn" data-notify="${c[1]}">${st.notify[c[1]] ? 'Сообщим, когда появится ✓' : 'Сообщить, когда появится'}</button>`}</div></div>`).join('')}</div>`).join('')}
   <p class="muted" style="font-size:13.5px;margin-top:18px">Сейчас коннекторы работают по открытой ссылке: входа в ваши аккаунты нет, читается только то, что видно всем. Вход через аккаунт появится для сервисов с пометкой «скоро».</p>`;
 }
 function viewSite(){
@@ -533,36 +611,64 @@ const OUT = {
 let runSeq = 0;
 const FX = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 const logRun = (a, what) => { st.runs = [{ a: a[0], n: a[1], what, t: Date.now() }, ...st.runs].slice(0, 40); store.save(st) };
-function runAgent(id){
-  const a = AGENTS.find(x => x[0] === id);
-  if (id === 'audit') { logRun(a, 'открыта проверка сайта'); location.hash = '#/site'; return }
-  if (id === 'watch') { logRun(a, API ? 'замер запускается из настроек' : 'сервер не запущен'); return drawer(a[1], `<p>${API ? 'Новый замер запускается при входе. Автоматическое расписание появится вместе с хранением данных на сервере.' : 'Наблюдатель начнёт работать, когда будет запущен сервер Körin: он будет задавать нейросетям ваши вопросы каждую неделю и сохранять ответы.'}</p><p class="muted">Сейчас в кабинете показан пример замера.</p>`) }
-  const o = OUT[id], show = (text, live) => {
-    logRun(a, live ? 'текст от нейросети' : 'текст по шаблону');
-    drawer(a[1], `<div class="byline">${orb(a, 'sm')}<span>${a[1]} закончил работу</span></div><p class="mono">${live ? 'составлено нейросетью · проверьте перед отправкой' : 'шаблон · заполните скобки своими фактами'}</p><textarea class="ans" id="out" rows="12" style="width:100%;resize:vertical;font:inherit">${esc(text)}</textarea>${o.hint ? `<p class="muted" style="font-size:13.5px">${esc(o.hint)}</p>` : ''}`,
-      `<button class="btn btn-p" id="copy">Скопировать</button>${o.wa ? '<a class="btn" id="wa" target="_blank" rel="noopener">Открыть в WhatsApp</a>' : ''}`);
-    const out = $('#out'); let typing = FX;
-    if (FX) { let i = 0; const n = Math.ceil(text.length / 45); out.value = ''; const tm = setInterval(() => { i += n; out.value = text.slice(0, i); if (i >= text.length || !out.isConnected) { clearInterval(tm); typing = false } }, 18); out.onfocus = () => { clearInterval(tm); if (typing) out.value = text; typing = false } }
-    $('#copy').onclick = async () => { try { await navigator.clipboard.writeText(typing ? text : $('#out').value); $('#copy').textContent = 'Скопировано' } catch (e) { $('#out').select() } };
-    if (o.wa) { const set = () => $('#wa').href = 'https://wa.me/?text=' + encodeURIComponent(typing ? text : $('#out').value); set(); $('#out').oninput = set }
-    if (location.hash.startsWith('#/agents')) render();
-  };
-  const ctx = { company: me(), niche: st.niche, city: st.city, not_named_on: gaps().slice(0, 3).map(g => g.q), top_sources: sources().slice(0, 3).map(s => s[0]), review_link: st.conn.gis || '' };
-  const job = API ? call('/api/agent', { task: o.task, context: ctx }).then(d => [d.text, true]).catch(() => [o.text(), false]) : Promise.resolve([o.text(), false]);
-  const steps = [`Читаю замер: ${total()} ответов нейросетей`, gaps().length ? `Нахожу вопросы, где вас не назвали: ${gaps().length}` : 'Сверяю вас с конкурентами', API ? 'Пишу текст через нейросеть' : 'Собираю текст по шаблону'];
-  const run = ++runSeq;
-  drawer(a[1], `<div class="think">${orb(a)}<ul id="steps"></ul></div>`);
-  (async () => {
-    for (const t of steps) { if (run !== runSeq) return; $('#steps').insertAdjacentHTML('beforeend', `<li>${esc(t)}</li>`); await new Promise(r => setTimeout(r, FX ? 560 : 0)) }
-    const [text, live] = await job; if (run === runSeq) show(text, live);
-  })();
+function runAgent(id){ location.hash = '#/agents/' + id; send(id, ASK[id][0]) }
+async function send(id, q){
+  q = (q || '').trim(); if (!q || busy) return;
+  st.threads = st.threads || {};
+  const a = TEAM.find(x => x[0] === id), th = st.threads[id] = st.threads[id] || [];
+  th.push({ r: 'u', text: q, t: Date.now() }); store.save(st);
+  busy = { id, steps: [] }; render();
+  const step = (text, ok = true) => { busy.steps.push({ text, ok }); const el = $('#live'); if (el) { el.insertAdjacentHTML('beforeend', `<li class="${ok ? '' : 'no'}">${esc(text)}</li>`); scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }) } };
+  const pause = () => new Promise(r => setTimeout(r, FX ? 480 : 0));
+  let msg;
+  try { msg = id === 'audit' ? await doAudit(step, pause) : id === 'watch' ? await doWatch(step, pause) : await doWrite(id, q, step, pause) }
+  catch (e) { msg = { kind: 'err', text: 'Не получилось: ' + (e.message === 'Failed to fetch' ? 'сервер не ответил. Он засыпает без запросов и просыпается около минуты, попробуйте ещё раз.' : e.message) } }
+  th.push({ r: 'a', t: Date.now(), steps: busy.steps, ...msg }); st.threads[id] = th.slice(-30);
+  logRun(a, KIND[msg.kind]); busy = null; typeLast = msg.kind !== 'audit'; render();
+}
+async function doWrite(id, q, step, pause){
+  const links = {}; CONNECTORS.forEach(c => { if (c[5] === 'link' && connected(c[1])) links[c[2]] = st.conn[c[1]] });
+  const o = OUT[id], names = Object.keys(links);
+  if (data.sample) step('Замера для вашей компании ещё нет, работаю без него', false); else step(`Беру данные замера: ${total()} ответов нейросетей`);
+  await pause();
+  if (AI) {
+    step(names.length ? `Открываю подключённые страницы: ${names.join(', ')}` : 'Подключённых страниц нет: добавьте сайт или карты, и я их прочитаю', !!names.length);
+    try {
+      const ctx = { company: me(), niche: st.niche, city: st.city, rivals: st.rivals, links };
+      if (!data.sample) { ctx.not_named_on = gaps().slice(0, 3).map(g => g.q); ctx.top_sources = sources().slice(0, 3).map(x => x[0]) }
+      const d = await call('/api/agent', { task: TASK[id], question: q, context: ctx });
+      (d.steps || []).forEach(x => step(x.text, x.ok));
+      return { kind: 'live', text: d.text, model: d.model };
+    } catch (e) { step('Нейросеть не ответила: ' + e.message, false); await pause() }
+  } else { step('Нейросеть ещё не подключена к серверу', false); await pause() }
+  if (!o) return { kind: 'tpl', text: 'На свободные вопросы я отвечаю через нейросеть, а она ещё не подключена к серверу.\n\nЧто уже работает по-настоящему:\n— «Аудитор сайта» читает ваш сайт и показывает, пускает ли он ботов нейросетей;\n— подключения проверяются: сервер открывает вашу ссылку;\n— остальные агенты дают заготовки текстов.' };
+  step('Собираю заготовку из ваших данных'); await pause();
+  return { kind: 'tpl', text: o.text(), hint: o.hint };
+}
+async function doAudit(step, pause){
+  if (!st.conn.site) return { kind: 'need', need: 'site', text: 'Мне нужен адрес вашего сайта. Подключите сайт, и я его проверю.' };
+  step('Открываю ' + st.conn.site); await pause(); step('Читаю robots.txt: правила для ботов ChatGPT, Gemini, Perplexity, Claude');
+  const d = await call('/api/site-audit', { url: st.conn.site });
+  step(`Проверил главную страницу: ${d.checks.filter(c => c.ok).length} из ${d.checks.length} признаков в порядке`);
+  return { kind: 'audit', audit: d, text: '' };
+}
+async function doWatch(step, pause){
+  if (!AI) { step('Нейросеть ещё не подключена к серверу', false); await pause(); return { kind: 'tpl', text: 'Замер — это 10 вопросов ваших клиентов, которые я задаю нейросети и считаю, кого она назвала.\n\nЗапущу его, как только к серверу подключат нейросеть. Выдумывать цифры для вашей компании я не буду, поэтому сейчас в кабинете пример.' } }
+  step(`Задаю нейросети 10 вопросов про «${st.niche}», ${st.city}`);
+  const r = await call('/api/check', { company: st.company, rivals: st.rivals, city: st.city, questions: questionsFor() });
+  st.real = { ...r, at: Date.now() }; store.save(st); load();
+  step('Считаю, кого назвали в ответах');
+  return { kind: 'live', model: r.model, text: `Готово. Вас назвали в ${hits(0)} из ${total()} ответов. Подробности на главной и в разделе «Ответы».` };
 }
 function openConnector(id){
   const c = cById(id);
   drawer(c[2], `<div style="display:flex;gap:12px;align-items:center">${logo(c)}<p class="muted">${c[6]}</p></div><div class="field" style="margin-top:4px"><label for="cl">Ссылка</label><input class="inp" id="cl" maxlength="300" value="${esc(st.conn[id] || '')}" placeholder="${c[7]}"></div><p class="mono">Входа в аккаунт нет: читается только то, что открыто всем.</p>`,
     `<button class="btn btn-p" id="csave">Сохранить</button>${connected(id) ? '<button class="btn" id="cdel">Отключить</button>' : ''}`);
-  $('#csave').onclick = () => { const v = $('#cl').value.trim(); if (!v) return $('#cl').focus(); st.conn[id] = v; store.save(st); closeDrawer(); render() };
-  if ($('#cdel')) $('#cdel').onclick = () => { delete st.conn[id]; store.save(st); closeDrawer(); render() };
+  $('#csave').onclick = async () => { const v = $('#cl').value.trim(); if (!v) return $('#cl').focus(); st.conn[id] = v; st.cinfo = st.cinfo || {}; delete st.cinfo[id]; store.save(st);
+    $('#csave').disabled = true; $('#csave').textContent = 'Открываю ссылку…';
+    try { const d = await call('/api/connect', { url: v }); st.cinfo[id] = { ok: d.ok, status: d.status, title: d.title, chars: d.chars } } catch (e) { st.cinfo[id] = { err: e.message === 'Failed to fetch' ? 'сервер не ответил' : e.message } }
+    store.save(st); closeDrawer(); render() };
+  if ($('#cdel')) $('#cdel').onclick = () => { delete st.conn[id]; if (st.cinfo) delete st.cinfo[id]; store.save(st); closeDrawer(); render() };
   $('#cl').focus();
 }
 function openAnswer(qi){
@@ -581,7 +687,7 @@ let lastRoute = '';
 function render(){
   const [route = 'overview', sub] = location.hash.replace('#/', '').split('/');
   const cur = NAV.some(n => n[1] === route) ? route : 'overview', title = NAV.find(n => n[1] === cur)[3];
-  const view = cur === 'serp' ? viewSerp(['questions', 'rivals', 'sources'].includes(sub) ? sub : 'questions') : VIEWS[cur]();
+  const view = cur === 'serp' ? viewSerp(['questions', 'rivals', 'sources'].includes(sub) ? sub : 'questions') : VIEWS[cur](sub);
   const badge = { agents: AGENTS.filter(a => agentOn(a[0])).length, connectors: CONNECTORS.filter(c => connected(c[1])).length || '', tasks: todos().filter(t => !st.done[t.id]).length };
   const top = [['overview', 'Главная'], ['agents', 'Агенты'], ['serp', 'Ответы'], ['connectors', 'Подключения'], ['tasks', 'Задачи']];
   const mob = [['overview', 'home', 'Главная'], ['agents', 'bot', 'Агенты'], ['serp', 'list', 'Ответы'], ['connectors', 'plug', 'Подключения'], ['settings', 'more', 'Ещё']];
@@ -593,6 +699,15 @@ function render(){
   <nav class="tabs" aria-label="Разделы">${mob.map(n => `<a href="#/${n[0]}" class="${n[0] === cur || (n[0] === 'settings' && ['tasks', 'site'].includes(cur)) ? 'on' : ''}">${ic(n[1])}<span>${n[2]}</span></a>`).join('')}</nav>`;
   if (enter && FX) $$('[data-count]').forEach(el => { const n = +el.dataset.count, t0 = performance.now(); const f = t => { const k = Math.min(1, (t - t0) / 800); el.textContent = Math.round(n * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f) }; requestAnimationFrame(f) });
   bindTheme();
+  const cm = $('#composer');
+  if (cm) { const q = $('#q'); cm.onsubmit = e => { e.preventDefault(); send(cm.dataset.id, q.value) }; q.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cm.requestSubmit() } }; q.oninput = () => { q.style.height = 'auto'; q.style.height = q.scrollHeight + 'px' };
+    $$('[data-ask]').forEach(b => b.onclick = () => send(cm.dataset.id, b.dataset.ask));
+    $$('[data-copy]').forEach(b => b.onclick = async () => { try { await navigator.clipboard.writeText(st.threads[cm.dataset.id][+b.dataset.copy].text); b.textContent = 'Скопировано' } catch (e) {} });
+    $$('[data-clear]').forEach(b => b.onclick = () => { delete st.threads[b.dataset.clear]; store.save(st); render() });
+    if ($('.msg')) scrollTo(0, document.body.scrollHeight);
+    if (typeLast && FX) { const el = [...$$('.msg.a .txt')].pop(); if (el) { const html = el.innerHTML, text = el.textContent; let i = 0; const n = Math.max(2, Math.ceil(text.length / 70)); el.textContent = ''; const tm = setInterval(() => { i += n; if (i >= text.length || !el.isConnected) { clearInterval(tm); el.innerHTML = html } else el.textContent = text.slice(0, i) }, 16) } }
+    typeLast = false }
+  const ha = $('#homeask'); if (ha) ha.onsubmit = e => { e.preventDefault(); const v = $('#hq').value; if (v.trim()) { location.hash = '#/agents/chat'; send('chat', v) } };
   $$('[data-eng]').forEach(b => b.onclick = () => { engine = b.dataset.eng; render() });
   $$('[data-run]').forEach(b => b.onclick = () => runAgent(b.dataset.run));
   $$('[data-conn]').forEach(b => b.onclick = () => openConnector(b.dataset.conn));
