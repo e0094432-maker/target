@@ -2,393 +2,333 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Körin — кабинет</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f7fb;--white:#fff;--ink:#0b1437;--muted:#5d6785;--line:#e3e7f2;--soft:#eef2ff;--blue:#2355ff;--blue-d:#1238c9;--good:#12b76a;--bad:#f04438;--warn:#f79009;--sh:0 1px 2px rgba(11,20,55,.05),0 12px 32px -12px rgba(11,20,55,.14)}
+:root{--bg:#f6f5f0;--card:#fff;--line:#e5e2d9;--ink:#141a18;--muted:#5e6864;--dark:#111c1a;--dark2:#1b2a27;--jade:#0e7c5d;--jade-d:#0a5e46;--lime:#d9f99d;--lime-ink:#1a2e05;--bad:#d93829;--bad-bg:#feeceb;--warn:#b45309;--warn-bg:#fef3c7;
+  --sans:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Onest",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 h1,h2,h3,h4,p{margin:0}
-h1{font-size:clamp(24px,5vw,32px);letter-spacing:-.035em;font-weight:800;line-height:1.15}
-h2{font-size:19px;letter-spacing:-.02em;font-weight:800}
-h4{font-size:14.5px;font-weight:700}
+h1{font-size:clamp(24px,5vw,30px);letter-spacing:-.025em;font-weight:800;line-height:1.15}
+h2{font-size:18px;letter-spacing:-.02em;font-weight:700}
+h4{font-size:15px;font-weight:600}
 a{color:inherit;text-decoration:none}
-button,input,select,textarea{font:inherit;color:inherit}
+button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
-:focus-visible{outline:3px solid rgba(35,85,255,.45);outline-offset:2px;border-radius:8px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:11px;border:1px solid var(--line);background:var(--white);font-weight:700;font-size:14.5px;white-space:nowrap}
-.btn:hover{border-color:#c3cbe0}
-.btn-blue{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-blue:hover{background:var(--blue-d);border-color:var(--blue-d)}
-.btn-sm{min-height:36px;padding:0 13px;font-size:13.5px;border-radius:9px}
+:focus-visible{outline:3px solid rgba(14,124,93,.4);outline-offset:2px;border-radius:8px}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-weight:600;font-size:14.5px;white-space:nowrap}
+.btn:hover{border-color:#cfcbbf}
+.btn-main{background:var(--jade);color:#fff;border-color:var(--jade)}.btn-main:hover{background:var(--jade-d);border-color:var(--jade-d)}
+.btn-sm{min-height:38px;padding:0 14px;font-size:14px}
 .muted{color:var(--muted)}
-.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px}
-.pill.demo{color:#93540a;background:#fff4dd;border:1px solid #ffe0a3}
-.pill.ok{color:#067647;background:#e7f8ef}.pill.no{color:#b42318;background:#fee4e2}.pill.soon{color:var(--muted);background:var(--bg)}
+.mono{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.hl{background:var(--lime);color:var(--lime-ink);border-radius:4px;padding:0 4px;font-weight:600}
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:600;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.pill.ok{background:var(--lime);color:var(--lime-ink)}.pill.no{background:var(--bad-bg);color:var(--bad)}.pill.mid{background:var(--warn-bg);color:var(--warn)}.pill.ex{background:var(--warn-bg);color:var(--warn)}
 
-/* layout */
-.shell{display:grid;grid-template-rows:auto auto 1fr;min-height:100%}
-.topbar{display:flex;align-items:center;gap:12px;padding:0 14px;height:58px;background:var(--white);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
-.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:20px;letter-spacing:-.04em}
-.logo i{width:28px;height:28px;border-radius:8px;background:var(--blue);display:grid;place-items:center}
-.logo i::after{content:"";width:11px;height:11px;border-radius:50%;border:3px solid #fff}
-.co{margin-left:8px;font-weight:600;font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.topbar .sp{flex:1}
-.nav{display:flex;gap:4px;overflow-x:auto;padding:8px 10px;background:var(--white);border-bottom:1px solid var(--line);scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
-.nav a{flex:none;display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;font-weight:600;font-size:14px;color:var(--muted)}
-.nav a::before{content:"";width:8px;height:8px;border-radius:3px;background:#cfd6ea}
-.nav a.on{background:var(--soft);color:var(--blue)}.nav a.on::before{background:var(--blue)}
-.nav b{display:none}
-.nav .help{display:none}
-main{padding:18px 14px 90px;min-width:0;max-width:1180px;width:100%}
-.head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:18px}
-.head p{color:var(--muted);font-size:14px;margin-top:3px}
-.seg{display:flex;margin-left:auto;background:#e9ecf5;border-radius:10px;padding:3px;gap:2px}
-.seg button{border:0;background:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--muted)}
-.seg button[aria-pressed=true]{background:var(--white);color:var(--ink);box-shadow:0 1px 3px rgba(11,20,55,.16)}
+.shell{min-height:100%;display:grid;grid-template-rows:auto 1fr}
+.top{display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;letter-spacing:-.03em}
+.logo i{width:26px;height:26px;border-radius:7px;background:var(--dark);display:grid;place-items:center;position:relative}
+.logo i::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--lime)}
+.logo i::after{content:"";position:absolute;inset:5px;border:1.5px solid var(--lime);border-radius:50%;clip-path:polygon(0 0,45% 0,45% 45%,0 45%)}
+.co{font-weight:500;font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sp{flex:1}
+.side{display:none}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;display:grid;grid-template-columns:repeat(4,1fr);background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tabs a{display:grid;justify-items:center;gap:2px;padding:8px 2px 7px;font-size:11.5px;font-weight:600;color:var(--muted);position:relative}
+.tabs a.on{color:var(--jade)}
+.tabs b{position:absolute;top:5px;left:calc(50% + 8px);min-width:16px;height:16px;border-radius:9px;background:var(--bad);color:#fff;font:700 10px/16px var(--mono);text-align:center;padding:0 4px}
+main{padding:16px 14px 96px;min-width:0;max-width:1140px;width:100%}
+.head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:16px}
+.head p{color:var(--muted);font-size:14px;margin-top:2px}
+.seg{display:flex;background:#e9e6dc;border-radius:9px;padding:3px;gap:2px;overflow-x:auto;max-width:100%}
+.seg button,.seg a{border:0;background:none;border-radius:7px;padding:7px 12px;font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+.seg [aria-pressed=true],.seg a.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(20,26,24,.14)}
+.note{background:var(--warn-bg);color:#7a3d06;border-radius:10px;padding:10px 14px;font-size:13.5px;margin-bottom:14px}
 
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.kpi{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px}
-.kpi small{display:block;font-size:13px;font-weight:500;color:var(--muted)}
-.kpi b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.04em;font-weight:800;margin-top:6px}
-.kpi span{font-size:12.5px;color:var(--muted)}
-.kpi.main{background:var(--blue);border-color:var(--blue);color:#fff}.kpi.main small,.kpi.main span{color:rgba(255,255,255,.82)}.kpi.main b{font-size:40px}
-.cols{display:grid;gap:12px;margin-top:12px}
-.box{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
-.box>h4{margin-bottom:14px;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.box>h4 small{font-size:12.5px;font-weight:500;color:var(--muted)}
-.row{display:grid;grid-template-columns:minmax(90px,140px) 1fr 44px;gap:10px;align-items:center;margin:10px 0;font-size:14px}
-.row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.row u{display:block;height:10px;border-radius:99px;background:var(--bg);overflow:hidden}
-.row i{display:block;height:100%;border-radius:99px;background:#c3cbe0}
-.row.me i{background:var(--blue)}.row.me span:first-child{color:var(--blue);font-weight:700}
-.row em{font-style:normal;font-weight:700;font-size:13.5px;text-align:right}
-svg.trend{width:100%;height:150px;display:block}
+.verdict{background:var(--dark);color:#f3f1ea;border-radius:16px;padding:20px;display:grid;gap:18px}
+.verdict small{font:500 11.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:#93a39d}
+.frac{font:700 clamp(40px,11vw,56px)/1 var(--mono);letter-spacing:-.04em;margin-top:8px}
+.frac span{font-size:.42em;font-weight:500;color:#93a39d;letter-spacing:0;margin-left:8px}
+.verdict .by{font:500 12.5px var(--mono);color:#93a39d;margin-top:10px}
+.verdict .diag{font-size:17px;line-height:1.45}
+.verdict .diag b{background:var(--lime);color:var(--lime-ink);border-radius:4px;padding:0 5px;font-weight:600}
+.verdict .seg{background:var(--dark2)}.verdict .seg button{color:#93a39d}.verdict .seg [aria-pressed=true]{background:#f3f1ea;color:var(--dark)}
+.grid{display:grid;gap:12px;margin-top:12px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.box>h2{margin-bottom:14px;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.box>h2 a{font-size:13.5px;font-weight:600;color:var(--jade)}
+.todo{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.todo:first-of-type{border-top:0;padding-top:0}
+.todo .ic{width:36px;height:36px;border-radius:10px;background:var(--bg);display:grid;place-items:center;color:var(--jade)}
+.todo p{font-size:14px;color:var(--muted);margin:3px 0 10px}
+.todo.done h4{text-decoration:line-through;color:var(--muted)}
+.todo label{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);margin-top:10px}
+.todo input[type=checkbox]{width:18px;height:18px;accent-color:var(--jade)}
+.rank{display:grid;grid-template-columns:minmax(80px,150px) 1fr auto;gap:10px;align-items:center;margin:11px 0;font-size:14px}
+.rank span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank u{display:block;height:8px;border-radius:9px;background:var(--bg);overflow:hidden}
+.rank i{display:block;height:100%;border-radius:9px;background:#c9c5b8}
+.rank.me i{background:var(--jade)}.rank.me span:first-child{font-weight:700}
+.rank em{font:700 12.5px var(--mono);font-style:normal}
+.qrow{display:grid;gap:8px;padding:13px 0;border-top:1px solid var(--line)}
+.qrow:first-of-type{border-top:0;padding-top:0}
+.qrow .who{font-size:13.5px;color:var(--muted)}.qrow .who b{color:var(--bad);font-weight:600}
+.dots{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lnk{border:0;background:none;padding:0;color:var(--jade);font-weight:600;font-size:13.5px}
 .tw{overflow-x:auto;margin:0 -16px;padding:0 16px}
 table{border-collapse:collapse;width:100%;font-size:14px}
-th{font-size:12.5px;font-weight:600;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font:500 12px var(--mono);color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
 td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 tr:last-child td{border-bottom:0}
-td.c,th.c{text-align:center}td.n,th.n{text-align:right;font-weight:700;white-space:nowrap}
-tr.me td{background:var(--soft);font-weight:700}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#dfe3ee}.dot.y{background:var(--good)}
-.q small{display:block;font-size:12.5px;color:var(--muted);margin-top:3px}.q small b{color:var(--bad);font-weight:600}
-.add{display:flex;gap:8px;margin-top:14px}
-.inp{min-height:44px;border-radius:11px;border:1px solid var(--line);background:var(--white);padding:0 14px;width:100%;font-size:15px}
-.inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(35,85,255,.15)}
-.task{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
-.task:first-of-type{border-top:0;padding-top:0}
-.task input{width:20px;height:20px;margin-top:2px;accent-color:var(--blue)}
-.task p{font-size:13.5px;color:var(--muted);margin-top:3px}
-.task.done h4{text-decoration:line-through;color:var(--muted)}
-.task .btn{margin-top:10px}
-.conns{display:grid;gap:12px}
-.conn{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
-.conn .ic{width:44px;height:44px;border-radius:12px;background:var(--soft);color:var(--blue);display:grid;place-items:center;font-weight:900;font-size:15px}
-.conn p{font-size:13.5px;color:var(--muted);margin:3px 0 10px}
-.banner{background:#fff4dd;border:1px solid #ffe0a3;color:#7a4407;border-radius:12px;padding:10px 14px;font-size:13.5px;margin-bottom:16px}
-.agency{background:var(--ink);color:#fff;border-radius:14px;padding:18px;margin-top:12px;display:grid;gap:12px}
-.agency p{color:#b9c2de;font-size:14px;margin-top:4px}
-
-/* onboarding */
-.onb{max-width:560px;margin:5vh auto 0;background:var(--white);border:1px solid var(--line);border-radius:20px;padding:26px 20px;box-shadow:var(--sh)}
-.onb .steps{display:flex;gap:6px;margin-bottom:22px}.onb .steps i{flex:1;height:4px;border-radius:9px;background:var(--line)}.onb .steps i.on{background:var(--blue)}
-.onb label{display:block;font-size:13.5px;font-weight:600;margin:16px 0 6px}
-.onb .acts{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
+td.n,th.n{text-align:right;white-space:nowrap}td.n{font:700 13px var(--mono)}
+tr.me td{background:#f1f8e4;font-weight:600}
+.inp{min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--card);padding:0 14px;width:100%;font-size:15px}
+.inp:focus{outline:none;border-color:var(--jade);box-shadow:0 0 0 3px rgba(14,124,93,.14)}
+.add{display:flex;gap:8px}
+.field{display:grid;gap:6px;margin-top:14px}.field label{font-size:13.5px;font-weight:600}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.chips span{display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--blue);font-weight:600;font-size:13.5px;border-radius:999px;padding:6px 6px 6px 12px}
-.chips button{border:0;background:rgba(35,85,255,.15);color:var(--blue);width:20px;height:20px;border-radius:50%;line-height:1;font-size:13px;padding:0}
-.prog{height:8px;border-radius:9px;background:var(--line);overflow:hidden;margin:18px 0 10px}.prog i{display:block;height:100%;width:0;background:var(--blue);transition:width .5s}
+.chips span{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);font-weight:500;font-size:13.5px;border-radius:999px;padding:5px 6px 5px 12px}
+.chips button{border:0;background:#dedbd0;width:20px;height:20px;border-radius:50%;line-height:1;font-size:13px;padding:0}
+.agency{background:var(--dark);color:#f3f1ea;border-radius:14px;padding:18px;margin-top:12px;display:grid;gap:12px}
+.agency p{color:#a9b6b1;font-size:14px;margin-top:4px}
+.empty{border:1px dashed #cfcbbf;border-radius:14px;padding:16px;font-size:14px;color:var(--muted);display:grid;gap:10px;justify-items:start}
 
-/* assistant */
-.fab{position:fixed;right:16px;bottom:16px;z-index:30;box-shadow:0 12px 28px -8px rgba(35,85,255,.7);min-height:50px;border-radius:999px}
-.drawer{position:fixed;z-index:40;inset:auto 0 0 0;height:min(84dvh,640px);background:var(--white);border:1px solid var(--line);border-radius:18px 18px 0 0;box-shadow:0 -20px 60px -20px rgba(11,20,55,.4);display:none;flex-direction:column}
+.onb{max-width:540px;margin:4vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 20px}
+.onb .st{display:flex;gap:6px;margin-bottom:22px}.onb .st i{flex:1;height:4px;border-radius:9px;background:var(--line)}.onb .st i.on{background:var(--jade)}
+.onb .acts{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
+.prog{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin:18px 0 10px}.prog i{display:block;height:100%;width:0;background:var(--jade);transition:width .5s}
+
+.scrim{position:fixed;inset:0;background:rgba(17,28,26,.45);z-index:39;display:none}.scrim.open{display:block}
+.drawer{position:fixed;z-index:40;inset:auto 0 0 0;max-height:88dvh;background:var(--card);border-radius:18px 18px 0 0;display:none;flex-direction:column}
 .drawer.open{display:flex}
-.dh{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);font-weight:800}
-.dh button{margin-left:auto;border:0;background:var(--bg);width:34px;height:34px;border-radius:9px;font-size:18px}
-.db{flex:1;overflow-y:auto;padding:16px;display:grid;gap:10px;align-content:start;background:var(--bg)}
-.m{max-width:92%;padding:11px 14px;border-radius:14px;font-size:14.5px;white-space:pre-wrap;background:var(--white);border:1px solid var(--line)}
-.m.u{justify-self:end;background:var(--blue);color:#fff;border-color:var(--blue)}
-.quick{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;border-top:1px solid var(--line);scrollbar-width:none}
-.quick button{flex:none;border:1px solid var(--line);background:var(--white);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600}
-.df{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}
+.dh{display:flex;align-items:flex-start;gap:10px;padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+.dh h2{flex:1}.dh button{border:0;background:var(--bg);width:34px;height:34px;border-radius:9px;font-size:18px;flex:none}
+.db{overflow-y:auto;padding:16px;display:grid;gap:12px}
+.ans{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px;white-space:pre-wrap;font-size:14.5px;line-height:1.55}
+.ans b{font-weight:700}
+.df{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
 
-@media (min-width:640px){.kpis{grid-template-columns:repeat(4,1fr)}.conns{grid-template-columns:repeat(2,1fr)}.onb{padding:34px}}
+@media (min-width:640px){.onb{padding:32px}.two{grid-template-columns:1fr 1fr}}
 @media (min-width:980px){
-  .shell{grid-template-columns:230px 1fr;grid-template-rows:auto 1fr}
-  .topbar{grid-column:1/-1;padding:0 22px}
-  .nav{flex-direction:column;overflow:visible;padding:18px 12px;border-bottom:0;border-right:1px solid var(--line);gap:2px}
-  .nav b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9aa3bd;margin:0 12px 8px}
-  .nav .help{display:block;margin-top:auto;background:var(--soft);border-radius:12px;padding:14px;font-size:13px;color:var(--muted)}
-  .nav .help a{display:inline;padding:0;color:var(--blue);font-weight:700}.nav .help a::before{display:none}
-  main{padding:26px 28px 90px}
-  .cols{grid-template-columns:1.2fr .8fr}.cols.eq{grid-template-columns:1fr 1fr}
-  .conns{grid-template-columns:repeat(3,1fr)}
+  .shell{grid-template-columns:220px 1fr}
+  .top{grid-column:1/-1;padding:0 22px}
+  .tabs{display:none}
+  .side{display:flex;flex-direction:column;gap:2px;padding:16px 12px;border-right:1px solid var(--line);background:var(--card)}
+  .side a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;font-weight:600;font-size:14.5px;color:var(--muted)}
+  .side a.on{background:var(--bg);color:var(--ink)}.side a.on svg{color:var(--jade)}
+  .side .help{margin-top:auto;background:var(--bg);border-radius:12px;padding:14px;font-size:13.5px;color:var(--muted)}
+  .side .help a{display:inline;padding:0;color:var(--jade)}
+  main{padding:26px 28px 60px}
+  .verdict{grid-template-columns:auto 1fr auto;align-items:center;gap:36px;padding:26px 28px}
+  .work{grid-template-columns:7fr 5fr}
   .agency{grid-template-columns:1fr auto;align-items:center}
-  .drawer{inset:0 0 0 auto;width:420px;height:auto;border-radius:0;border-width:0 0 0 1px}
+  .scrim.open{display:block}
+  .drawer{inset:0 0 0 auto;width:460px;max-height:none;border-radius:0;border-left:1px solid var(--line)}
 }
 </style>
 </head>
 <body>
 <div id="root"></div>
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dtitle"><div class="dh"><h2 id="dtitle"></h2><button id="dclose" aria-label="Закрыть">×</button></div><div class="db" id="db"></div><div class="df" id="df"></div></div>
 
 <script>
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const KEY = 'korin-demo-v1';
-const API = '';  // адрес сервера Körin (server/app.py). Пусто — кабинет работает в демо-режиме.
-async function call(path, body){ const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Ошибка сервера'); return d }
+const KEY = 'korin-v2';
+const API = '';  // адрес сервера Körin (server/app.py). Пусто — кабинет показывает пример.
 const store = { load(){ try{ return JSON.parse(localStorage.getItem(KEY)) }catch(e){ return null } }, save(v){ try{ localStorage.setItem(KEY, JSON.stringify(v)) }catch(e){} }, clear(){ try{ localStorage.removeItem(KEY) }catch(e){} } };
+async function call(path, body){ const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Ошибка сервера'); return d }
 
-const ENGINES = [['chatgpt','ChatGPT'],['gemini','Gemini'],['perplexity','Perplexity']];
-const CONNECTORS = [
-  ['site','WWW','Сайт','Проверяем, может ли нейросеть прочитать страницы и что на них не хватает.'],
-  ['instagram','IG','Instagram','Берём описание профиля и посты, чтобы сверить с тем, что говорит нейросеть.'],
-  ['facebook','FB','Facebook','Страница компании и отзывы на ней.'],
-  ['gbp','G','Google Карты','Карточка компании, рейтинг и отзывы.'],
-  ['2gis','2G','2ГИС','Карточка, отзывы и актуальность адреса и телефона.'],
-  ['ga','GA','Google Analytics','Считаем переходы на сайт из ChatGPT и других нейросетей.'],
-  ['whatsapp','WA','WhatsApp','Уведомления, когда видимость упала или появился новый конкурент.']
-];
-const QUESTIONS = n => [
-  `${n.niche} в городе ${n.city}: что выбрать?`, `${n.niche}, ${n.city} — кого посоветуешь?`,
-  `${n.niche}: кому можно доверять, ${n.city}?`, `${n.niche} недорого и качественно, ${n.city}`,
-  `${n.niche} с хорошими отзывами, ${n.city}`, `${n.niche}, ${n.city}: сравни варианты, плюсы и минусы`,
-  `${n.niche} рядом со мной, ${n.city}`, `${n.niche} для семьи с детьми, ${n.city}`,
-  `${n.niche}, ${n.city}: что сейчас самое популярное?`, `${n.city} қаласында ${n.niche}: қайсысын таңдаған дұрыс?`
-];
-const SOURCE_POOL = ['2gis.kz','google.com/maps','instagram.com','yandex.kz/maps','the-steppe.com','tengrinews.kz','olx.kz','kaspi.kz','facebook.com','zoon.kz'];
+const P = { home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>', list: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>', check: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12l3 3 5-6"/>', more: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>', globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.500 3 14.500 0 18M12 3c-3 3.500-3 14.500 0 18"/>', star: '<path d="M12 3l2.700 5.600 6.100.900-4.400 4.300 1 6.100L12 17l-5.400 2.900 1-6.100L3.200 9.500l6.100-.900z"/>', file: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/>', send: '<path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/>', pin: '<path d="M12 21s7-6.200 7-11a7 7 0 0 0-14 0c0 4.800 7 11 7 11z"/><circle cx="12" cy="10" r="2.500"/>', chat: '<path d="M4 5h16v11H9l-5 4z"/>' };
+const ic = n => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+const ENG = { chatgpt: 'ChatGPT', gemini: 'Gemini', perplexity: 'Perplexity' };
 
-/* Демо-данные: числа получаются из названий по формуле, а не из ответов нейросетей. */
+/* ---------- Пример: вымышленная школа и вымышленные конкуренты ---------- */
 function rng(seed){ let h = 2166136261; for (const ch of seed) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) } return () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296 } }
-function build(st){
-  const names = [st.company, ...st.rivals], qs = [...QUESTIONS(st), ...(st.custom || [])];
-  const data = { names, qs, eng: {} };
-  for (const [id] of ENGINES) {
-    const r = rng(st.company + '|' + st.rivals.join(',') + '|' + id);
-    const strength = names.map((n, i) => i === 0 ? .22 + r() * .25 : .25 + r() * .5);
-    const grid = qs.map(q => { const rq = rng(q + id + st.company); return names.map((n, i) => rq() < strength[i]) });
-    const count = names.map((n, i) => grid.filter(g => g[i]).length);
-    const vis = count.map(c => Math.round(c / qs.length * 100));
-    const rs = rng('src' + st.company + id), src = SOURCE_POOL.map(s => [s, Math.round(rs() * 40) + 2]).sort((a, b) => b[1] - a[1]).slice(0, 6);
-    const tr = rng('trend' + st.company + id); let v = Math.max(3, vis[0] - 18 - Math.round(tr() * 8)); const trend = [];
-    for (let i = 0; i < 5; i++) { trend.push(v); v = Math.min(vis[0], v + Math.round(tr() * 8)) } trend.push(vis[0]);
-    const good = 45 + Math.round(rs() * 25), bad = 3 + Math.round(rs() * 9);
-    data.eng[id] = { grid, vis, src, trend, tone: [good, 100 - good - bad, bad], cites: Math.round(rs() * vis[0] / 4) };
+const WHY = ['много свежих отзывов на 2ГИС', 'на сайте подробно расписаны программы и цены', 'есть пробный урок и понятные условия', 'упоминается в подборках городских изданий', 'несколько филиалов в разных районах'];
+function sample(){
+  const names = ['Hello Kids', 'Lingua Plus', 'Bright School', 'English Hub', 'Oxford Street'];
+  const qs = ['Какие курсы английского в Алматы подойдут ребёнку 8 лет?', 'Где подготовиться к IELTS в Алматы?', 'Курсы английского с носителем языка недорого, Алматы', 'Английский для взрослых с нуля в Алматы — что посоветуешь?', 'Какая языковая школа в Алматы самая надёжная?', 'Курсы английского рядом с метро в Алматы', 'Сравни языковые школы Алматы: плюсы и минусы', 'Где в Алматы учат разговорному английскому?', 'Алматыда балаларға арналған ағылшын тілі курстары қайда?', 'Алматыда ағылшын тілін қайдан үйренуге болады?'];
+  const strength = { chatgpt: [.3, .7, .55, .35, .2], gemini: [.2, .5, .6, .4, .15], perplexity: [.45, .6, .4, .4, .25] }, src = { chatgpt: [['2gis.kz', 38], ['instagram.com', 21], ['yandex.kz/maps', 17], ['the-steppe.com', 9]], gemini: [['google.com/maps', 44], ['2gis.kz', 26], ['instagram.com', 12], ['the-steppe.com', 5]], perplexity: [['2gis.kz', 41], ['the-steppe.com', 23], ['yandex.kz/maps', 19], ['instagram.com', 8]] };
+  const eng = {};
+  for (const id of Object.keys(ENG)) {
+    const r = rng('korin-sample-' + id), grid = qs.map(() => names.map((n, i) => r() < strength[id][i]));
+    const answers = grid.map((g, qi) => { const who = names.filter((n, i) => g[i]); if (!who.length) return 'Однозначного лидера назвать сложно. Сравните программы, размер групп и отзывы на картах, а перед оплатой сходите на пробный урок.'; return 'Вот варианты, на которые стоит обратить внимание:\n\n' + who.map((n, k) => `${k + 1}. ${n} — ${WHY[Math.floor(r() * WHY.length)]}.`).join('\n') + '\n\nПеред записью уточните расписание и стоимость.' });
+    eng[id] = { grid, answers, src: src[id], model: 'пример' };
   }
-  return data;
+  return { names, qs, eng, engines: Object.keys(ENG), sample: true, label: 'Hello Kids', sub: 'курсы английского · Алматы' };
+}
+function fromReal(r){
+  return { names: r.names, qs: r.questions, engines: ['chatgpt'], sample: false, label: r.names[0], sub: `${st.niche} · ${st.city}`,
+    eng: { chatgpt: { grid: r.grid.map(g => g || r.names.map(() => false)), answers: r.answers || [], src: r.sources || [], model: r.model || 'ChatGPT', failed: r.grid.filter(g => !g).length } }, at: r.at };
 }
 
-let st = store.load(), data = st && st.ready ? build(st) : null, engine = 'chatgpt';
+let st = store.load(), engine = 'all', data;
 const param = new URLSearchParams(location.search).get('company');
-if (!st) st = { company: param ? param.slice(0, 40) : '', city: 'Алматы', niche: '', rivals: [], conn: {}, done: {}, custom: [], ready: false, step: 1 };
+if (!st) st = { company: param ? param.slice(0, 40) : '', niche: '', city: 'Алматы', rivals: [], links: {}, done: {}, ready: false, step: 1 };
+const load = () => { data = st.real ? fromReal(st.real) : sample(); if (!data.engines.includes(engine)) engine = data.engines.length > 1 ? 'all' : data.engines[0] };
+const questionsFor = () => [`${st.niche} в городе ${st.city}: что выбрать?`, `${st.niche}, ${st.city} — кого посоветуешь?`, `${st.niche}: кому можно доверять, ${st.city}?`, `${st.niche} недорого и качественно, ${st.city}`, `${st.niche} с хорошими отзывами, ${st.city}`, `${st.niche}, ${st.city}: сравни варианты`, `${st.niche} для семьи с детьми, ${st.city}`, `${st.niche}, ${st.city}: что сейчас самое популярное?`, `${st.city} қаласында ${st.niche}: қайсысын таңдаған дұрыс?`, `${st.city} қаласындағы ең сенімді ${st.niche} қайсы?`];
 
-/* ---------- Onboarding ---------- */
+/* ---------- Подсчёты ---------- */
+const engs = () => engine === 'all' ? data.engines : [engine];
+const hits = i => engs().reduce((s, e) => s + data.eng[e].grid.filter(g => g[i]).length, 0);
+const total = () => engs().length * data.qs.length;
+const ranked = () => data.names.map((n, i) => [n, hits(i), i === 0]).sort((a, b) => b[1] - a[1]);
+const gaps = () => data.qs.map((q, qi) => { const who = new Set(), me = engs().some(e => data.eng[e].grid[qi][0]); engs().forEach(e => data.names.forEach((n, i) => { if (i && data.eng[e].grid[qi][i]) who.add(n) })); return { q, qi, me, who: [...who] } }).filter(g => !g.me && g.who.length);
+const sources = () => { const m = {}; engs().forEach(e => data.eng[e].src.forEach(([d, n]) => m[d] = (m[d] || 0) + n)); return Object.entries(m).sort((a, b) => b[1] - a[1]) };
+const meta = () => data.sample ? 'пример · вымышленные компании' : `${total()} ответов · ${data.qs.length} вопросов · ${new Date(data.at).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
+const segHtml = () => data.engines.length < 2 ? '' : `<div class="seg" role="group" aria-label="Нейросеть">${['all', ...data.engines].map(e => `<button type="button" data-eng="${e}" aria-pressed="${e === engine}">${e === 'all' ? 'Все' : ENG[e]}</button>`).join('')}</div>`;
+const banner = () => data.sample ? `<div class="note">Это пример кабинета на вымышленной школе «Hello Kids». ${st.company ? `Замер для «${esc(st.company)}» появится здесь, когда сервис начнёт опрашивать нейросети.` : ''}</div>` : '';
+
+/* ---------- Вход ---------- */
 function onboarding(){
-  const s = st.step || 1;
-  const bar = `<div class="steps"><i class="on"></i><i class="${s > 1 ? 'on' : ''}"></i><i class="${s > 2 ? 'on' : ''}"></i></div>`;
-  let body = '';
-  if (s === 1) body = `<h1>Расскажите о компании</h1><p class="muted" style="margin-top:8px">Это займёт минуту. Потом всё можно поменять.</p>
-    <label for="o1">Название компании</label><input class="inp" id="o1" maxlength="40" value="${esc(st.company)}" placeholder="Например, Hello Kids">
-    <label for="o2">Чем занимаетесь</label><input class="inp" id="o2" maxlength="40" value="${esc(st.niche)}" placeholder="Например, курсы английского">
-    <label for="o3">Город</label><input class="inp" id="o3" maxlength="30" value="${esc(st.city)}">
-    <div class="acts"><a class="btn" href="../">На сайт</a><button class="btn btn-blue" id="next">Дальше</button></div>`;
-  if (s === 2) body = `<h1>Кто ваши конкуренты?</h1><p class="muted" style="margin-top:8px">Добавьте от одного до пяти. С ними будем сравнивать.</p>
-    <label for="o4">Название конкурента</label><div class="add" style="margin-top:0"><input class="inp" id="o4" maxlength="40" placeholder="Например, Lingua Plus"><button class="btn" id="addr">Добавить</button></div>
+  const s = st.step || 1, bar = `<div class="st"><i class="on"></i><i class="${s > 1 ? 'on' : ''}"></i><i class="${s > 2 ? 'on' : ''}"></i></div>`;
+  let b = '';
+  if (s === 1) b = `<h1>Расскажите о компании</h1><p class="muted" style="margin-top:8px">Минута. Потом всё можно поменять.</p>
+    <div class="field"><label for="o1">Название компании</label><input class="inp" id="o1" maxlength="40" value="${esc(st.company)}" placeholder="Например, Hello Kids"></div>
+    <div class="field"><label for="o2">Чем занимаетесь</label><input class="inp" id="o2" maxlength="40" value="${esc(st.niche)}" placeholder="Например, курсы английского"></div>
+    <div class="field"><label for="o3">Город</label><input class="inp" id="o3" maxlength="30" value="${esc(st.city)}"></div>
+    <div class="acts"><a class="btn" href="../">На сайт</a><button class="btn btn-main" id="next">Дальше</button></div>`;
+  if (s === 2) b = `<h1>Кто ваши конкуренты?</h1><p class="muted" style="margin-top:8px">От одного до пяти. С ними будем сравнивать.</p>
+    <div class="field"><label for="o4">Название конкурента</label><div class="add"><input class="inp" id="o4" maxlength="40" placeholder="Например, Lingua Plus"><button class="btn" id="addr">Добавить</button></div></div>
     <div class="chips">${st.rivals.map((r, i) => `<span>${esc(r)}<button data-del="${i}" aria-label="Убрать">×</button></span>`).join('')}</div>
-    <div class="acts"><button class="btn" id="back">Назад</button><button class="btn btn-blue" id="next">Дальше</button></div>`;
-  if (s === 3) body = `<h1>Запускаем первую проверку</h1><p class="muted" style="margin-top:8px">Зададим нейросетям 10 вопросов о нише «${esc(st.niche)}» в городе ${esc(st.city)}.</p>
-    <div class="banner" style="margin-top:18px">Демо-режим. Нейросети сейчас не опрашиваются: цифры в кабинете условные и считаются по формуле.</div>
+    <div class="acts"><button class="btn" id="back">Назад</button><button class="btn btn-main" id="next">Дальше</button></div>`;
+  if (s === 3) b = API ? `<h1>Запускаем первый замер</h1><p class="muted" style="margin-top:8px">Зададим ChatGPT 10 вопросов про «${esc(st.niche)}» в городе ${esc(st.city)}. Это займёт пару минут.</p>
     <div class="prog"><i id="pg"></i></div><p class="muted" id="pgt">Готово к запуску</p>
-    <div class="acts"><button class="btn" id="back">Назад</button><button class="btn btn-blue" id="run">Запустить</button></div>`;
-  $('#root').innerHTML = `<div class="topbar"><a class="logo" href="../"><i></i>Körin</a></div><div style="padding:0 14px 40px"><div class="onb">${bar}${body}<p class="muted" id="err" style="color:var(--bad);margin-top:12px;min-height:20px"></p></div></div>`;
+    <div class="acts"><button class="btn" id="back">Назад</button><button class="btn btn-main" id="run">Запустить замер</button></div>`
+    : `<h1>Замер пока не запущен</h1><p style="margin-top:10px">Сервис ещё не опрашивает нейросети, поэтому настоящих цифр для «${esc(st.company)}» нет. Выдумывать их мы не будем.</p><p class="muted" style="margin-top:10px">Сейчас покажем пример кабинета на вымышленной школе, чтобы было понятно, что вы получите.</p>
+    <div class="acts"><button class="btn" id="back">Назад</button><button class="btn btn-main" id="run">Посмотреть пример</button></div>`;
+  $('#root').innerHTML = `<div class="top"><a class="logo" href="../"><i></i>Körin</a></div><div style="padding:0 14px 40px"><div class="onb">${bar}${b}<p id="err" style="color:var(--bad);margin-top:12px;min-height:20px;font-size:14px"></p></div></div>`;
   const err = m => $('#err').textContent = m;
-  $('#back') && ($('#back').onclick = () => { st.step = s - 1; store.save(st); onboarding() });
-  if (s === 1) $('#next').onclick = () => {
-    st.company = $('#o1').value.trim(); st.niche = $('#o2').value.trim(); st.city = $('#o3').value.trim();
-    if (!st.company || !st.niche || !st.city) return err('Заполните все три поля.');
-    st.step = 2; store.save(st); onboarding();
-  };
+  if ($('#back')) $('#back').onclick = () => { st.step = s - 1; store.save(st); onboarding() };
+  if (s === 1) $('#next').onclick = () => { st.company = $('#o1').value.trim(); st.niche = $('#o2').value.trim(); st.city = $('#o3').value.trim(); if (!st.company || !st.niche || !st.city) return err('Заполните все три поля.'); st.step = 2; store.save(st); onboarding() };
   if (s === 2) {
     const add = () => { const v = $('#o4').value.trim(); if (!v) return; if (st.rivals.length >= 5) return err('Не больше пяти конкурентов.'); if ([st.company, ...st.rivals].some(x => x.toLowerCase() === v.toLowerCase())) return err('Такое название уже есть.'); st.rivals.push(v); store.save(st); onboarding(); $('#o4').focus() };
     $('#addr').onclick = add; $('#o4').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); add() } };
-    $$('[data-del]').forEach(b => b.onclick = () => { st.rivals.splice(+b.dataset.del, 1); store.save(st); onboarding() });
+    $$('[data-del]').forEach(x => x.onclick = () => { st.rivals.splice(+x.dataset.del, 1); store.save(st); onboarding() });
     $('#next').onclick = () => { if (!st.rivals.length) return err('Добавьте хотя бы одного конкурента.'); st.step = 3; store.save(st); onboarding() };
   }
-  if (s === 3) $('#run').onclick = () => {
-    $('#run').disabled = true; const stages = ['Составляем вопросы…', 'Спрашиваем ChatGPT…', 'Спрашиваем Gemini…', 'Спрашиваем Perplexity…', 'Считаем упоминания…'];
-    stages.forEach((t, i) => setTimeout(() => { $('#pg').style.width = (i + 1) * 20 + '%'; $('#pgt').textContent = t }, i * 550));
-    setTimeout(() => { st.ready = true; store.save(st); data = build(st); location.hash = '#/overview'; app() }, stages.length * 550 + 300);
+  if (s === 3) $('#run').onclick = async () => {
+    const done = () => { st.ready = true; store.save(st); load(); location.hash = '#/overview'; app() };
+    if (!API) return done();
+    $('#run').disabled = true; $('#pg').style.width = '35%'; $('#pgt').textContent = 'Спрашиваем ChatGPT…';
+    try { const r = await call('/api/check', { company: st.company, rivals: st.rivals, city: st.city, questions: questionsFor() }); st.real = { ...r, at: Date.now() }; $('#pg').style.width = '100%'; done() }
+    catch (e) { $('#run').disabled = false; $('#pg').style.width = '0'; $('#pgt').textContent = ''; err('Замер не удался: ' + e.message + ' Можно посмотреть пример кабинета.'); $('#run').textContent = 'Посмотреть пример'; $('#run').onclick = done }
   };
 }
 
-/* ---------- App ---------- */
-const NAV = [['overview','Обзор'],['questions','Вопросы'],['rivals','Конкуренты'],['sources','Источники'],['site','Сайт для ИИ'],['tasks','Что сделать'],['agents','ИИ-агенты'],['connectors','Подключения'],['settings','Настройки']];
-const segHtml = () => `<div class="seg" role="group" aria-label="Нейросеть">${ENGINES.map(([id, n]) => `<button type="button" data-eng="${id}" aria-pressed="${id === engine}">${n}</button>`).join('')}</div>`;
-const E = () => data.eng[engine];
-const ranked = () => data.names.map((n, i) => [n, E().vis[i], i === 0]).sort((a, b) => b[1] - a[1]);
-const gaps = () => data.qs.map((q, qi) => ({ q, who: data.names.filter((n, i) => i > 0 && E().grid[qi][i]), me: E().grid[qi][0] })).filter(g => !g.me && g.who.length);
-
-function viewOverview(){
-  const e = E(), r = ranked(), place = r.findIndex(x => x[2]) + 1, total = e.vis.reduce((a, b) => a + b, 0) || 1, me = e.vis[0];
-  const t = e.trend, max = Math.max(...t, 10) * 1.3, mo = ['июн','июл','авг','сен','окт','ноя'], pts = t.map((v, i) => [20 + i * 56, 118 - v / max * 100]);
-  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1].toFixed(1)).join(' '), g = gaps();
-  return `<div class="head"><div><h1>Обзор</h1><p>${esc(st.niche)} · ${esc(st.city)} · ${data.qs.length} вопросов</p></div>${segHtml()}</div>
-  <div class="kpis"><div class="kpi main"><small>Видимость</small><b>${me}%</b><span>названы в ${e.grid.filter(x => x[0]).length} ответах из ${data.qs.length}</span></div>
-  <div class="kpi"><small>Место</small><b>${place} из ${r.length}</b><span>среди отслеживаемых</span></div>
-  <div class="kpi"><small>Доля упоминаний</small><b>${Math.round(me / total * 100)}%</b><span>от всех в нише</span></div>
-  <div class="kpi"><small>Ссылок на ваш сайт</small><b>${e.cites}</b><span>в ответах нейросети</span></div></div>
-  <div class="cols"><div class="box"><h4>Кого называет нейросеть <small>доля ответов</small></h4>${r.map(x => `<div class="row${x[2] ? ' me' : ''}"><span>${esc(x[0])}</span><u><i style="width:${x[1]}%"></i></u><em>${x[1]}%</em></div>`).join('')}</div>
-  <div class="box"><h4>Ваша видимость <small>6 месяцев</small></h4><svg class="trend" viewBox="0 0 320 150" preserveAspectRatio="none" role="img" aria-label="График видимости"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2355ff" stop-opacity=".22"/><stop offset="1" stop-color="#2355ff" stop-opacity="0"/></linearGradient></defs><path d="${line} L${pts[5][0]} 118 L${pts[0][0]} 118 Z" fill="url(#g)"/><path d="${line}" fill="none" stroke="#2355ff" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>${pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1].toFixed(1)}" r="3.5" fill="#fff" stroke="#2355ff" stroke-width="2"/><text x="${p[0]}" y="${(p[1] - 10).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0b1437">${t[i]}%</text><text x="${p[0]}" y="140" text-anchor="middle" font-size="10.5" fill="#5d6785">${mo[i]}</text>`).join('')}</svg></div></div>
-  <div class="cols eq"><div class="box"><h4>Где вас не называют <small><a href="#/questions" style="color:var(--blue);font-weight:700">все вопросы</a></small></h4>${g.length ? g.slice(0, 3).map(x => `<div class="q" style="padding:9px 0">${esc(x.q)}<small>вместо вас: <b>${esc(x.who.join(', '))}</b></small></div>`).join('') : '<p class="muted">Таких вопросов нет.</p>'}</div>
-  <div class="box"><h4>Что сделать сначала <small><a href="#/tasks" style="color:var(--blue);font-weight:700">все задачи</a></small></h4>${tasks().slice(0, 3).map(t => `<div class="q" style="padding:9px 0"><b>${esc(t.t)}</b><small>${esc(t.d)}</small></div>`).join('')}</div></div>`;
-}
-function viewQuestions(){
-  return `<div class="head"><div><h1>Вопросы</h1><p>Что спрашивают клиенты и называет ли вас нейросеть</p></div></div>
-  <div class="box"><div class="tw"><table><tr><th>Вопрос</th>${ENGINES.map(e => `<th class="c">${e[1]}</th>`).join('')}<th>Кого называют вместо вас</th></tr>
-  ${data.qs.map((q, qi) => `<tr><td>${esc(q)}</td>${ENGINES.map(([id]) => `<td class="c"><span class="dot${data.eng[id].grid[qi][0] ? ' y' : ''}" title="${data.eng[id].grid[qi][0] ? 'называет' : 'не называет'}"></span></td>`).join('')}<td class="muted">${esc(data.names.filter((n, i) => i > 0 && ENGINES.some(([id]) => data.eng[id].grid[qi][i])).join(', ') || '—')}</td></tr>`).join('')}</table></div>
-  <form class="add" id="addq"><input class="inp" maxlength="120" placeholder="Добавить свой вопрос" aria-label="Свой вопрос" required><button class="btn btn-blue">Добавить</button></form>
-  <p class="muted" style="font-size:13px;margin-top:10px">Зелёная точка — нейросеть назвала вашу компанию в ответе на этот вопрос.</p></div>`;
-}
-function viewRivals(){
-  return `<div class="head"><div><h1>Конкуренты</h1><p>Видимость по каждой нейросети</p></div></div>
-  <div class="box"><div class="tw"><table><tr><th>Компания</th>${ENGINES.map(e => `<th class="n">${e[1]}</th>`).join('')}<th class="n">В среднем</th></tr>
-  ${data.names.map((n, i) => { const v = ENGINES.map(([id]) => data.eng[id].vis[i]); return [n, v, Math.round(v.reduce((a, b) => a + b, 0) / v.length), i === 0] }).sort((a, b) => b[2] - a[2]).map(x => `<tr class="${x[3] ? 'me' : ''}"><td>${esc(x[0])}${x[3] ? ' · вы' : ''}</td>${x[1].map(v => `<td class="n">${v}%</td>`).join('')}<td class="n">${x[2]}%</td></tr>`).join('')}</table></div>
-  <p class="muted" style="font-size:13px;margin-top:12px">Список конкурентов меняется в <a href="#/settings" style="color:var(--blue);font-weight:700">настройках</a>.</p></div>`;
-}
-function viewSources(){
-  const e = E(), max = e.src[0][1];
-  return `<div class="head"><div><h1>Источники</h1><p>На какие сайты ссылается нейросеть, отвечая про вашу нишу</p></div>${segHtml()}</div>
-  <div class="cols"><div class="box"><h4>Сайты <small>ссылок в ответах</small></h4>${e.src.map(s => `<div class="row"><span>${esc(s[0])}</span><u><i style="width:${s[1] / max * 100}%;background:var(--blue)"></i></u><em>${s[1]}</em></div>`).join('')}</div>
-  <div class="box"><h4>Как о вас говорят</h4><div style="display:flex;height:10px;border-radius:99px;overflow:hidden;margin:4px 0 12px"><i style="width:${e.tone[0]}%;background:var(--good)"></i><i style="width:${e.tone[1]}%;background:#c3cbe0"></i><i style="width:${e.tone[2]}%;background:var(--bad)"></i></div>
-  <p class="muted" style="font-size:13.5px">Хорошо ${e.tone[0]}% · нейтрально ${e.tone[1]}% · плохо ${e.tone[2]}%</p><p style="font-size:14px;margin-top:14px">Чем больше о вас написано на сайтах слева, тем чаще нейросеть вас называет. Начните с первого в списке.</p></div></div>`;
-}
-function tasks(){
-  const src = E().src, g = gaps()[0], lead = ranked().find(x => !x[2]);
+/* ---------- Экраны ---------- */
+function todos(){
+  const g = gaps()[0], src = sources(), lead = ranked().find(x => !x[2]);
   return [
-    { id: 'bots', t: 'Открыть сайт для ботов нейросетей', d: 'Если бот закрыт в robots.txt, нейросеть не может прочитать ваши страницы. Проверка — в разделе «Сайт для ИИ».', ai: null },
-    { id: 'faq', t: 'Переписать главные страницы: вопрос в заголовке, ответ в первом абзаце', d: g ? `Нейросеть не называет вас на вопрос «${g.q}». Ей не из чего взять ответ.` : 'Так нейросети проще найти ответ на вашем сайте.', ai: 'faq' },
-    { id: 'facts', t: 'Добавить цифры с источником и датой, кейсы и отзывы с именами', d: 'В исследованиях это даёт самый большой прирост видимости. Ключевые слова набивать не нужно.', ai: null },
-    { id: 'nap', t: 'Выровнять название, адрес, телефон и часы работы на всех площадках', d: 'Если данные расходятся, нейросеть может назвать устаревшие.', ai: null },
-    { id: 'src', t: `Обновить карточку и собрать отзывы на ${src[0][0]}`, d: 'Отсюда нейросеть берёт больше всего ответов в вашей нише.', ai: 'review' },
-    { id: 'out', t: `Попасть на площадки, которые цитирует нейросеть: ${src[1][0]}, ${src[2][0]}`, d: 'Обзоры, рейтинги и комментарии экспертов там, где уже есть конкуренты.', ai: null },
-    { id: 'ig', t: 'Переписать описание профиля в Instagram', d: 'В описании должно быть прямо сказано, чем вы занимаетесь и в каком городе.', ai: 'bio' },
-    { id: 'cmp', t: lead ? `Сделать страницу «Чем мы отличаемся от ${lead[0]}»` : 'Сделать страницу с вашими отличиями', d: 'На вопросы со сравнением нейросеть отвечает по таким страницам.', ai: 'compare' },
-    { id: 'again', t: 'Повторять замер каждую неделю', d: 'Сравнивайте с конкурентами: если выросли все, это движение рынка, а не ваш результат.', ai: null }
+    { id: 'site', icon: 'globe', t: 'Проверьте, пускает ли сайт ботов нейросетей', d: 'Если бот закрыт, нейросеть не может прочитать ваши страницы.', tag: 'Высокий эффект', btn: 'Проверить сайт', go: '#/actions/site' },
+    { id: 'reviews', icon: 'star', t: src[0] ? `Соберите отзывы на ${src[0][0]}` : 'Соберите отзывы на картах', d: 'Отсюда нейросети чаще всего берут ответы про местный бизнес.', tag: 'Высокий эффект', btn: 'Запросить отзывы в WhatsApp', tool: 'reviews' },
+    { id: 'faq', icon: 'file', t: 'Сделайте страницу с ответами на вопросы клиентов', d: g ? `На вопрос «${g.q}» нейросети нечего взять с вашего сайта.` : 'Вопрос в заголовке, полный ответ в первом предложении.', tag: 'Высокий эффект', btn: 'Собрать страницу', tool: 'faq' },
+    { id: 'pitch', icon: 'send', t: 'Попадите в подборки, где уже есть конкуренты', d: lead ? `${lead[0]} называют чаще всех. Напишите в издания и каталоги, которые его упоминают.` : 'Напишите в издания и каталоги своей ниши.', tag: 'Средний эффект', btn: 'Написать письмо', tool: 'pitch' },
+    { id: 'nap', icon: 'pin', t: 'Выровняйте название, адрес и телефон на всех площадках', d: 'Если данные расходятся, нейросеть может назвать устаревшие.', tag: 'Средний эффект' },
+    { id: 'again', icon: 'list', t: 'Повторяйте замер каждую неделю', d: 'Колебание в один ответ между неделями — норма. Смотрите на динамику за 3–4 недели.', tag: 'Привычка' }
   ];
 }
-function viewSite(){
-  const r = rng('site' + st.company), ok = () => r() > .35;
-  const bots = [['OAI-SearchBot','поиск в ChatGPT'],['GPTBot','обучение моделей OpenAI'],['ChatGPT-User','когда человек просит ChatGPT открыть страницу'],['PerplexityBot','Perplexity'],['Google-Extended','Gemini'],['ClaudeBot','Claude']].map(b => [...b, ok()]);
-  const checks = [['Файл robots.txt найден и читается', ok()],['Главные страницы открываются без входа и капчи', ok()],['Текст виден без JavaScript', ok()],['Есть страница с ценами', ok()],['Адрес и телефон на сайте совпадают с карточками на картах', ok()],['Страницы открываются быстрее трёх секунд', ok()]];
-  const pill = v => v ? '<span class="pill ok">в порядке</span>' : '<span class="pill no">исправить</span>';
-  return `<div class="head"><div><h1>Сайт для ИИ</h1><p>Могут ли нейросети прочитать ваш сайт</p></div></div>
-  <form class="add" id="audit" style="margin:0 0 14px"><input class="inp" maxlength="200" value="${esc(st.site || '')}" placeholder="Адрес сайта, например example.kz" aria-label="Адрес сайта" required><button class="btn btn-blue">Проверить сайт</button></form>
-  <div class="banner" id="auditNote">${API ? 'Введите адрес и нажмите «Проверить сайт». Ниже пока условные статусы.' : 'Демо-режим. Сервер проверки ещё не подключён: статусы ниже условные.'}</div>
-  <div class="cols eq" id="auditOut"><div class="box"><h4>Доступ ботов <small>robots.txt</small></h4><div class="tw"><table>${bots.map(b => `<tr><td><b>${b[0]}</b><div class="muted" style="font-size:13px">${b[1]}</div></td><td class="n">${b[2] ? '<span class="pill ok">открыт</span>' : '<span class="pill no">закрыт</span>'}</td></tr>`).join('')}</table></div></div>
-  <div class="box"><h4>Проверка страниц</h4><div class="tw"><table>${checks.map(c => `<tr><td>${c[0]}</td><td class="n">${pill(c[1])}</td></tr>`).join('')}</table></div></div></div>`;
-}
-function viewTasks(){
-  return `<div class="head"><div><h1>Что сделать</h1><p>План по шагам. Отмечайте, что уже готово</p></div></div>
-  <div class="box">${tasks().map(t => `<div class="task${st.done[t.id] ? ' done' : ''}"><input type="checkbox" data-task="${t.id}" ${st.done[t.id] ? 'checked' : ''} aria-label="Готово"><div><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p>${t.ai ? `<button class="btn btn-sm" data-ai="${t.ai}">Сделать с помощником</button>` : ''}</div></div>`).join('')}</div>
-  <div class="agency"><div><h2>Нет времени делать самим?</h2><p>Агентство Kenes AI выполнит эти задачи за вас и запустит рекламу в ChatGPT.</p></div><a class="btn btn-blue" href="https://kenesai.asia/#lead">Позвать агентство</a></div>`;
-}
-function viewConnectors(){
-  return `<div class="head"><div><h1>Подключения</h1><p>Подключите площадки, чтобы Körin видел то же, что и нейросети</p></div></div>
-  <div class="banner">Демо-режим. Кнопки переключают статус, но настоящего входа в Instagram, Facebook и другие сервисы пока нет.</div>
-  <div class="conns">${CONNECTORS.map(c => `<div class="conn"><div class="ic">${c[1]}</div><div><h4>${c[2]} ${st.conn[c[0]] ? '<span class="pill ok">подключено · демо</span>' : ''}</h4><p>${c[3]}</p><button class="btn btn-sm${st.conn[c[0]] ? '' : ' btn-blue'}" data-conn="${c[0]}">${st.conn[c[0]] ? 'Отключить' : 'Подключить'}</button></div></div>`).join('')}</div>`;
-}
-function viewSettings(){
-  return `<div class="head"><div><h1>Настройки</h1><p>Компания и конкуренты</p></div></div>
-  <div class="cols eq"><div class="box"><h4>Компания</h4><p><b>${esc(st.company)}</b></p><p class="muted">${esc(st.niche)} · ${esc(st.city)}</p>
-  <h4 style="margin-top:20px">Конкуренты</h4><div class="chips">${st.rivals.map((r, i) => `<span>${esc(r)}${st.rivals.length > 1 ? `<button data-delr="${i}" aria-label="Убрать">×</button>` : ''}</span>`).join('')}</div>
-  <form class="add" id="addrv"><input class="inp" maxlength="40" placeholder="Добавить конкурента" aria-label="Конкурент" required><button class="btn">Добавить</button></form></div>
-  <div class="box"><h4>Тариф</h4><p><b>Демо</b> <span class="pill demo">данные условные</span></p><p class="muted" style="margin-top:6px">Настоящие ответы нейросетей появятся после запуска сервиса.</p>
-  <h4 style="margin-top:20px">Начать заново</h4><p class="muted" style="margin-bottom:10px">Удалит компанию и конкурентов из этого браузера.</p><button class="btn" id="reset">Сбросить демо</button></div></div>`;
-}
-const AGENT_LIST = [
-  ['why', 'Аналитик', 'Объясняет, почему вас называют реже конкурентов, и даёт три первых шага.'],
-  ['plan', 'Планировщик', 'Составляет план работ на четыре недели по данным кабинета.'],
-  ['faq', 'Редактор сайта', 'Пишет страницу «Вопросы и ответы» под вопросы, на которых вас не называют.'],
-  ['review', 'Менеджер отзывов', 'Готовит сообщения клиентам с просьбой оставить отзыв на нужной площадке.'],
-  ['bio', 'SMM-агент', 'Переписывает описание профиля в Instagram так, чтобы нейросеть понимала нишу и город.'],
-  ['compare', 'Агент сравнения', 'Составляет страницу сравнения с лидером ниши без оценок конкурента.']
-];
-function viewAgents(){
-  const runs = st.runs || [];
-  return `<div class="head"><div><h1>ИИ-агенты</h1><p>Каждый агент видит данные кабинета и делает одну работу</p></div></div>
-  <div class="banner">${API ? 'Агенты подключены к серверу. Результат — черновик: проверьте его перед публикацией.' : 'Демо-режим. Сервер с нейросетью ещё не подключён: агенты отвечают по шаблонам.'}</div>
-  <div class="conns">${AGENT_LIST.map(a => `<div class="conn"><div class="ic">${a[1].slice(0, 1)}</div><div><h4>${a[1]}</h4><p>${a[2]}</p><button class="btn btn-sm btn-blue" data-agent="${a[0]}">Запустить</button></div></div>`).join('')}</div>
-  <div class="box" style="margin-top:12px"><h4>История запусков <small>${runs.length}</small></h4>${runs.length ? runs.slice(0, 8).map(r => `<div class="q" style="padding:9px 0;border-top:1px solid var(--line)">${esc(r.n)}<small>${new Date(r.t).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })} · ${r.live ? 'нейросеть' : 'шаблон'}</small></div>`).join('') : '<p class="muted">Пока ни одного запуска.</p>'}</div>`;
-}
-function context(){
-  const g = gaps().slice(0, 3).map(x => ({ question: x.q, named_instead: x.who }));
-  return { company: st.company, niche: st.niche, city: st.city, engine, demo_numbers: true, visibility: ranked().map(x => ({ name: x[0], percent: x[1], me: x[2] })), not_named_on: g, top_sources: E().src.slice(0, 3).map(x => x[0]) };
-}
-function renderAudit(d){
-  $('#auditNote').textContent = 'Проверено: ' + d.url;
-  $('#auditOut').innerHTML = `<div class="box"><h4>Доступ ботов <small>robots.txt</small></h4><div class="tw"><table>${d.bots.map(b => `<tr><td><b>${esc(b.bot)}</b><div class="muted" style="font-size:13px">${esc(b.what)}</div></td><td class="n">${b.allowed ? '<span class="pill ok">открыт</span>' : '<span class="pill no">закрыт</span>'}</td></tr>`).join('')}</table></div></div>
-  <div class="box"><h4>Проверка страниц</h4><div class="tw"><table>${d.checks.map(c => `<tr><td>${esc(c.label)}<div class="muted" style="font-size:13px">${esc(c.detail)}</div></td><td class="n">${c.ok ? '<span class="pill ok">в порядке</span>' : '<span class="pill no">исправить</span>'}</td></tr>`).join('')}</table></div></div>`;
-}
-const VIEWS = { overview: viewOverview, questions: viewQuestions, rivals: viewRivals, sources: viewSources, site: viewSite, tasks: viewTasks, agents: viewAgents, connectors: viewConnectors, settings: viewSettings };
+const todoHtml = (t, full) => `<div class="todo${st.done[t.id] ? ' done' : ''}"><div class="ic">${ic(t.icon)}</div><div><h4>${esc(t.t)} <span class="pill ${t.tag.startsWith('Высокий') ? 'ok' : 'mid'}">${t.tag}</span></h4><p>${esc(t.d)}</p>${t.btn ? `<button class="btn btn-sm${full ? '' : ' btn-main'}" ${t.tool ? `data-tool="${t.tool}"` : `data-go="${t.go}"`}>${t.btn}</button>` : ''}${full ? `<label><input type="checkbox" data-task="${t.id}" ${st.done[t.id] ? 'checked' : ''}>Сделано</label>` : ''}</div></div>`;
+const dotsHtml = qi => data.engines.map(e => `<span class="pill ${data.eng[e].grid[qi][0] ? 'ok' : 'no'}">${ENG[e]} ${data.eng[e].grid[qi][0] ? '✓' : '✕'}</span>`).join('');
 
-function app(){
-  const route = (location.hash.replace('#/', '') || 'overview'), cur = VIEWS[route] ? route : 'overview';
-  $('#root').innerHTML = `<div class="shell"><div class="topbar"><a class="logo" href="../"><i></i>Körin</a><span class="co">${esc(st.company)}</span><span class="pill demo">демо</span><span class="sp"></span></div>
-  <nav class="nav" aria-label="Разделы"><b>Кабинет</b>${NAV.map(([id, n]) => `<a href="#/${id}" class="${id === cur ? 'on' : ''}">${n}</a>`).join('')}<div class="help">Не получается разобраться? <a href="https://kenesai.asia/#lead">Позвать агентство</a></div></nav>
-  <main>${VIEWS[cur]()}</main></div>
-  <button class="btn btn-blue fab" id="fab">Помощник</button>
-  <div class="drawer" id="drawer" role="dialog" aria-label="Помощник"><div class="dh">Помощник Körin <span class="pill demo">демо</span><button id="dclose" aria-label="Закрыть">×</button></div><div class="db" id="db"></div>
-  <div class="quick" id="quick"></div><form class="df" id="dform"><input class="inp" id="dinp" placeholder="Спросите про свою видимость" aria-label="Сообщение"><button class="btn btn-blue">→</button></form></div>`;
-  bind();
+function viewOverview(){
+  const r = ranked(), me = hits(0), place = r.findIndex(x => x[2]) + 1, g = gaps(), top = r.filter(x => !x[2]).slice(0, 2).map(x => x[0]);
+  const diag = me === 0 ? `Нейросети ни разу не назвали вас. Чаще всего советуют <b>${esc(top.join(' и '))}</b>.` : g.length ? `Вы на ${place}-м месте из ${r.length}. В ${g.length} вопросах из ${data.qs.length} вместо вас называют <b>${esc(top.join(' и '))}</b>.` : `Вы на ${place}-м месте из ${r.length}. Вас называют во всех вопросах, где называют конкурентов.`;
+  const max = Math.max(...r.map(x => x[1]), 1);
+  return `${banner()}<div class="verdict"><div><small>Вас назвали</small><div class="frac">${me}<span>из ${total()} ответов</span></div>${data.engines.length > 1 ? `<div class="by">${data.engines.map(e => `${ENG[e]} ${data.eng[e].grid.filter(x => x[0]).length}/${data.qs.length}`).join(' · ')}</div>` : ''}</div><p class="diag">${diag}</p><div>${segHtml()}<div class="by">${esc(meta())}</div></div></div>
+  <div class="grid work"><div class="box"><h2>Сделайте на этой неделе <a href="#/actions/tasks">все задачи</a></h2>${todos().slice(0, 3).map(t => todoHtml(t)).join('')}</div>
+  <div class="box"><h2>Кто забирает ваших клиентов</h2>${r.map(x => `<div class="rank${x[2] ? ' me' : ''}"><span>${esc(x[0])}${x[2] ? ' · вы' : ''}</span><u><i style="width:${x[1] / max * 100}%"></i></u><em>${x[1]}/${total()}</em></div>`).join('')}<a class="lnk" href="#/serp/sources" style="display:inline-block;margin-top:8px">Откуда нейросети берут ответы →</a></div></div>
+  <div class="grid"><div class="box"><h2>Где вас не назвали <a href="#/serp/questions">все вопросы</a></h2>${g.length ? g.slice(0, 4).map(x => `<div class="qrow"><b style="font-weight:600">${esc(x.q)}</b><div class="who">вместо вас: <b>${esc(x.who.join(', '))}</b></div><div class="dots">${dotsHtml(x.qi)}<button class="lnk" data-ans="${x.qi}">Читать ответ</button></div></div>`).join('') : '<p class="muted">Таких вопросов в этом замере нет.</p>'}</div>
+  <div class="empty"><b style="color:var(--ink)">История видимости</b>График появится после второго замера: одной точки для линии мало. Замер повторяется раз в неделю.</div></div>
+  <div class="agency"><div><h2>Нет времени внедрять самим?</h2><p>Агентство Kenes AI настроит сайт, отзывы и упоминания за вас.</p></div><a class="btn btn-main" href="https://kenesai.asia/#lead">Позвать агентство</a></div>`;
 }
-function bind(){
-  $$('[data-eng]').forEach(b => b.onclick = () => { engine = b.dataset.eng; app() });
-  $$('[data-task]').forEach(c => c.onchange = () => { st.done[c.dataset.task] = c.checked; store.save(st); app() });
-  $$('[data-conn]').forEach(b => b.onclick = () => { st.conn[b.dataset.conn] = !st.conn[b.dataset.conn]; store.save(st); app() });
-  $$('[data-delr]').forEach(b => b.onclick = () => { st.rivals.splice(+b.dataset.delr, 1); store.save(st); data = build(st); app() });
-  $$('[data-ai]').forEach(b => b.onclick = () => { openDrawer(); ask(AI[b.dataset.ai].q) });
-  const aq = $('#addq'); if (aq) aq.onsubmit = e => { e.preventDefault(); const v = aq.querySelector('input').value.trim(); if (!v || data.qs.includes(v)) return; st.custom.push(v); store.save(st); data = build(st); app() };
-  const ar = $('#addrv'); if (ar) ar.onsubmit = e => { e.preventDefault(); const v = ar.querySelector('input').value.trim(); if (!v || st.rivals.length >= 5 || [st.company, ...st.rivals].some(x => x.toLowerCase() === v.toLowerCase())) return; st.rivals.push(v); store.save(st); data = build(st); app() };
-  const rs = $('#reset'); if (rs) rs.onclick = () => { store.clear(); location.href = location.pathname };
-  $$('[data-agent]').forEach(b => b.onclick = () => { openDrawer(); ask(AI[b.dataset.agent].q) });
-  const au = $('#audit'); if (au) au.onsubmit = async e => { e.preventDefault(); const v = au.querySelector('input').value.trim(); st.site = v; store.save(st);
-    if (!API) { $('#auditNote').textContent = 'Демо-режим. Сервер проверки ещё не подключён, поэтому сайт ' + v + ' не проверялся: статусы ниже условные.'; return }
-    $('#auditNote').textContent = 'Проверяем ' + v + '…';
-    try { renderAudit(await call('/api/site-audit', { url: v })) } catch (err) { $('#auditNote').textContent = 'Не получилось проверить: ' + err.message } };
-  $('#fab').onclick = openDrawer; $('#dclose').onclick = () => $('#drawer').classList.remove('open');
-  $('#dform').onsubmit = e => { e.preventDefault(); const v = $('#dinp').value.trim(); if (v) { $('#dinp').value = ''; ask(v) } };
-  $('#quick').innerHTML = Object.values(AI).map(a => `<button type="button">${esc(a.q)}</button>`).join('');
-  $$('#quick button').forEach(b => b.onclick = () => ask(b.textContent));
+function viewSerp(tab){
+  const tabs = `<div class="seg" style="margin-bottom:14px">${[['questions', 'Вопросы'], ['rivals', 'Конкуренты'], ['sources', 'Источники']].map(t => `<a href="#/serp/${t[0]}" class="${t[0] === tab ? 'on' : ''}">${t[1]}</a>`).join('')}</div>`;
+  let body = '';
+  if (tab === 'questions') body = `<div class="box">${data.qs.map((q, qi) => { const who = data.names.filter((n, i) => i && data.engines.some(e => data.eng[e].grid[qi][i])); return `<div class="qrow"><b style="font-weight:600">${esc(q)}</b><div class="dots">${dotsHtml(qi)}<button class="lnk" data-ans="${qi}">Читать ответ</button></div>${who.length ? `<div class="who">называют: ${esc(who.join(', '))}</div>` : ''}</div>` }).join('')}</div>`;
+  if (tab === 'rivals') body = `<div class="box"><div class="tw"><table><tr><th>Компания</th>${data.engines.map(e => `<th class="n">${ENG[e]}</th>`).join('')}</tr>${data.names.map((n, i) => [n, data.engines.map(e => data.eng[e].grid.filter(g => g[i]).length), i === 0]).sort((a, b) => b[1].reduce((x, y) => x + y, 0) - a[1].reduce((x, y) => x + y, 0)).map(x => `<tr class="${x[2] ? 'me' : ''}"><td>${esc(x[0])}${x[2] ? ' · вы' : ''}</td>${x[1].map(v => `<td class="n">${v}/${data.qs.length}</td>`).join('')}</tr>`).join('')}</table></div><p class="mono" style="margin-top:12px">В скольких ответах из ${data.qs.length} назвали компанию</p></div>`;
+  if (tab === 'sources') { const s = sources(), max = s[0] ? s[0][1] : 1; body = `<div class="box"><h2>Сайты, на которые ссылаются нейросети</h2>${s.length ? s.map(x => `<div class="rank"><span>${esc(x[0])}</span><u><i style="width:${x[1] / max * 100}%;background:var(--jade)"></i></u><em>${x[1]}</em></div>`).join('') : '<p class="muted">В этом замере нейросеть не дала ссылок.</p>'}<p class="muted" style="margin-top:12px;font-size:14px">Чем больше о вас написано на сайтах сверху списка, тем чаще нейросеть вас называет. Это наблюдение, а не гарантия.</p></div>` }
+  return `${banner()}<div class="head"><div><h1>Выдача</h1><p>${esc(meta())}</p></div><div class="sp"></div>${tab === 'rivals' ? '' : segHtml()}</div>${tabs}${body}`;
+}
+function viewActions(tab){
+  const tabs = `<div class="seg" style="margin-bottom:14px">${[['tasks', 'Задачи'], ['site', 'Сайт для ИИ']].map(t => `<a href="#/actions/${t[0]}" class="${t[0] === tab ? 'on' : ''}">${t[1]}</a>`).join('')}</div>`;
+  const body = tab === 'site'
+    ? `<form class="add" id="audit" style="margin-bottom:12px"><input class="inp" maxlength="200" value="${esc(st.links.site || '')}" placeholder="Адрес сайта, например example.kz" aria-label="Адрес сайта" required><button class="btn btn-main">Проверить</button></form><div id="auditOut"><div class="empty">${API ? 'Введите адрес сайта. Проверим, пускает ли он ботов нейросетей и читается ли главная страница.' : 'Проверка сайта заработает, когда будет запущен сервер Körin. Она смотрит файл robots.txt для ботов ChatGPT, Gemini, Perplexity и Claude и семь признаков главной страницы.'}</div></div>`
+    : `<div class="box">${todos().map(t => todoHtml(t, true)).join('')}</div>`;
+  return `${tab === 'tasks' ? banner() : ''}<div class="head"><div><h1>Действия</h1><p>Что повышает шанс, что нейросеть вас назовёт</p></div></div>${tabs}${body}`;
+}
+function viewMore(){
+  const L = [['site', 'globe', 'Сайт', 'example.kz'], ['gis', 'pin', 'Карточка в 2ГИС', 'ссылка на филиал в 2ГИС'], ['gmaps', 'pin', 'Карточка в Google Картах', 'ссылка на карточку']];
+  return `<div class="head"><div><h1>Ещё</h1><p>Площадки, компания и помощь</p></div></div>
+  <div class="grid two"><div class="box"><h2>Ваши площадки</h2><p class="muted" style="font-size:14px">Вставьте ссылки. Автоматического входа в аккаунты нет: мы читаем только то, что открыто всем.</p>${L.map(l => `<div class="field"><label for="l_${l[0]}">${l[2]}</label><input class="inp" id="l_${l[0]}" data-link="${l[0]}" maxlength="300" value="${esc(st.links[l[0]] || '')}" placeholder="${l[3]}"></div>`).join('')}<p class="mono" id="saved" style="margin-top:12px;min-height:18px"></p></div>
+  <div class="box"><h2>Компания</h2><p><b>${esc(st.company)}</b></p><p class="muted">${esc(st.niche)} · ${esc(st.city)}</p><h4 style="margin-top:18px">Конкуренты</h4><div class="chips">${st.rivals.map(r => `<span style="padding-right:12px">${esc(r)}</span>`).join('')}</div>
+  <h4 style="margin-top:22px">Начать заново</h4><p class="muted" style="font-size:14px;margin:4px 0 10px">Удалит компанию и конкурентов из этого браузера.</p><button class="btn btn-sm" id="reset">Сбросить</button></div></div>
+  <div class="agency"><div><h2>Нужна помощь?</h2><p>Агентство Kenes AI сделает всё под ключ и запустит рекламу в ChatGPT.</p></div><a class="btn btn-main" href="https://kenesai.asia/#lead">Позвать агентство</a></div>`;
 }
 
-/* Помощник: готовые шаблоны, подставляющие данные кабинета. Настоящей нейросети здесь нет. */
-const AI = {
-  why: { q: 'Почему нас не называют?', a: () => { const g = gaps()[0], r = ranked().find(x => !x[2]); return g ? `Самый показательный вопрос: «${g.q}». В ответе названы ${g.who.join(', ')}, а вас нет.\n\nЧаще всех в нише называют ${r[0]} — ${r[1]}%. У вас ${E().vis[0]}%.\n\nБольше всего ответов нейросеть берёт с ${E().src[0][0]}. Начните с карточки и отзывов там.` : 'В этой проверке нет вопросов, где конкурентов называют, а вас нет.' } },
-  faq: { q: 'Напиши ответы на вопросы для сайта', a: () => `Черновик для страницы «Вопросы и ответы»:\n\n1. Чем занимается ${st.company}?\n${st.company} — ${st.niche} в городе ${st.city}. [добавьте, сколько лет работаете и для кого]\n\n2. Сколько это стоит?\n[впишите цены или диапазон — нейросеть называет компании, у которых цены указаны]\n\n3. Где вы находитесь и как записаться?\n[адрес, телефон, часы работы]\n\nКвадратные скобки заполните своими фактами.` },
-  review: { q: 'Как попросить клиентов оставить отзыв', a: () => `Сообщение клиенту:\n\n«Здравствуйте! Спасибо, что выбрали ${st.company}. Если вам всё понравилось, оставьте, пожалуйста, короткий отзыв на ${E().src[0][0]} — это занимает минуту и очень нам помогает. [ссылка на карточку]»\n\nОтправляйте сразу после оказания услуги.` },
-  bio: { q: 'Перепиши описание для Instagram', a: () => `Вариант описания профиля:\n\n${st.company} · ${st.niche}\n📍 ${st.city}, [адрес]\n[главное отличие в 4–6 словах]\nЗапись: [телефон или ссылка]\n\nВажно, чтобы ниша и город были написаны словами, а не только в хэштегах.` },
-  plan: { q: 'Составь план на четыре недели', a: () => `План для «${st.company}»:\n\nНеделя 1. Открыть сайт ботам нейросетей и выровнять адрес, телефон и часы работы на всех площадках.\nНеделя 2. Переписать главные страницы: вопрос в заголовке, ответ в первом абзаце, цены и факты.\nНеделя 3. Собрать отзывы на ${E().src[0][0]} и попасть на ${E().src[1][0]}.\nНеделя 4. Повторить замер и сравнить с конкурентами.` },
-  compare: { q: 'Чем мы отличаемся от лидера', a: () => { const r = ranked().find(x => !x[2]); return `План страницы «${st.company} и ${r[0]}: в чём разница»:\n\n1. Для кого подходим мы, для кого они.\n2. Цены и что входит.\n3. Чем мы объективно отличаемся: [3 факта].\n4. Отзывы клиентов.\n\nПишите только проверяемые факты и без оценок конкурента.` } }
+/* ---------- Инструменты: готовый результат, а не чат ---------- */
+const me = () => data.sample ? (st.company || 'Ваша компания') : data.label;
+const TOOLS = {
+  reviews: { title: 'Сбор отзывов', task: 'review', text: () => `Здравствуйте! Спасибо, что выбрали «${me()}». Если всё понравилось, оставьте, пожалуйста, короткий отзыв${st.links.gis ? ': ' + st.links.gis : ' на 2ГИС — [вставьте ссылку на карточку]'}. Напишите пару слов о том, что именно вы у нас заказывали. Это занимает минуту и очень нам помогает.`, wa: true, hint: 'Отправляйте сразу после оказания услуги. Не обещайте скидку за отзыв: площадки это запрещают.' },
+  faq: { title: 'Страница вопросов и ответов', task: 'faq', text: () => `Вопросы и ответы — ${me()}\n\nЧем занимается «${me()}»?\n«${me()}» — ${st.niche || '[ниша]'} в городе ${st.city || '[город]'}. [Сколько лет работаете и для кого]\n\nСколько это стоит?\n[Цены или диапазон. Нейросети называют компании, у которых цены написаны]\n\nГде вы находитесь и как записаться?\n[Адрес, телефон, часы работы]\n\nЧем вы отличаетесь от других?\n[Три проверяемых факта]`, hint: 'Заполните квадратные скобки своими фактами и разместите на сайте отдельной страницей.' },
+  pitch: { title: 'Письмо в подборку', task: 'pitch', text: () => `Здравствуйте!\n\nПишу от компании «${me()}» (${st.niche || '[ниша]'}, ${st.city || '[город]'}). В вашей подборке [название материала] нас нет, и я хочу предложить добавить.\n\nКоротко о нас: [три факта: сколько лет работаем, сколько клиентов, чем отличаемся].\nСсылки: [сайт], [карточка в 2ГИС].\n\nГотов прислать фотографии и ответить на вопросы.\n\nСпасибо!`, hint: 'Отправляйте авторам подборок и каталогов, где уже упомянуты ваши конкуренты.' }
 };
-function openDrawer(){ $('#drawer').classList.add('open'); if (!$('#db').children.length) say(`Здравствуйте! Я вижу данные кабинета «${st.company}» и могу объяснить цифры или подготовить текст. Это демо: ответы собраны по шаблонам.`) }
-function say(t, u){ const d = document.createElement('div'); d.className = 'm' + (u ? ' u' : ''); d.textContent = t; $('#db').appendChild(d); $('#db').scrollTop = $('#db').scrollHeight }
-function ask(q){
-  say(q, true); const s = q.toLowerCase();
-  const k = Object.keys(AI).find(k => AI[k].q === q) || (/почему|не назыв/.test(s) ? 'why' : /faq|вопрос|сайт/.test(s) ? 'faq' : /отзыв/.test(s) ? 'review' : /инст|описан|bio/.test(s) ? 'bio' : /отлич|сравн|лидер|конкурент/.test(s) ? 'compare' : null);
-  const demo = () => say(k ? AI[k].a() : 'В демо я отвечаю на шесть тем. Выберите одну из кнопок ниже.');
-  const log = live => { if (!k) return; st.runs = [{ n: AI[k].q, t: Date.now(), live }, ...(st.runs || [])].slice(0, 30); store.save(st) };
-  if (!API || !k) { setTimeout(() => { demo(); log(false) }, 400); return }
-  call('/api/agent', { task: k, question: q, context: context() }).then(d => { say(d.text); log(true) }).catch(err => { say('Нейросеть сейчас недоступна (' + err.message + '). Показываю ответ по шаблону.'); demo(); log(false) });
+function drawer(title, html, foot){ $('#dtitle').textContent = title; $('#db').innerHTML = html; $('#df').innerHTML = foot || ''; $('#drawer').classList.add('open'); $('#scrim').classList.add('open'); $('#dclose').focus() }
+function closeDrawer(){ $('#drawer').classList.remove('open'); $('#scrim').classList.remove('open') }
+function openTool(k){
+  const t = TOOLS[k], show = (text, live) => {
+    drawer(t.title, `<p class="mono">${live ? 'составлено нейросетью · проверьте перед отправкой' : 'шаблон · заполните скобки своими фактами'}</p><textarea class="ans" id="out" rows="12" style="width:100%;resize:vertical;font:inherit">${esc(text)}</textarea><p class="muted" style="font-size:14px">${esc(t.hint)}</p>`,
+      `<button class="btn btn-main" id="copy">Скопировать</button>${t.wa ? '<a class="btn" id="wa" target="_blank" rel="noopener">Открыть в WhatsApp</a>' : ''}`);
+    $('#copy').onclick = async () => { try { await navigator.clipboard.writeText($('#out').value); $('#copy').textContent = 'Скопировано' } catch (e) { $('#out').select() } };
+    if (t.wa) { const set = () => $('#wa').href = 'https://wa.me/?text=' + encodeURIComponent($('#out').value); set(); $('#out').oninput = set }
+  };
+  if (!API) return show(t.text(), false);
+  drawer(t.title, '<p class="muted">Готовим текст…</p>');
+  call('/api/agent', { task: t.task, context: { company: me(), niche: st.niche, city: st.city, not_named_on: gaps().slice(0, 3).map(g => g.q), top_sources: sources().slice(0, 3).map(s => s[0]), review_link: st.links.gis || '' } }).then(d => show(d.text, true)).catch(() => show(t.text(), false));
+}
+function openAnswer(qi){
+  const marks = text => { let h = esc(text); data.names.forEach((n, i) => { h = h.split(esc(n)).join(i === 0 ? `<span class="hl">${esc(n)}</span>` : `<b>${esc(n)}</b>`) }); return h };
+  drawer(data.qs[qi], data.engines.map(e => { const a = data.eng[e].answers[qi]; return `<div><p class="mono" style="margin-bottom:6px">${ENG[e]} · ${data.sample ? 'пример ответа, составлен для демонстрации' : esc(data.eng[e].model)} · ${data.eng[e].grid[qi][0] ? 'вас назвали' : 'вас не назвали'}</p><div class="ans">${a ? marks(a) : '<span class="muted">Текст ответа не сохранён.</span>'}</div></div>` }).join(''));
 }
 
-addEventListener('hashchange', () => { if (st.ready) app() });
-st.ready ? app() : onboarding();
+/* ---------- Каркас ---------- */
+const NAV = [['overview', 'home', 'Обзор'], ['serp', 'list', 'Выдача'], ['actions', 'check', 'Действия'], ['more', 'more', 'Ещё']];
+function app(){
+  const [route = 'overview', sub] = location.hash.replace('#/', '').split('/');
+  const cur = NAV.some(n => n[0] === route) ? route : 'overview';
+  const view = cur === 'serp' ? viewSerp(['questions', 'rivals', 'sources'].includes(sub) ? sub : 'questions') : cur === 'actions' ? viewActions(sub === 'site' ? 'site' : 'tasks') : cur === 'more' ? viewMore() : viewOverview();
+  const left = todos().filter(t => t.btn && !st.done[t.id]).length;
+  const link = (n, tab) => `<a href="#/${n[0]}" class="${n[0] === cur ? 'on' : ''}" ${n[0] === cur ? 'aria-current="page"' : ''}>${ic(n[1])}<span>${n[2]}</span>${tab && n[0] === 'actions' && left ? `<b>${left}</b>` : ''}</a>`;
+  $('#root').innerHTML = `<div class="shell"><div class="top"><a class="logo" href="../"><i></i>Körin</a><span class="co">${esc(data.sample ? 'Hello Kids' : data.label)}</span>${data.sample ? '<span class="pill ex">пример</span>' : ''}</div>
+  <nav class="side" aria-label="Разделы">${NAV.map(n => link(n)).join('')}<div class="help">Не получается? <a href="https://kenesai.asia/#lead">Позвать агентство</a></div></nav><main>${view}</main></div><nav class="tabs" aria-label="Разделы">${NAV.map(n => link(n, true)).join('')}</nav>`;
+  $$('[data-eng]').forEach(b => b.onclick = () => { engine = b.dataset.eng; app() });
+  $$('[data-go]').forEach(b => b.onclick = () => location.hash = b.dataset.go);
+  $$('[data-tool]').forEach(b => b.onclick = () => openTool(b.dataset.tool));
+  $$('[data-ans]').forEach(b => b.onclick = () => openAnswer(+b.dataset.ans));
+  $$('[data-task]').forEach(c => c.onchange = () => { st.done[c.dataset.task] = c.checked; store.save(st); app() });
+  $$('[data-link]').forEach(i => i.onchange = () => { st.links[i.dataset.link] = i.value.trim(); store.save(st); $('#saved').textContent = 'Сохранено в этом браузере' });
+  const rs = $('#reset'); if (rs) rs.onclick = () => { store.clear(); location.href = location.pathname };
+  const au = $('#audit'); if (au) au.onsubmit = async e => { e.preventDefault(); const v = au.querySelector('input').value.trim(); st.links.site = v; store.save(st); const out = $('#auditOut');
+    if (!API) { out.innerHTML = `<div class="empty">Сайт ${esc(v)} не проверялся: сервер Körin ещё не запущен. Адрес сохранён, проверим, когда сервис заработает.</div>`; return }
+    out.innerHTML = '<div class="empty">Проверяем…</div>';
+    try { const d = await call('/api/site-audit', { url: v }); out.innerHTML = `<p class="mono" style="margin-bottom:10px">проверено: ${esc(d.url)}</p><div class="grid two" style="margin-top:0"><div class="box"><h2>Доступ ботов</h2><div class="tw"><table>${d.bots.map(b => `<tr><td><b>${esc(b.bot)}</b><div class="muted" style="font-size:13px">${esc(b.what)}</div></td><td class="n"><span class="pill ${b.allowed ? 'ok' : 'no'}">${b.allowed ? 'открыт' : 'закрыт'}</span></td></tr>`).join('')}</table></div></div><div class="box"><h2>Главная страница</h2><div class="tw"><table>${d.checks.map(c => `<tr><td>${esc(c.label)}<div class="muted" style="font-size:13px">${esc(c.detail)}</div></td><td class="n"><span class="pill ${c.ok ? 'ok' : 'no'}">${c.ok ? 'в порядке' : 'исправить'}</span></td></tr>`).join('')}</table></div></div></div><p class="muted" style="font-size:14px;margin-top:12px">Открытый доступ ботам не гарантирует, что нейросеть вас назовёт: это только условие, без которого она не прочитает сайт.</p>` }
+    catch (err) { out.innerHTML = `<div class="empty" style="color:var(--bad)">Не получилось проверить: ${esc(err.message)}</div>` } };
+}
+$('#dclose').onclick = closeDrawer; $('#scrim').onclick = closeDrawer;
+addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer() });
+addEventListener('hashchange', () => { closeDrawer(); if (st.ready) app() });
+if (st.ready) { load(); app() } else onboarding();
 </script>
 </body>
 </html>

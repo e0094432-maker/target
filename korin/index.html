@@ -3,358 +3,183 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Körin — видит ли вас ChatGPT</title>
-<meta name="description" content="Körin показывает, называют ли нейросети вашу компанию, кого советуют вместо вас и что с этим делать. Аналитика видимости в ChatGPT, Gemini и Perplexity для бизнеса в Казахстане.">
+<title>Körin — кого ChatGPT советует вместо вас</title>
+<meta name="description" content="Körin проверяет, называют ли ChatGPT, Gemini и Perplexity вашу компанию, кого советуют вместо вас и что сделать, чтобы называли вас. Для бизнеса в Казахстане, на русском и казахском.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#f6f7fb; --white:#fff; --ink:#0b1437; --muted:#5d6785; --line:#e3e7f2; --soft:#eef2ff;
-  --blue:#2355ff; --blue-d:#1238c9; --good:#12b76a; --bad:#f04438; --warn:#f79009;
-  --sh:0 1px 2px rgba(11,20,55,.05),0 12px 32px -12px rgba(11,20,55,.14);
-  --max:1180px;
-}
+:root{--bg:#f6f5f0;--card:#fff;--line:#e5e2d9;--ink:#141a18;--muted:#5e6864;--dark:#111c1a;--jade:#0e7c5d;--jade-d:#0a5e46;--lime:#d9f99d;--lime-ink:#1a2e05;--bad:#d93829;--bad-bg:#feeceb;
+  --sans:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--max:1120px}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:84px;-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "Onest",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 h1,h2,h3,p{margin:0}
-h1{font-size:clamp(34px,7.6vw,68px);line-height:1.04;letter-spacing:-.04em;font-weight:900}
-h2{font-size:clamp(27px,5.2vw,44px);line-height:1.1;letter-spacing:-.035em;font-weight:800}
-h3{font-size:18px;line-height:1.3;letter-spacing:-.015em;font-weight:700}
+h1{font-size:clamp(32px,7.4vw,60px);line-height:1.06;letter-spacing:-.035em;font-weight:800}
+h2{font-size:clamp(26px,5vw,40px);line-height:1.12;letter-spacing:-.03em;font-weight:800}
+h3{font-size:18px;line-height:1.3;font-weight:700}
 a{color:inherit;text-decoration:none}
 button,input{font:inherit;color:inherit}
 button{cursor:pointer}
-:focus-visible{outline:3px solid rgba(35,85,255,.45);outline-offset:2px;border-radius:8px}
+:focus-visible{outline:3px solid rgba(14,124,93,.4);outline-offset:2px;border-radius:8px}
 .wrap{max-width:var(--max);margin:0 auto;padding:0 16px}
-section{padding:72px 0}
-.center{text-align:center}.center .lead{margin-inline:auto}
-.tag{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--blue);background:var(--soft);border-radius:999px;padding:7px 14px;margin-bottom:18px}
-.tag i{width:7px;height:7px;border-radius:50%;background:var(--good)}
-.lead{color:var(--muted);font-size:18px;margin-top:18px;max-width:58ch}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:12px;border:1px solid var(--line);background:var(--white);font-weight:700;font-size:15px;transition:transform .15s,box-shadow .15s,background .15s;white-space:nowrap}
-.btn:hover{transform:translateY(-1px);box-shadow:var(--sh)}
-.btn-blue{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 8px 20px -8px rgba(35,85,255,.7)}
-.btn-blue:hover{background:var(--blue-d)}
-.btn-sm{min-height:40px;padding:0 16px;font-size:14px;border-radius:10px}
-.rv{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0s)}
+section{padding:64px 0}
+.kick{font:500 12.5px var(--mono);letter-spacing:.04em;color:var(--jade);margin-bottom:14px;display:block}
+.lead{color:var(--muted);font-size:18px;margin-top:16px;max-width:54ch}
+.hl{background:var(--lime);color:var(--lime-ink);border-radius:.18em;padding:0 .14em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:0 24px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:600;font-size:15.5px;white-space:nowrap;transition:transform .15s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn-main{background:var(--jade);color:#fff;border-color:var(--jade)}.btn-main:hover{background:var(--jade-d)}
+.btn-sm{min-height:40px;padding:0 16px;font-size:14.5px;border-radius:10px}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0s)}
 .rv.in{opacity:1;transform:none}
 
-header{position:sticky;top:0;z-index:30;background:rgba(246,247,251,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.bar{display:flex;align-items:center;gap:24px;height:64px}
-.logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:22px;letter-spacing:-.04em;margin-right:auto}
-.logo i{width:30px;height:30px;border-radius:9px;background:var(--blue);display:grid;place-items:center}
-.logo i::after{content:"";width:12px;height:12px;border-radius:50%;border:3px solid #fff}
-nav{display:none;gap:26px;font-size:15px;font-weight:500;color:var(--muted)}
+header{position:sticky;top:0;z-index:30;background:rgba(246,245,240,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:22px;height:60px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:21px;letter-spacing:-.03em;margin-right:auto}
+.logo i{width:28px;height:28px;border-radius:8px;background:var(--dark);display:grid;place-items:center;position:relative}
+.logo i::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--lime)}
+.logo i::after{content:"";position:absolute;inset:5px;border:1.5px solid var(--lime);border-radius:50%;clip-path:polygon(0 0,45% 0,45% 45%,0 45%)}
+nav{display:none;gap:24px;font-size:15px;font-weight:500;color:var(--muted)}
 nav a:hover{color:var(--ink)}
 
-/* hero */
-.hero{padding:52px 0 0;position:relative;overflow:hidden}
-.hero::before{content:"";position:absolute;inset:0 0 auto 0;height:760px;z-index:-1;
-  background:radial-gradient(60% 55% at 50% 0,rgba(35,85,255,.16),transparent 70%),radial-gradient(#cfd6ea 1px,transparent 1.2px) 0 0/22px 22px;
-  -webkit-mask:linear-gradient(#000 55%,transparent);mask:linear-gradient(#000 55%,transparent)}
-h1 em{font-style:normal;color:var(--blue)}
-.check{margin:30px auto 0;display:grid;gap:10px;max-width:620px;background:var(--white);border:1px solid var(--line);border-radius:18px;padding:8px;box-shadow:var(--sh)}
-.field{display:flex;align-items:center;gap:10px;padding:0 12px;min-height:54px}
-.field svg{width:20px;height:20px;color:var(--muted);flex:none}
-.field input{flex:1;min-width:0;background:none;border:0;outline:0;height:52px;font-size:16px}
-.field input::placeholder{color:#9aa3bd}
-.note{font-size:13.5px;color:var(--muted);margin-top:14px}
-.engines{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;margin-top:22px;font-size:14px;font-weight:600;color:var(--muted)}
-.engines span{display:flex;align-items:center;gap:7px}
-.engines span::before{content:"";width:16px;height:16px;border-radius:50%;background:var(--good);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.700 6.300-4.200 4.200a1 1 0 0 1-1.400 0L4.300 8.700l1.400-1.400L6.800 8.400l3.500-3.500 1.400 1.400Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.700 6.300-4.200 4.200a1 1 0 0 1-1.400 0L4.300 8.700l1.400-1.400L6.800 8.400l3.500-3.500 1.400 1.400Z'/%3E%3C/svg%3E") center/contain no-repeat}
+.hero{padding:44px 0 56px}
+.hero-grid{display:grid;gap:36px;align-items:center}
+.check{margin-top:26px;display:grid;gap:10px;max-width:520px}
+.check input{min-height:54px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:0 16px;font-size:16px;width:100%}
+.check input:focus{outline:none;border-color:var(--jade);box-shadow:0 0 0 3px rgba(14,124,93,.14)}
+.small{font:500 12.5px/1.5 var(--mono);color:var(--muted);margin-top:12px}
+.chat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 30px 60px -30px rgba(17,28,26,.35);display:grid;gap:12px}
+.chat .q{justify-self:end;max-width:88%;background:var(--dark);color:#f3f1ea;border-radius:16px 16px 4px 16px;padding:11px 15px;font-size:15px}
+.chat .a{background:var(--bg);border-radius:16px 16px 16px 4px;padding:14px 16px;font-size:15px;display:grid;gap:9px}
+.chat .a b{font-weight:700}
+.chat .a div{opacity:0;transform:translateY(8px);animation:in .5s forwards;animation-delay:var(--t)}
+@keyframes in{to{opacity:1;transform:none}}
+.miss{display:flex;align-items:center;gap:10px;background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:12px 14px;font-weight:600;font-size:15px;opacity:0;animation:in .5s 2.100s forwards}
+.miss::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--bad);flex:none}
+.chat .cap{font:500 12px var(--mono);color:var(--muted)}
 
-/* app window */
-.window{margin-top:48px;background:var(--white);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 2px 4px rgba(11,20,55,.04),0 40px 80px -30px rgba(11,20,55,.32)}
-.chrome{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line);background:#fafbfe}
-.chrome .dots{display:flex;gap:6px}.chrome .dots i{width:11px;height:11px;border-radius:50%;background:#dfe3ee}
-.chrome .url{flex:1;max-width:420px;margin:0 auto;background:var(--bg);border-radius:8px;padding:6px 12px;font-size:12.5px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.app{display:grid}
-.side{display:none;border-right:1px solid var(--line);padding:18px 12px;background:#fafbfe;font-size:14px;font-weight:500;color:var(--muted)}
-.side b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9aa3bd;margin:0 10px 8px}
-.side span{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px}
-.side span::before{content:"";width:8px;height:8px;border-radius:3px;background:#cfd6ea}
-.side span.on{background:var(--soft);color:var(--blue);font-weight:700}.side span.on::before{background:var(--blue)}
-.main{padding:16px;min-width:0}
-.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:16px}
-.top h3{font-size:19px}
-.top p{font-size:13.5px;color:var(--muted)}
-.demo{font-size:11.5px;font-weight:700;color:#93540a;background:#fff4dd;border:1px solid #ffe0a3;border-radius:6px;padding:3px 8px}
-.seg{display:flex;margin-left:auto;background:var(--bg);border-radius:10px;padding:3px;gap:2px}
-.seg button{border:0;background:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--muted)}
-.seg button[aria-pressed=true]{background:var(--white);color:var(--ink);box-shadow:0 1px 3px rgba(11,20,55,.16)}
-.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.kpi{border:1px solid var(--line);border-radius:14px;padding:16px}
-.kpi small{display:block;font-size:13px;font-weight:500;color:var(--muted)}
-.kpi b{display:block;font-size:32px;line-height:1.1;letter-spacing:-.04em;font-weight:800;margin-top:6px}
-.kpi span{font-size:12.5px;color:var(--muted)}
-.kpi.main{background:var(--blue);border-color:var(--blue);color:#fff}
-.kpi.main small,.kpi.main span{color:rgba(255,255,255,.82)}
-.kpi.main b{font-size:42px}
-.up{display:inline-block;font-size:12px;font-weight:700;color:var(--good);background:#e7f8ef;border-radius:6px;padding:2px 6px;margin-left:4px;vertical-align:middle}
-.cols{display:grid;gap:12px;margin-top:12px}
-.box{border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
-.box h4{margin:0 0 14px;font-size:14.5px;font-weight:700;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.box h4 small{font-size:12.5px;font-weight:500;color:var(--muted)}
-.row{display:grid;grid-template-columns:minmax(90px,130px) 1fr 44px;gap:10px;align-items:center;margin:10px 0;font-size:14px}
-.row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.row u{display:block;height:10px;border-radius:99px;background:var(--bg);overflow:hidden;text-decoration:none}
-.row i{display:block;height:100%;border-radius:99px;background:#c3cbe0;width:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
-.row.me i{background:var(--blue)}.row.me span:first-child{color:var(--blue);font-weight:700}
-.row em{font-style:normal;font-weight:700;font-size:13.5px;text-align:right}
-svg.trend{width:100%;height:150px;display:block}
-.q{display:grid;gap:5px;padding:11px 0;border-top:1px solid var(--line);font-size:14px}
-.q:first-of-type{border-top:0;padding-top:0}
-.q small{font-size:12.5px;color:var(--muted)}
-.q small b{color:var(--bad);font-weight:600}
-.src{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
-.src:first-of-type{border-top:0;padding-top:0}
-.src em{font-style:normal;font-weight:700;color:var(--muted)}
-.tone{display:flex;height:10px;border-radius:99px;overflow:hidden;margin:4px 0 12px}
-.tone i{display:block}
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
-.legend b{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
-.todo{display:grid;gap:10px;counter-reset:t}
-.todo div{counter-increment:t;display:grid;grid-template-columns:24px 1fr;gap:10px;font-size:14px;align-items:start}
-.todo div::before{content:counter(t);width:24px;height:24px;border-radius:7px;background:var(--soft);color:var(--blue);display:grid;place-items:center;font-size:12px;font-weight:800}
-.foot-note{padding:12px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);background:#fafbfe}
-
-/* sections */
-.grid{display:grid;gap:14px;margin-top:36px}
-.card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:26px;transition:transform .2s,box-shadow .2s;text-align:left}
-.card:hover{transform:translateY(-3px);box-shadow:var(--sh)}
+.dark{background:var(--dark);color:#f3f1ea}
+.dark .kick{color:var(--lime)}.dark .lead{color:#a9b6b1}
+.grid{display:grid;gap:14px;margin-top:32px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
 .card p{color:var(--muted);font-size:15px;margin-top:8px}
-.ico{width:44px;height:44px;border-radius:12px;background:var(--soft);color:var(--blue);display:grid;place-items:center;margin-bottom:16px;font-weight:900;font-size:17px}
-.steps{counter-reset:s}.steps .card{counter-increment:s}
-.steps .card::before{content:counter(s);width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;margin-bottom:16px}
-.white{background:var(--white);border-block:1px solid var(--line)}
-.price{display:flex;flex-direction:column}
-.price b{display:block;font-size:34px;line-height:1;letter-spacing:-.05em;font-weight:900;margin-top:14px}
-.price b small{font-size:15px;font-weight:500;color:var(--muted);letter-spacing:0}
-.price ul{list-style:none;padding:0;margin:20px 0 24px;display:grid;gap:10px;font-size:15px;flex:1}
-.price li{padding-left:26px;position:relative}
-.price li::before{content:"";position:absolute;left:0;top:.28em;width:16px;height:16px;border-radius:50%;background:var(--good);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.700 6.300-4.200 4.200a1 1 0 0 1-1.400 0L4.300 8.700l1.400-1.400L6.800 8.400l3.500-3.500 1.400 1.400Z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm3.700 6.300-4.200 4.200a1 1 0 0 1-1.400 0L4.300 8.700l1.400-1.400L6.800 8.400l3.500-3.500 1.400 1.400Z'/%3E%3C/svg%3E") center/contain no-repeat}
-.price.hot{border:2px solid var(--blue);box-shadow:0 24px 50px -24px rgba(35,85,255,.5);position:relative}
-.price.hot::after{content:"Чаще выбирают";position:absolute;top:-13px;left:24px;background:var(--blue);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:4px 12px}
-.cta{background:var(--ink);color:#fff;border-radius:26px;padding:36px 22px;display:grid;gap:26px;position:relative;overflow:hidden}
-.cta::before{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(35,85,255,.75),transparent 68%)}
-.cta>*{position:relative}
-.cta p{color:#b9c2de;margin-top:14px;font-size:17px}
+.card .n{font:700 13px var(--mono);color:var(--jade);margin-bottom:14px;display:block}
+.dark .card{background:#1b2a27;border-color:#2a3d39}.dark .card p{color:#a9b6b1}.dark .card .n{color:var(--lime)}
+.tool{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start}
+.tool .ic{width:44px;height:44px;border-radius:12px;background:var(--bg);display:grid;place-items:center;color:var(--jade)}
+.tool svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.cta{background:var(--lime);color:var(--lime-ink);border-radius:24px;padding:32px 22px;display:grid;gap:22px}
+.cta p{font-size:17px;margin-top:12px;opacity:.85}
 .cta form{display:grid;gap:10px}
-.cta input{min-height:56px;border-radius:12px;border:1px solid #2a3766;background:#141e47;padding:0 16px;color:#fff;font-size:16px;width:100%}
-.cta input::placeholder{color:#8591b8}
-.cta input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(35,85,255,.35)}
-.cta .msg{font-size:14px;min-height:21px;color:#b9c2de}
-footer{padding:32px 0 48px;font-size:13.5px;color:var(--muted)}
+.cta input{min-height:54px;border-radius:12px;border:1.5px solid var(--lime-ink);background:rgba(255,255,255,.6);padding:0 16px;font-size:16px;width:100%}
+.cta button{min-height:54px;border-radius:12px;border:0;background:var(--dark);color:#f3f1ea;font-weight:600;font-size:15.5px}
+.cta .msg{font:500 13px var(--mono);min-height:20px}
+footer{padding:28px 0 44px;font:400 12.5px/1.6 var(--mono);color:var(--muted)}
 
-@media (min-width:640px){
-  .check{grid-template-columns:1fr auto}
-  .kpis{grid-template-columns:repeat(4,1fr)}
-  .main{padding:22px}
-  .cta{padding:56px 52px}
-}
-@media (min-width:900px){
-  section{padding:100px 0}
-  .wrap{padding:0 28px}
-  nav{display:flex}
-  .hero{padding:80px 0 0}
-  .app{grid-template-columns:200px 1fr}
-  .side{display:block}
-  .cols{grid-template-columns:1.2fr .8fr}
-  .cols.three{grid-template-columns:repeat(3,1fr)}
-  .g3{grid-template-columns:repeat(3,1fr)}
-  .g5{grid-template-columns:repeat(5,1fr)}.g5 .card{padding:22px}
+@media (min-width:600px){.check{grid-template-columns:1fr auto}.cta{padding:48px}}
+@media (min-width:920px){
+  section{padding:96px 0}.wrap{padding:0 28px}nav{display:flex}
+  .hero{padding:72px 0 88px}.hero-grid{grid-template-columns:1.1fr .9fr;gap:56px}
+  .g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
   .cta{grid-template-columns:1fr 1fr;align-items:center}
 }
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01s!important;animation-delay:0s!important;transition:none!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="wrap bar">
-    <a class="logo" href="#top"><i></i>Körin</a>
-    <nav aria-label="Меню"><a href="#demo">Демо</a><a href="#how">Как работает</a><a href="#what">Что измеряем</a><a href="app/index.html#/agents">ИИ-агенты</a></nav>
-    <a class="btn btn-blue btn-sm" href="app/">Открыть кабинет</a>
-  </div>
-</header>
+<header><div class="wrap bar">
+  <a class="logo" href="#top"><i></i>Körin</a>
+  <nav aria-label="Меню"><a href="#how">Как работает</a><a href="#get">Что вы получите</a><a href="#why">Почему Körin</a></nav>
+  <a class="btn btn-main btn-sm" href="app/index.html">Открыть кабинет</a>
+</div></header>
 
 <main id="top">
-<section class="hero">
-  <div class="wrap center">
-    <span class="tag rv"><i></i>Аналитика видимости в нейросетях · Казахстан</span>
-    <h1 class="rv" style="--d:.06s">Клиенты спрашивают ChatGPT.<br><em>Называет ли он вас?</em></h1>
-    <p class="lead rv" style="--d:.12s">Körin задаёт нейросетям вопросы ваших покупателей и показывает, как часто они называют вашу компанию, кого советуют вместо вас и что с этим делать.</p>
+<section class="hero"><div class="wrap hero-grid">
+  <div>
+    <span class="kick rv">ChatGPT · Gemini · Perplexity · русский и қазақша</span>
+    <h1 class="rv" style="--d:.06s">Узнайте, кого ChatGPT советует <span class="hl">вместо вас</span></h1>
+    <p class="lead rv" style="--d:.12s">Клиенты спрашивают совета у нейросетей. Körin покажет, называют ли они вашу компанию в Казахстане, и даст три шага, как попасть в ответы.</p>
     <form class="check rv" style="--d:.18s" id="checkForm">
-      <label class="field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg>
-        <input id="company" type="text" maxlength="40" required placeholder="Название вашей компании" aria-label="Название вашей компании"></label>
-      <button class="btn btn-blue">Попробовать бесплатно</button>
+      <input id="company" type="text" maxlength="40" required placeholder="Название вашей компании" aria-label="Название вашей компании">
+      <button class="btn btn-main">Проверить мой бизнес</button>
     </form>
-    <p class="note rv" style="--d:.22s">Откроется демо-кабинет: вы сами добавите конкурентов и посмотрите отчёт. Цифры в демо условные.</p>
-    <div class="engines rv" style="--d:.26s"><span>ChatGPT</span><span>Gemini</span><span>Perplexity</span><span>Русский и казахский</span></div>
-
-    <div class="window rv" style="--d:.3s;text-align:left" id="demo">
-      <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url">app.korin.kz / <span data-co>ваша-компания</span> / обзор</span></div>
-      <div class="app">
-        <aside class="side"><b>Отчёты</b><span class="on">Обзор</span><span>Конкуренты</span><span>Источники</span><span>Вопросы</span><span>Тональность</span><span>Рекомендации</span></aside>
-        <div class="main">
-          <div class="top">
-            <div><h3><span data-co>Ваша компания</span> <span class="demo">демо · данные условные</span></h3><p>Курсы английского · Алматы · 100 вопросов</p></div>
-            <div class="seg" role="group" aria-label="Нейросеть">
-              <button type="button" data-eng="chatgpt" aria-pressed="true">ChatGPT</button>
-              <button type="button" data-eng="gemini" aria-pressed="false">Gemini</button>
-              <button type="button" data-eng="perplexity" aria-pressed="false">Perplexity</button>
-            </div>
-          </div>
-          <div class="kpis">
-            <div class="kpi main"><small>Видимость</small><b id="k1">0%</b><span id="k1s"></span></div>
-            <div class="kpi"><small>Место</small><b id="k2">—</b><span>среди 5 компаний</span></div>
-            <div class="kpi"><small>Доля упоминаний</small><b id="k3">0%</b><span>от всех в нише</span></div>
-            <div class="kpi"><small>Ссылок на ваш сайт</small><b id="k4">0</b><span>из 100 ответов</span></div>
-          </div>
-          <div class="cols">
-            <div class="box"><h4>Кого называет нейросеть <small>доля ответов</small></h4><div id="bars"></div></div>
-            <div class="box"><h4>Ваша видимость <small>6 месяцев <span class="up" id="delta"></span></small></h4><svg class="trend" id="trend" viewBox="0 0 320 150" preserveAspectRatio="none" role="img" aria-label="График видимости за шесть месяцев"></svg></div>
-          </div>
-          <div class="cols three">
-            <div class="box"><h4>Где вас не называют</h4><div id="gaps"></div></div>
-            <div class="box"><h4>Откуда нейросеть берёт ответы <small>ссылок</small></h4><div id="srcs"></div></div>
-            <div class="box"><h4>Как о вас говорят</h4>
-              <div class="tone" id="tone"></div>
-              <div class="legend"><span><b style="background:var(--good)"></b>хорошо <span id="t1"></span></span><span><b style="background:#c3cbe0"></b>нейтрально <span id="t2"></span></span><span><b style="background:var(--bad)"></b>плохо <span id="t3"></span></span></div>
-              <h4 style="margin-top:22px">Что сделать</h4>
-              <div class="todo"><div>Добавить на сайт страницу с ценами и программами: нейросеть их не находит.</div><div>Собрать отзывы на 2ГИС: оттуда берётся больше всего ответов.</div><div>Исправить устаревший адрес, который нейросеть называет до сих пор.</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="foot-note">Это пример интерфейса. Названия компаний и цифры условные и не относятся к реальным организациям.</div>
-    </div>
+    <p class="small rv" style="--d:.22s">Сервис в разработке: сейчас откроется пример кабинета, а не замер вашей компании.</p>
   </div>
-</section>
-
-<section id="how">
-  <div class="wrap center">
-    <span class="tag rv">Как работает</span>
-    <h2 class="rv">Три шага. Доступ к вашему сайту не нужен</h2>
-    <div class="grid g3 steps">
-      <div class="card rv"><h3>Вы называете компанию и конкурентов</h3><p>Нужны только название, город и чем вы занимаетесь.</p></div>
-      <div class="card rv" style="--d:.08s"><h3>Мы задаём сотни вопросов нейросетям</h3><p>Те же вопросы, что задают ваши клиенты, на русском и казахском. Каждую неделю заново.</p></div>
-      <div class="card rv" style="--d:.16s"><h3>Вы видите отчёт и что исправить</h3><p>Где вас называют, где нет, кого советуют вместо вас и на какие сайты нейросеть опирается.</p></div>
+  <div class="chat rv" style="--d:.16s" aria-label="Пример ответа нейросети">
+    <div class="q">Какие курсы английского в Алматы подойдут ребёнку?</div>
+    <div class="a">
+      <div style="--t:.5s">Вот на что стоит обратить внимание:</div>
+      <div style="--t:.9s">1. <b>Lingua Plus</b> — много свежих отзывов на 2ГИС.</div>
+      <div style="--t:1.3s">2. <b>Bright School</b> — на сайте расписаны программы и цены.</div>
+      <div style="--t:1.700s">3. <b>English Hub</b> — упоминается в городских подборках.</div>
     </div>
+    <div class="miss">Вашей компании в этом ответе нет</div>
+    <span class="cap">пример · компании вымышленные</span>
   </div>
-</section>
+</div></section>
 
-<section id="what" class="white">
-  <div class="wrap center">
-    <span class="tag rv">Что измеряем</span>
-    <h2 class="rv">Пять ответов на вопрос «почему не нас?»</h2>
-    <div class="grid g5">
-      <div class="card rv"><div class="ico">%</div><h3>Видимость</h3><p>В скольких ответах из ста названа ваша компания.</p></div>
-      <div class="card rv" style="--d:.05s"><div class="ico">VS</div><h3>Конкуренты</h3><p>Кого нейросеть советует чаще и на каких вопросах.</p></div>
-      <div class="card rv" style="--d:.1s"><div class="ico">↗</div><h3>Источники</h3><p>С каких сайтов, каталогов и отзывов она берёт ответы.</p></div>
-      <div class="card rv" style="--d:.15s"><div class="ico">±</div><h3>Тональность</h3><p>Что о вас говорят и где информация устарела.</p></div>
-      <div class="card rv" style="--d:.2s"><div class="ico">✓</div><h3>Рекомендации</h3><p>Какие страницы и публикации добавить, чтобы вас называли.</p></div>
-    </div>
+<section id="how" class="dark"><div class="wrap">
+  <span class="kick rv">Как работает</span>
+  <h2 class="rv">Замер → причина → действие → новый замер</h2>
+  <div class="grid g3">
+    <div class="card rv"><span class="n">01</span><h3>Задаём вопросы ваших клиентов</h3><p>На русском и казахском, так, как спрашивают в вашем городе. Сохраняем ответы дословно.</p></div>
+    <div class="card rv" style="--d:.08s"><span class="n">02</span><h3>Показываем, кого назвали</h3><p>Не «видимость 30%», а «вас назвали в 3 ответах из 10». Каждый ответ можно открыть и прочитать.</p></div>
+    <div class="card rv" style="--d:.16s"><span class="n">03</span><h3>Даём три шага на неделю</h3><p>С готовым текстом и кнопкой. Через неделю повторяем замер и смотрим, что изменилось.</p></div>
   </div>
-</section>
+</div></section>
 
-<section id="why">
-  <div class="wrap center">
-    <span class="tag rv">Почему Körin</span>
-    <h2 class="rv">Сделан для Казахстана, а не переведён</h2>
-    <div class="grid g3">
-      <div class="card rv"><div class="ico">KZ</div><h3>Русский и казахский</h3><p>Вопросы, отчёты и кабинет на двух языках. Зарубежные сервисы про Казахстан не пишут ничего.</p></div>
-      <div class="card rv" style="--d:.08s"><div class="ico">₸</div><h3>Цены и оплата в тенге</h3><p>Счёт для ТОО и ИП, без долларовой карты.</p></div>
-      <div class="card rv" style="--d:.16s"><div class="ico">2G</div><h3>Местные площадки</h3><p>2ГИС, Instagram и казахстанские сайты: именно оттуда нейросети берут ответы про местный бизнес.</p></div>
-    </div>
+<section id="get"><div class="wrap">
+  <span class="kick rv">Что вы получите</span>
+  <h2 class="rv">Не отчёт, а готовые действия</h2>
+  <div class="grid g2">
+    <div class="card tool rv"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l2.700 5.600 6.100.900-4.400 4.300 1 6.100L12 17l-5.400 2.900 1-6.100L3.200 9.500l6.100-.900z"/></svg></div><div><h3>Сбор отзывов</h3><p>Готовое сообщение клиенту со ссылкой на вашу карточку и кнопка «Открыть в WhatsApp».</p></div></div>
+    <div class="card tool rv" style="--d:.06s"><div class="ic"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/></svg></div><div><h3>Страница вопросов и ответов</h3><p>Текст под те вопросы, на которых вас не называют. Остаётся вставить на сайт.</p></div></div>
+    <div class="card tool rv" style="--d:.12s"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.500 3 14.500 0 18M12 3c-3 3.500-3 14.500 0 18"/></svg></div><div><h3>Проверка сайта для нейросетей</h3><p>Пускает ли сайт ботов ChatGPT, Gemini, Perplexity и Claude и читается ли главная страница.</p></div></div>
+    <div class="card tool rv" style="--d:.18s"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg></div><div><h3>Письмо в подборку</h3><p>Обращение в издания и каталоги, где уже упомянуты ваши конкуренты.</p></div></div>
   </div>
-</section>
+</div></section>
 
-<section id="start" style="padding-top:0">
-  <div class="wrap">
-    <div class="cta rv">
-      <div><h2>Узнайте, что нейросети говорят о вас на самом деле</h2><p>Оставьте название компании и WhatsApp. Подготовим настоящий отчёт по вашей нише и пришлём.</p></div>
-      <form id="leadForm" novalidate>
-        <input name="business" type="text" placeholder="Компания и город" aria-label="Компания и город" required>
-        <input name="whatsapp" type="tel" inputmode="tel" placeholder="WhatsApp: +7 7__ ___ __ __" aria-label="WhatsApp" required>
-        <button class="btn btn-blue" style="min-height:56px">Получить отчёт</button>
-        <div class="msg" id="leadMsg" role="status"></div>
-      </form>
-    </div>
+<section id="why" style="padding-top:0"><div class="wrap">
+  <span class="kick rv">Почему Körin</span>
+  <h2 class="rv">Сделан под местный рынок</h2>
+  <div class="grid g3">
+    <div class="card rv"><h3>Вопросы, как их задают здесь</h3><p>Казахские вопросы составляются отдельно, а не переводятся с русского.</p></div>
+    <div class="card rv" style="--d:.08s"><h3>Местные площадки</h3><p>2ГИС, карты и городские издания: оттуда нейросети берут ответы про местный бизнес.</p></div>
+    <div class="card rv" style="--d:.16s"><h3>Честные цифры</h3><p>Мы не обещаем, что нейросеть вас назовёт. Показываем, что она отвечает, и помогаем повысить шансы.</p></div>
   </div>
-</section>
+</div></section>
+
+<section id="start" style="padding-top:0"><div class="wrap">
+  <div class="cta rv">
+    <div><h2>Хотите настоящий замер для своей компании?</h2><p>Оставьте название и WhatsApp. Сделаем первый замер вручную и пришлём ответы нейросетей.</p></div>
+    <form id="leadForm" novalidate>
+      <input name="business" type="text" placeholder="Компания и город" aria-label="Компания и город" required>
+      <input name="whatsapp" type="tel" inputmode="tel" placeholder="WhatsApp: +7 7__ ___ __ __" aria-label="WhatsApp" required>
+      <button>Получить замер</button>
+      <div class="msg" id="leadMsg" role="status"></div>
+    </form>
+  </div>
+</div></section>
 </main>
 
-<footer><div class="wrap">Körin · сервис ТОО «FORGE THE FUTURE», БИН 250640005875, г. Алматы.<br>Независимый сервис. Не связан с OpenAI, Google и Perplexity. Отчёты показывают, что отвечают нейросети, и не гарантируют упоминаний.</div></footer>
+<footer><div class="wrap">Körin · сервис ТОО «FORGE THE FUTURE», БИН 250640005875, г. Алматы.<br>Независимый сервис. Не связан с OpenAI, Google и Perplexity. Не гарантирует упоминаний в ответах нейросетей.</div></footer>
 
 <script>
 const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9kvzA8WbfzVFvVA4UfU5bKlHRZ3G1pCIDZ2kY0nP1CG/exec';
-const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-let company = 'Ваша компания', engine = 'chatgpt';
-
-/* Условные данные для демонстрации интерфейса */
-const DATA = {
-  chatgpt:   { me:31, rivals:[['Lingua Plus',64],['Bright School',51],['English Hub',29],['Oxford Street',18]], cites:4,  trend:[12,15,14,22,27,31], tone:[58,34,8] },
-  gemini:    { me:22, rivals:[['Lingua Plus',48],['Bright School',57],['English Hub',35],['Oxford Street',12]], cites:2,  trend:[9,11,16,15,19,22],  tone:[51,42,7] },
-  perplexity:{ me:44, rivals:[['Lingua Plus',59],['Bright School',40],['English Hub',38],['Oxford Street',25]], cites:11, trend:[20,26,24,33,39,44], tone:[66,29,5] }
-};
-const GAPS = [
-  ['Какие курсы английского в Алматы подойдут ребёнку 8 лет?', 'Lingua Plus, Bright School'],
-  ['Где подготовиться к IELTS в Алматы?', 'Lingua Plus, English Hub'],
-  ['Алматыда ағылшын тілін қайдан үйренуге болады?', 'Bright School'],
-  ['Курсы английского с носителем языка недорого', 'English Hub, Oxford Street']
-];
-const SRCS = { chatgpt:[['2gis.kz',38],['instagram.com',21],['yandex.kz/maps',17],['lingua-plus.example',14],['the-steppe.com',9]],
-               gemini:[['google.com/maps',44],['2gis.kz',26],['instagram.com',12],['bright-school.example',11],['the-steppe.com',5]],
-               perplexity:[['2gis.kz',41],['the-steppe.com',23],['yandex.kz/maps',19],['lingua-plus.example',16],['instagram.com',8]] };
-
-const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-function render(){
-  const d = DATA[engine];
-  const all = [[company, d.me, true], ...d.rivals.map(r => [...r, false])].sort((a, b) => b[1] - a[1]);
-  const place = all.findIndex(r => r[2]) + 1, total = all.reduce((s, r) => s + r[1], 0);
-  $('#k1').textContent = d.me + '%'; $('#k1s').textContent = `названы в ${d.me} ответах из 100`;
-  $('#k2').textContent = place + ' из 5'; $('#k3').textContent = Math.round(d.me / total * 100) + '%'; $('#k4').textContent = d.cites;
-  $('#bars').innerHTML = all.map(r => `<div class="row${r[2] ? ' me' : ''}"><span>${esc(r[0])}</span><u><i data-w="${r[1]}"></i></u><em>${r[1]}%</em></div>`).join('');
-  requestAnimationFrame(() => requestAnimationFrame(() => $$('#bars i').forEach(i => i.style.width = i.dataset.w + '%')));
-
-  const t = d.trend, max = Math.max(...t) * 1.25, months = ['июн','июл','авг','сен','окт','ноя'];
-  const pts = t.map((v, i) => [20 + i * 56, 118 - v / max * 100]);
-  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1].toFixed(1)).join(' ');
-  $('#trend').innerHTML = `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2355ff" stop-opacity=".22"/><stop offset="1" stop-color="#2355ff" stop-opacity="0"/></linearGradient></defs>`
-    + `<path d="${line} L${pts[5][0]} 118 L${pts[0][0]} 118 Z" fill="url(#g)"/><path d="${line}" fill="none" stroke="#2355ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`
-    + pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1].toFixed(1)}" r="3.500" fill="#fff" stroke="#2355ff" stroke-width="2"/><text x="${p[0]}" y="${(p[1] - 10).toFixed(1)}" text-anchor="middle" font-family="Onest,sans-serif" font-size="10.5" font-weight="700" fill="#0b1437">${t[i]}%</text><text x="${p[0]}" y="140" text-anchor="middle" font-family="Onest,sans-serif" font-size="10.5" fill="#5d6785">${months[i]}</text>`).join('');
-
-  $('#gaps').innerHTML = GAPS.map(g => `<div class="q">${esc(g[0])}<small>вместо вас: <b>${esc(g[1])}</b></small></div>`).join('');
-  $('#srcs').innerHTML = SRCS[engine].map(s => `<div class="src"><span>${esc(s[0])}</span><em>${s[1]}</em></div>`).join('');
-  const c = ['var(--good)', '#c3cbe0', 'var(--bad)'];
-  $('#tone').innerHTML = d.tone.map((v, i) => `<i style="width:${v}%;background:${c[i]}"></i>`).join('');
-  d.tone.forEach((v, i) => $('#t' + (i + 1)).textContent = v + '%');
-  $$('[data-co]').forEach(e => e.textContent = e.closest('.url') ? company.toLowerCase().split(' ').join('-') : company);
-  $('#delta').textContent = '+' + (t[5] - t[0]) + ' п.п.';
-}
-
-$$('[data-eng]').forEach(b => b.addEventListener('click', () => {
-  engine = b.dataset.eng; $$('[data-eng]').forEach(x => x.setAttribute('aria-pressed', x === b)); render();
-}));
-$('#checkForm').addEventListener('submit', e => {
-  e.preventDefault(); const v = $('#company').value.trim(); if (!v) return;
-  location.href = 'app/index.html?company=' + encodeURIComponent(v);
-});
+const $ = s => document.querySelector(s);
+$('#checkForm').addEventListener('submit', e => { e.preventDefault(); const v = $('#company').value.trim(); if (v) location.href = 'app/index.html?company=' + encodeURIComponent(v) });
 $('#leadForm').addEventListener('submit', async e => {
   e.preventDefault(); const f = e.target, m = $('#leadMsg');
+  if (f.dataset.busy) return;
   if (!f.business.value.trim() || !f.whatsapp.value.trim()) { m.textContent = 'Заполните компанию и WhatsApp.'; return }
-  const data = { name: 'Körin: заявка на отчёт', business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang: 'korin' };
-  try { await fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) }); f.reset(); m.textContent = 'Спасибо! Напишем в WhatsApp в течение рабочего дня.' }
+  f.dataset.busy = '1'; m.textContent = '…';
+  try { await fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: 'Körin: заявка на замер', business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang: 'korin' }) }); f.reset(); m.textContent = 'Спасибо! Напишем в WhatsApp в течение рабочего дня.' }
   catch (err) { m.textContent = 'Не получилось отправить. Попробуйте ещё раз.' }
+  finally { delete f.dataset.busy }
 });
-
-const io = 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches
-  ? new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target) } }), { rootMargin: '0px 0px -6% 0px' }) : null;
-$$('.rv').forEach(e => io ? io.observe(e) : e.classList.add('in'));
-render();
+const io = 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion:reduce)').matches ? new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target) } }), { rootMargin: '0px 0px -6% 0px' }) : null;
+document.querySelectorAll('.rv').forEach(e => io ? io.observe(e) : e.classList.add('in'));
 </script>
 </body>
 </html>

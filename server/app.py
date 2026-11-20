@@ -127,7 +127,7 @@ def run_check(body):
     names = [company, *rivals]
     companies = [{"id": i, "name": n, "aliases": []} for i, n in enumerate(names)]
     system = f"Пользователь находится в городе {str(body.get('city', 'Алматы'))[:40]}, Казахстан."
-    grid, sources, errors = [], {}, 0
+    grid, answers, sources, errors, used = [], [], {}, 0, None
     for q in questions:
         try:
             text, urls, model = providers.openai(q, system)
@@ -136,13 +136,16 @@ def run_check(body):
                 raise
             errors += 1
             grid.append(None)
+            answers.append(None)
             continue
         mentioned = {m["company_id"] for m in detect.find_mentions(text, companies)}
         grid.append([i in mentioned for i in range(len(names))])
+        answers.append(text[:4000])
+        used = model
         for c in detect.find_citations(text, urls):
             sources[c["domain"]] = sources.get(c["domain"], 0) + 1
     top = sorted(sources.items(), key=lambda kv: -kv[1])[:8]
-    return {"names": names, "questions": questions, "grid": grid, "sources": top, "errors": errors}
+    return {"names": names, "questions": questions, "grid": grid, "answers": answers, "sources": top, "errors": errors, "model": used}
 
 
 # ---------- agents ----------
@@ -152,6 +155,7 @@ AGENTS = {
     "review": "Ты менеджер по отзывам. Напиши два коротких сообщения клиенту с просьбой оставить отзыв на площадке из данных: для WhatsApp и для Instagram. Без давления и без обещаний скидок за отзыв.",
     "bio": "Ты SMM-специалист. Предложи три варианта описания профиля Instagram до 150 знаков: ниша и город словами, одно отличие, способ связи. Неизвестное отметь как [что вписать].",
     "compare": "Ты маркетолог. Составь план страницы сравнения компании с конкурентом-лидером из данных: только проверяемые критерии, без оценок конкурента. Факты, которых нет, отметь как [что вписать].",
+    "pitch": "Ты специалист по связям с изданиями. Напиши короткое вежливое письмо автору подборки или каталога с предложением добавить компанию. Факты, которых нет в данных, отметь как [что вписать]. Без преувеличений.",
     "plan": "Ты руководитель проекта. Составь план работ на 4 недели, чтобы нейросети начали чаще называть компанию: по неделям, с ответственным и результатом. Опирайся на данные кабинета.",
 }
 
