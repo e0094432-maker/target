@@ -8,7 +8,7 @@
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('korin-theme-v2')||'dark'}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fff;--side:#fafafa;--card:#fff;--sub:#f6f6f7;--line:#ebebee;--line2:#dcdce0;--ink:#0f1114;--text:#2a2d33;--muted:#6f737b;--dim:#9a9ea6;--acc:#2f5bff;--acc-bg:#eef2ff;--lime:#c9f560;--lime-ink:#1c2600;--ok:#0f7b4f;--ok-bg:#e6f6ee;--bad:#c2331f;--bad-bg:#fdecea;--warn:#8a5a00;--warn-bg:#fff5db;--btn:#0f1114;--btn-ink:#fff;--hero:linear-gradient(135deg,#f3f6ff,#fff 60%);--shadow:0 1px 2px rgba(15,17,20,.04),0 8px 24px -12px rgba(15,17,20,.12);
   --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
@@ -173,43 +173,14 @@ tr.me td{background:var(--acc-bg);font-weight:600;color:var(--ink)}
   .drawer{inset:0 0 0 auto;width:480px;max-height:none;border-radius:0;border-left:1px solid var(--line)}
 }
 
-/* ---------- galactic layer ---------- */
-:root{--bg:#f5f6ff;--side:rgba(255,255,255,.55);--card:rgba(255,255,255,.7);--sub:rgba(99,102,241,.07);--line:rgba(80,90,170,.14);--line2:rgba(80,90,170,.26);--ink:#0b0e26;--text:#2c3154;--muted:#6a7096;--dim:#9aa0c2;--acc:#5b54f0;--acc-bg:rgba(99,102,241,.1);--lime:rgba(91,84,240,.14);--lime-ink:#3a2fd0;--btn:#0b0e26;--btn-ink:#fff;--hero:linear-gradient(135deg,rgba(124,92,255,.16),rgba(76,201,255,.14));--g:linear-gradient(120deg,#7c5cff,#4c8dff 55%,#22c7ee);--glow:rgba(124,92,255,.35);--head:"Unbounded","Inter",system-ui,sans-serif;--shadow:0 1px 2px rgba(40,40,120,.05),0 16px 40px -20px rgba(60,60,160,.3)}
-[data-theme=dark]{--bg:#05060f;--side:rgba(8,10,24,.55);--card:rgba(255,255,255,.04);--sub:rgba(255,255,255,.055);--line:rgba(150,160,255,.13);--line2:rgba(150,160,255,.24);--ink:#f5f6ff;--text:#c8cdee;--muted:#8b91b8;--dim:#5d638a;--acc:#a79bff;--acc-bg:rgba(124,92,255,.18);--lime:rgba(76,201,255,.16);--lime-ink:#9fe9ff;--btn:#fff;--btn-ink:#05060f;--hero:linear-gradient(135deg,rgba(124,92,255,.24),rgba(34,199,238,.07));--glow:rgba(124,92,255,.55);--shadow:0 1px 2px rgba(0,0,0,.5),0 24px 60px -24px rgba(0,0,0,.9)}
-body{background:var(--bg)}
-body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(48% 42% at 82% 0,rgba(124,92,255,.28),transparent 70%),radial-gradient(40% 36% at 8% 12%,rgba(34,199,238,.18),transparent 70%),radial-gradient(50% 40% at 50% 110%,rgba(76,141,255,.2),transparent 70%)}
-[data-theme=dark] body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.7;background-image:radial-gradient(1px 1px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 34% 62%,#cfd6ff,transparent),radial-gradient(1.2px 1.2px at 58% 28%,#fff,transparent),radial-gradient(1px 1px at 76% 74%,#bfe9ff,transparent),radial-gradient(1px 1px at 90% 40%,#fff,transparent),radial-gradient(1.2px 1.2px at 22% 86%,#d9d2ff,transparent),radial-gradient(1px 1px at 66% 92%,#fff,transparent),radial-gradient(1px 1px at 46% 8%,#fff,transparent);background-size:520px 520px}
-h1,h2,.frac,.logo,.ws b,.onb h1{font-family:var(--head)}
-h1{font-size:19px;font-weight:500;letter-spacing:-.02em}
-h2{font-size:12.5px;font-weight:500;letter-spacing:0}
-.onb h1{font-size:21px;line-height:1.3}
-.top{background:transparent;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.side{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.box,.agent,.conn,.hero,.onb,.drawer{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:18px}
-.drawer{background:color-mix(in srgb,var(--bg) 88%,transparent)}
-.hero{position:relative;overflow:hidden}
-.hero::after{content:"";position:absolute;right:-90px;top:50%;width:360px;height:360px;transform:translateY(-50%);border-radius:50%;pointer-events:none;border:1px solid var(--line2);box-shadow:0 0 0 46px transparent,0 0 0 47px var(--line),0 0 0 100px transparent,0 0 0 101px var(--line);opacity:.8}
-.hero>*{position:relative;z-index:1}
-.frac{font-weight:500;letter-spacing:-.04em;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
-.frac span{-webkit-text-fill-color:var(--muted);font-family:var(--sans)}
-.btn{border-radius:10px;backdrop-filter:blur(8px)}
-.btn-p{background:var(--g);color:#fff;border-color:transparent;box-shadow:0 8px 22px -10px var(--glow)}
-.btn-p:hover{background:var(--g);opacity:1;filter:brightness(1.1)}
-.mark{background:var(--lime);color:var(--lime-ink);border-radius:6px;padding:1px 7px}
-.rank.me i,.prog i{background:var(--g)}
-.onb .st i.on{background:var(--g)}
-.side a.n.on{background:var(--acc-bg);color:var(--ink)}.side a.n.on svg{color:var(--acc)}
-.av{background:var(--acc-bg);border-color:transparent;color:var(--acc)}
-.agent .av{background:var(--g);color:#fff;box-shadow:0 8px 20px -10px var(--glow)}
-.sw input:checked+i{background:var(--g)}
-.dot.on{background:#4cc9ff;box-shadow:0 0 0 3px rgba(76,201,255,.2),0 0 12px #4cc9ff}
-.logo i{background:var(--g);box-shadow:0 0 16px var(--glow)}.logo i::before{background:#fff}
-.lg{border-radius:11px;box-shadow:0 6px 16px -8px rgba(20,20,80,.45);font:700 11px var(--sans);letter-spacing:-.02em}
+/* ---------- same look as the landing page hero ---------- */
+[data-theme=dark]{--bg:#08090a;--side:#0b0c0d;--card:#0f1011;--sub:#17181a;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14)}
+[data-theme=dark] body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(50% 40% at 60% 0,rgba(91,140,255,.2),transparent 70%)}
+.lg{border-radius:11px;font:700 11px var(--sans);letter-spacing:-.02em}
 .lg.real svg{stroke:none;width:22px;height:22px}
-.lg.own{background:var(--acc-bg);box-shadow:none}.lg.own svg{stroke:var(--acc)}
+.lg.own{background:var(--sub);border:1px solid var(--line)}.lg.own svg{stroke:var(--ink)}
 .lg.lite{border:1px solid var(--line)}
-.note{border:1px solid var(--line);backdrop-filter:blur(12px)}
-.seg{backdrop-filter:blur(8px)}
+.agent .av{background:var(--sub);border:1px solid var(--line);color:var(--ink)}
 </style>
 </head>
 <body>
