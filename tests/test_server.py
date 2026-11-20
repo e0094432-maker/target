@@ -168,6 +168,16 @@ class ApiTest(unittest.TestCase):
         self.assertEqual((first["result"]["named"], first["result"]["cached"]), (True, False))
         self.assertEqual((second["result"]["named"], second["result"]["cached"]), (False, True))
 
+    def test_competitors_are_parsed_from_a_free_form_answer(self):
+        answer = "1. **English Hub** — крупная сеть\n- Lingua Plus (центр)\n• Hello Kids\n3) «Bright School»: отзывы\n\nНЕТ"
+        self.assertEqual(app.clean_names(answer, "Hello Kids"), ["English Hub", "Lingua Plus", "Bright School"])
+        real, app.ask = app.ask, lambda prompt, system=None: (answer, [], "test-model")
+        try:
+            code, data, _ = post(self.api.server_port, "/api/suggest", {"company": "Hello Kids", "niche": "курсы", "city": "Алматы"})
+        finally:
+            app.ask = real
+        self.assertEqual((code, len(data["rivals"])), (200, 3))
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))

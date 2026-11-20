@@ -610,6 +610,7 @@ function onboarding(){
     <div class="field"><label for="o3">Город</label><input class="inp" id="o3" maxlength="30" value="${esc(st.city)}"></div>
     <div class="acts"><a class="btn btn-lg" href="../">На сайт</a><button class="btn btn-p btn-lg" id="next">Дальше</button></div>`;
   if (s === 2) b = `<h1>Кто ваши конкуренты?</h1><p class="muted" style="margin-top:8px">От одного до пяти. С ними будем сравнивать.</p>
+    <button class="btn" id="auto" style="margin-top:14px">${ic('bot')}Найти конкурентов автоматически</button>
     <div class="field"><label for="o4">Название конкурента</label><div class="add"><input class="inp" id="o4" maxlength="40" placeholder="Например, Lingua Plus"><button class="btn" id="addr" style="height:38px">Добавить</button></div></div>
     <div class="chips">${st.rivals.map((r, i) => `<span>${esc(r)}<button data-del="${i}" aria-label="Убрать">×</button></span>`).join('')}</div>
     <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="next">Дальше</button></div>`;
@@ -625,6 +626,10 @@ function onboarding(){
   if (s === 1) $('#next').onclick = () => { st.company = $('#o1').value.trim(); st.niche = $('#o2').value.trim(); st.city = $('#o3').value.trim(); if (!st.company || !st.niche || !st.city) return err('Заполните все три поля.'); st.step = 2; store.save(st); onboarding() };
   if (s === 2) {
     const add = () => { const v = $('#o4').value.trim(); if (!v) return; if (st.rivals.length >= 5) return err('Не больше пяти конкурентов.'); if ([st.company, ...st.rivals].some(x => x.toLowerCase() === v.toLowerCase())) return err('Такое название уже есть.'); st.rivals.push(v); store.save(st); onboarding(); $('#o4').focus() };
+    $('#auto').onclick = async () => { const b = $('#auto'); b.disabled = true; b.lastChild.textContent = 'Ищу… до минуты'; err('');
+      try { const d = await call('/api/suggest', { company: st.company, niche: st.niche, city: st.city }); if (!d.rivals.length) { b.disabled = false; b.lastChild.textContent = 'Найти конкурентов автоматически'; return err('Нейросеть не знает конкурентов в этой нише. Добавьте их вручную.') }
+        d.rivals.forEach(n => { if (st.rivals.length < 5 && ![st.company, ...st.rivals].some(x => x.toLowerCase() === n.toLowerCase())) st.rivals.push(n) }); store.save(st); onboarding() }
+      catch (e) { b.disabled = false; b.lastChild.textContent = 'Найти конкурентов автоматически'; err(e.message === 'Failed to fetch' ? 'Сервер не ответил. Он просыпается около минуты, попробуйте ещё раз.' : e.message) } };
     $('#addr').onclick = add; $('#o4').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); add() } };
     $$('[data-del]').forEach(x => x.onclick = () => { st.rivals.splice(+x.dataset.del, 1); store.save(st); onboarding() });
     $('#next').onclick = () => { if (!st.rivals.length) return err('Добавьте хотя бы одного конкурента.'); st.step = 3; store.save(st); onboarding() };

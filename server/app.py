@@ -279,6 +279,26 @@ def quick_check(body):
     return {"company": company, "results": got, "named": sum(x["named"] for x in got), "asked": len(got)}
 
 
+# ---------- onboarding: find competitors ----------
+def clean_names(text, company):
+    """Company names from a free-form model answer: one per line, no numbering, no explanations."""
+    names = []
+    for line in text.splitlines():
+        n = re.sub(r"^[\s\-–—•*#\d.)]+", "", line).strip()
+        n = re.split(r"\s[—–-]\s|:|\(", n)[0].strip().strip("*«»\"'.").strip()
+        if 2 <= len(n) <= 40 and n.lower() not in (company.lower(), "нет") and n.lower() not in [x.lower() for x in names]:
+            names.append(n)
+    return names[:5]
+
+
+def suggest(body):
+    company, niche, city = (re.sub(r"\s+", " ", str(body.get(k, ""))).strip()[:60] for k in ("company", "niche", "city"))
+    if not company or not niche or not city:
+        raise BadRequest("Нужны компания, ниша и город.")
+    text, _, model = ask(f"Назови 5 реально существующих компаний — прямых конкурентов «{company}» в нише «{niche}», город {city}, Казахстан. Ответь списком: одно название в строке, без нумерации и пояснений. Не выдумывай: если не знаешь таких компаний, ответь одним словом НЕТ.")
+    return {"rivals": clean_names(text, company), "model": model}
+
+
 # ---------- agents ----------
 AGENTS = {
     "why": "Ты аналитик видимости в нейросетях. По данным кабинета объясни простым языком, почему компанию называют реже конкурентов, и дай три первых шага. Не выдумывай фактов о компании.",
@@ -336,7 +356,7 @@ def allowed(ip, limit=30, window=3600):
     return True
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check}
+ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest}
 
 
 class Handler(BaseHTTPRequestHandler):
