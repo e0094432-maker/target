@@ -7,6 +7,7 @@ import json
 import os
 import re
 import socket
+import threading
 import time
 import urllib.error
 import urllib.parse
@@ -150,7 +151,16 @@ def ask(prompt, system=None):
     name = provider_name()
     if not name:
         raise providers.ProviderError("не задан ключ нейросети")
-    return getattr(providers, name)(prompt, system)
+    if name != "gemini":
+        return providers.openai(prompt, system)
+    try:
+        return providers.gemini(prompt, system)
+    except providers.ProviderError as e:
+        if no_ai(e):
+            raise
+        # some keys cannot use search grounding: answer from the model alone rather than fail
+        print(f"gemini with search failed, retrying without: {e}", flush=True)
+        return providers.gemini(prompt, system, search=False)
 
 
 def no_ai(error):
@@ -186,6 +196,45 @@ def run_check(body):
             sources[c["domain"]] = sources.get(c["domain"], 0) + 1
     top = sorted(sources.items(), key=lambda kv: -kv[1])[:8]
     return {"names": names, "questions": questions, "grid": grid, "answers": answers, "sources": top, "errors": errors, "model": used}
+
+
+# ---------- free check on the landing page ----------
+_quick = {"day": "", "n": 0}
+QUICK_PER_DAY = int(os.environ.get("KORIN_QUICK_PER_DAY", "300"))
+
+
+def quick_check(body):
+    """Three real questions about the visitor's niche. Answers come back word for word."""
+    company, niche, city = (str(body.get(k, "")).strip()[:60] for k in ("company", "niche", "city"))
+    if not company or not niche or not city:
+        raise BadRequest("Нужны компания, ниша и город.")
+    today = time.strftime("%Y-%m-%d")
+    if _quick["day"] != today:
+        _quick.update(day=today, n=0)
+    if _quick["n"] >= QUICK_PER_DAY:
+        raise BadRequest("На сегодня бесплатные проверки закончились. Оставьте заявку, и мы сделаем замер вручную.")
+    _quick["n"] += 1
+    questions = [f"{niche} в городе {city}: кого посоветуешь?", f"{niche} с хорошими отзывами, {city} — назови конкретные компании", f"{city} қаласында {niche}: қай компанияны ұсынасың?"]
+    system = f"Пользователь находится в городе {city}, Казахстан. Называй конкретные компании."
+    me = [{"id": 0, "name": company, "aliases": []}]
+    out, fails = [None] * len(questions), []
+
+    def one(i, q):
+        try:
+            text, urls, model = ask(q, system)
+            out[i] = {"question": q, "answer": text[:3000], "named": bool(detect.find_mentions(text, me)), "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)})[:6], "model": model}
+        except providers.ProviderError as e:
+            fails.append(e)
+
+    threads = [threading.Thread(target=one, args=(i, q)) for i, q in enumerate(questions)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    got = [x for x in out if x]
+    if not got:
+        raise fails[0]
+    return {"company": company, "results": got, "named": sum(x["named"] for x in got), "asked": len(got)}
 
 
 # ---------- agents ----------
@@ -244,7 +293,7 @@ def allowed(ip, limit=30, window=3600):
     return True
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect}
+ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -275,7 +324,7 @@ class Handler(BaseHTTPRequestHandler):
         route = ROUTES.get(self.path)
         if not route:
             return self._send(404, {"error": "Не найдено."})
-        if not allowed(self.client_address[0]):
+        if not allowed((self.headers.get("X-Forwarded-For") or self.client_address[0]).split(",")[0].strip()):
             return self._send(429, {"error": "Слишком много запросов. Попробуйте через час."})
         try:
             length = int(self.headers.get("Content-Length", "0"))
@@ -290,6 +339,7 @@ class Handler(BaseHTTPRequestHandler):
         except json.JSONDecodeError:
             self._send(400, {"error": "Запрос не в формате JSON."})
         except providers.ProviderError as e:
+            print(f"provider error on {self.path}: {e}", flush=True)
             msg = "ИИ не подключён: на сервере нет ключа или закончился баланс." if no_ai(e) else "Нейросеть не ответила. Попробуйте позже."
             self._send(503, {"error": msg})
 

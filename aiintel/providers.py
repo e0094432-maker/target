@@ -72,12 +72,12 @@ def perplexity(prompt, system=None):
     return data["choices"][0]["message"].get("content") or "", urls, data.get("model", model)
 
 
-def gemini(prompt, system=None):
+def gemini(prompt, system=None, search=None):
     model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
     payload = {"contents": [{"role": "user", "parts": [{"text": prompt}]}]}
     if system:
         payload["systemInstruction"] = {"parts": [{"text": system}]}
-    if os.environ.get("GEMINI_SEARCH", "1") != "0":
+    if os.environ.get("GEMINI_SEARCH", "1") != "0" if search is None else search:
         payload["tools"] = [{"google_search": {}}]
     data = _post(
         f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",

@@ -136,6 +136,16 @@ class ApiTest(unittest.TestCase):
         self.assertIn("Прочитанные страницы", seen["prompt"])
         self.assertIn("что улучшить?", seen["prompt"])
 
+    def test_quick_check_returns_answers_word_for_word(self):
+        real, app.ask = app.ask, lambda prompt, system=None: ("Советую школу Alfa и Hello Kids.", [], "test-model")
+        try:
+            code, data, _ = post(self.api.server_port, "/api/quick", {"company": "Hello Kids", "niche": "курсы английского", "city": "Алматы"})
+        finally:
+            app.ask = real
+        self.assertEqual((code, data["asked"], data["named"]), (200, 3, 3))
+        self.assertIn("Alfa", data["results"][0]["answer"])
+        self.assertEqual(post(self.api.server_port, "/api/quick", {"company": "A"})[0], 400)
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))
