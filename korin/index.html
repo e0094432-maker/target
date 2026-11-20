@@ -6,6 +6,7 @@
 <title>Körin — кого ChatGPT советует вместо вас</title>
 <meta name="description" content="Körin проверяет, называют ли ChatGPT, Gemini и Perplexity вашу компанию, кого советуют вместо вас и что сделать, чтобы называли вас. Для бизнеса в Казахстане, на русском и казахском.">
 <meta name="theme-color" content="#05060f">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("korin-theme-v4")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
@@ -402,13 +403,60 @@ header{background:rgba(0,0,0,.85)}
 
 #eng{color:var(--text);white-space:nowrap}
 #eng svg{width:.82em;height:.82em;vertical-align:-.08em;margin-right:.2em}
+
+/* ---------- light theme ---------- */
+[data-theme=light]{--bg:#fff;--panel:#f6f7f9;--panel2:#eef0f3;--line:#e3e5ea;--line2:#cfd3da;--text:#0c0d10;--muted:#5b606b;--dim:#8a8f99;--ac:#4f5bd5;--lime:rgba(79,91,213,.12);--lime-ink:#3944b8;color-scheme:light}
+[data-theme=light] body{background:#fff;color:var(--text)}
+[data-theme=light] header{background:rgba(255,255,255,.88)}
+[data-theme=light] .hero::before{background:radial-gradient(50% 60% at 85% 10%,rgba(79,91,213,.1),transparent 70%)}
+[data-theme=light] .btn{color:var(--text);border-color:var(--line2);background:#fff}
+[data-theme=light] .btn-w,[data-theme=light] .btn-w:hover{background:#0c0d10;color:#fff;border-color:#0c0d10}
+[data-theme=light] .btn-w:hover{background:#2a2c33}
+[data-theme=light] .logo i{background:#0c0d10}[data-theme=light] .logo i::before{background:#fff}
+[data-theme=light] .win{border-color:var(--line2)}
+[data-theme=light] .win-top i{background:#d5d8de}
+[data-theme=light] .lv-q{background:#e9ebef;color:var(--text)}
+[data-theme=light] .lv-a{color:#33363d}
+[data-theme=light] .lv-b u{background:#e3e5ea}[data-theme=light] .lv-b i{background:#b9bec8}
+[data-theme=light] .lv-s i{border-color:#b9bec8;color:#fff}
+[data-theme=light] .lv-tag,[data-theme=light] .qc-tag.n{background:#fdecea;color:#c2331f}
+[data-theme=light] .qc-tag.y{background:#e6f6ee;color:#0f7b4f}
+[data-theme=light] .qc{background:rgba(20,22,30,.45)}
+[data-theme=light] .qc input{background:#fff;color:var(--text)}
+[data-theme=light] .qc-card{background:#fff}
+[data-theme=light] .qc-x{color:var(--text)}
+[data-theme=light] .qc-err{color:#c2331f}
+[data-theme=light] input,[data-theme=light] textarea{color:var(--text)}
+[data-theme=light] .core,[data-theme=light] .node{color:var(--text)}
+[data-theme=light] .node svg{stroke:var(--text)}
+[data-theme=light] .pts{color:var(--muted)}
+#themeBtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+[data-theme=light] .strip div{color:var(--text)}
+[data-theme=light] .ask{background:#0c0d10;color:#fff}
+[data-theme=light] .bubble,[data-theme=light] .lang{background:#fff;border-color:var(--line);color:#33363d}
+[data-theme=light] .bubble b{color:var(--text)}
+[data-theme=light] .miss{background:#fdecea;border-color:#f3c5bf;color:#c2331f}
+[data-theme=light] .miss::before{box-shadow:none}
+[data-theme=light] .bot{color:#33363d}
+[data-theme=light] .bot .ok{background:#e6f6ee;color:#0f7b4f}
+[data-theme=light] .bot .no{background:#fdecea;color:#c2331f}
+[data-theme=light] .t{color:#33363d}
+[data-theme=light] .t i{border-color:#b9bec8}
+[data-theme=light] .t.on i{background:var(--ac);border-color:var(--ac)}
+[data-theme=light] .fine{color:var(--dim)}
+[data-theme=light] h3{color:var(--text)}
+[data-theme=light] .web h2 span{opacity:.18}
+[data-theme=light] .web h2 span.on{opacity:1}
+[data-theme=dark] .ask{background:#edf2f5;color:#111}
+[data-theme=light] .lv-b.me i{background:var(--ac)}
 </style>
 </head>
 <body>
 <header><div class="wrap bar">
   <a class="logo" href="#top"><i></i>Körin</a>
   <nav aria-label="Меню"><a href="#product">Продукт</a><a href="#agents">ИИ-агенты</a><a href="#connectors">Коннекторы</a><a href="#how">Как работает</a><a href="#start">Замер</a></nav>
-  <button class="btn" id="langBtn" type="button" aria-label="Language" style="padding:0 10px">RU</button><a class="btn" href="app/index.html">Открыть кабинет</a>
+  <button class="btn" id="themeBtn" type="button" aria-label="Theme" style="padding:0;width:34px"></button><button class="btn" id="langBtn" type="button" aria-label="Language" style="padding:0 10px">RU</button><a class="btn" href="app/index.html">Открыть кабинет</a>
 </div></header>
 
 <main id="top">
@@ -521,6 +569,10 @@ function setLang(l){ lang = l; try { localStorage.setItem('korin-lang', l) } cat
   document.querySelector('meta[name=description]').content = L(RU_DESC, 'Körin checks whether ChatGPT, Gemini and Perplexity name your company, who they recommend instead, and what to do about it. For businesses in Kazakhstan.');
   const b = document.getElementById('langBtn'); if (b) b.textContent = l === 'en' ? 'RU' : 'EN';
   if (window.setWebText) setWebText(WEB[l === 'en' ? 0 : 1]); if (window.restartScene && document.getElementById('scene').children.length) restartScene() }
+const SUN = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.500 1.500M17.500 17.500L19 19M19 5l-1.500 1.500M6.500 17.500L5 19"/></svg>', MOON = '<svg viewBox="0 0 24 24"><path d="M20 14.500A8 8 0 1 1 9.500 4a6.500 6.500 0 0 0 10.500 10.500z"/></svg>';
+const paintTheme = () => { document.getElementById('themeBtn').innerHTML = document.documentElement.dataset.theme === 'light' ? MOON : SUN };
+document.getElementById('themeBtn').onclick = () => { const t = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = t; try { localStorage.setItem('korin-theme-v4', t) } catch (e) {} paintTheme(); if (window.paintEngine) paintEngine() };
+paintTheme();
 document.getElementById('langBtn').onclick = () => setLang(lang === 'en' ? 'ru' : 'en');
 addEventListener('DOMContentLoaded', () => setLang(lang)); if (document.readyState !== 'loading') setTimeout(() => setLang(lang));
 
@@ -581,17 +633,17 @@ const MORE_ICONS = [["M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 1
   const size = () => { const d = Math.min(2, devicePixelRatio || 1); W = sec.clientWidth; H = sec.clientHeight; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
     const n = W < 700 ? 44 : 130; fl = Array.from({ length: n }, (_, i) => spawn({ ic: i % 2 === 0 ? icons[k++ % icons.length] : null, s: 14 + Math.random() * 12 }, Math.random())) };
   const draw = () => {
-    ctx.clearRect(0, 0, W, H);
+    ctx.clearRect(0, 0, W, H); const lt = document.documentElement.dataset.theme === 'light', ink = lt ? '20,22,30' : '237,242,245', acc = lt ? '79,91,213' : '139,156,255';
     for (const f of fl) {
       f.t += f.v * (.55 + f.t * 1.6); if (f.t >= 1) spawn(f, 0);
       const [x, y] = pos(f); f.tr.push(x, y); if (f.tr.length > 110) f.tr.splice(0, 2);
       // появляется у края, гаснет у текста
       const al = Math.min(1, f.t * 6) * Math.min(1, Math.max(0, (.78 - f.t) / .3));
-      if (f.tr.length > 3) { const g = ctx.createLinearGradient(f.tr[0], f.tr[1], x, y); g.addColorStop(0, 'rgba(237,242,245,0)'); g.addColorStop(1, `rgba(${f.ic ? '237,242,245' : '139,156,255'},${al * (f.ic ? .34 : .6)})`);
+      if (f.tr.length > 3) { const g = ctx.createLinearGradient(f.tr[0], f.tr[1], x, y); g.addColorStop(0, `rgba(${ink},0)`); g.addColorStop(1, `rgba(${f.ic ? ink : acc},${al * (f.ic ? .34 : .6)})`);
         ctx.strokeStyle = g; ctx.lineWidth = f.ic ? 1 : 1.2; ctx.beginPath(); ctx.moveTo(f.tr[0], f.tr[1]); for (let i = 2; i < f.tr.length; i += 2) ctx.lineTo(f.tr[i], f.tr[i + 1]); ctx.stroke() }
       ctx.globalAlpha = al;
-      if (f.ic) { const z = f.s * (1 - f.t * .45); ctx.save(); ctx.translate(x - z / 2, y - z / 2); ctx.scale(z / 24, z / 24); ctx.fillStyle = f.ic.c; ctx.fill(f.ic.p); ctx.restore() }
-      else { ctx.fillStyle = '#aab6ff'; ctx.beginPath(); ctx.arc(x, y, 1.5, 0, 6.3); ctx.fill() }
+      if (f.ic) { const z = f.s * (1 - f.t * .45); ctx.save(); ctx.translate(x - z / 2, y - z / 2); ctx.scale(z / 24, z / 24); ctx.fillStyle = lt && f.ic.c === '#ffffff' ? '#16181d' : f.ic.c; ctx.fill(f.ic.p); ctx.restore() }
+      else { ctx.fillStyle = lt ? '#4f5bd5' : '#aab6ff'; ctx.beginPath(); ctx.arc(x, y, 1.5, 0, 6.3); ctx.fill() }
       ctx.globalAlpha = 1;
     }
     if (run && !still) raf = requestAnimationFrame(draw);
@@ -604,7 +656,7 @@ const MORE_ICONS = [["M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 1
 /* Название нейросети в заголовке сменяется вместе с её логотипом */
 const ENGINES = [["ChatGPT", "M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z", "#ffffff"], ["Gemini", "M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81", "#8E75B2"], ["Perplexity", "M22.3977 7.0896h-2.3106V.0676l-7.5094 6.3542V.1577h-1.1554v6.1966L4.4904 0v7.0896H1.6023v10.3976h2.8882V24l6.932-6.3591v6.2005h1.1554v-6.0469l6.9318 6.1807v-6.4879h2.8882V7.0896zm-3.4657-4.531v4.531h-5.355l5.355-4.531zm-13.2862.0676 4.8691 4.4634H5.6458V2.6262zM2.7576 16.332V8.245h7.8476l-6.1149 6.1147v1.9723H2.7576zm2.8882 5.0404v-3.8852h.0001v-2.6488l5.7763-5.7764v7.0111l-5.7764 5.2993zm12.7086.0248-5.7766-5.1509V9.0618l5.7766 5.7766v6.5588zm2.8882-5.0652h-1.733v-1.9723L13.3948 8.245h7.8478v8.087z", "#1FB8CD"], ["Claude", "m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z", "#D97757"]];
 (() => { const el = document.getElementById('eng'); if (!el) return; let i = 0;
-  const show = () => { const [n, d, c] = ENGINES[i]; el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="${c}" d="${d}"/></svg>${n}` };
+  const show = () => { const [n, d, c] = ENGINES[i]; el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="${c === '#ffffff' ? 'currentColor' : c}" d="${d}"/></svg>${n}` }; window.paintEngine = show;
   show(); if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   setInterval(() => { el.classList.add('out'); setTimeout(() => { i = (i + 1) % ENGINES.length; show(); el.classList.remove('out') }, 420) }, 2800) })();
 
