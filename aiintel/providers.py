@@ -38,9 +38,12 @@ def _post(url, headers, payload, timeout=180, retries=3):
 
 
 def _key(name):
-    value = os.environ.get(name)
+    # keys pasted into a dashboard often carry a space, a line break or quotes
+    value = "".join((os.environ.get(name) or "").split()).strip("\"'")
     if not value:
         raise ProviderError(f"не задан {name}")
+    if not value.isascii() or not value.isprintable():
+        raise ProviderError(f"не задан {name}: в ключе посторонние символы, вставьте его заново")
     return value
 
 

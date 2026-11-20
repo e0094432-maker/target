@@ -374,7 +374,10 @@ class Handler(BaseHTTPRequestHandler):
             self._send(400, {"error": str(e)})
         except json.JSONDecodeError:
             self._send(400, {"error": "Запрос не в формате JSON."})
-        except providers.ProviderError as e:
+        except Exception as e:  # never drop the connection: the page must get an answer it can show
+            if not isinstance(e, providers.ProviderError):
+                print(f"unexpected error on {self.path}: {type(e).__name__}: {e}", flush=True)
+                return self._send(500, {"error": "На сервере ошибка. Мы её уже видим в журнале."})
             print(f"provider error on {self.path}: {e}", flush=True)
             msg = "ИИ не подключён: на сервере нет ключа или закончился баланс." if no_ai(e) else "Нейросеть не ответила. Попробуйте позже."
             self._send(503, {"error": msg})
