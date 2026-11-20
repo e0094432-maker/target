@@ -1,6 +1,6 @@
 """Körin backend: real site audit, real AI-visibility check and AI agents.
 
-Standard library only. Run:  python3 -m server.app   (PORT, OPENAI_API_KEY, OPENAI_MODEL, KORIN_ORIGINS)
+Standard library only. Run:  python3 -m server.app   (PORT, GEMINI_API_KEY or OPENAI_API_KEY, KORIN_ORIGINS)
 """
 import ipaddress
 import json
@@ -117,6 +117,46 @@ def audit_site(raw_url):
     return {"url": final, "bots": bots, "checks": checks}
 
 
+# ---------- connectors ----------
+def page_url(raw):
+    """Full address of one public page, checked the same way as a site address."""
+    raw = (raw or "").strip()
+    if raw and "://" not in raw:
+        raw = "https://" + raw
+    safe_url(raw)
+    u = urllib.parse.urlsplit(raw)
+    return urllib.parse.urlunsplit((u.scheme, u.netloc, u.path or "/", u.query, ""))
+
+
+def read_page(raw):
+    """What anyone can see at this address: status, title and visible text."""
+    url = page_url(raw)
+    status, html, _, final = fetch(url)
+    title = re.search(r"(?is)<title[^>]*>(.*?)</title>", html)
+    return {"url": final, "status": status, "title": unescape(title.group(1)).strip()[:160] if title else "", "text": visible_text(html)}
+
+
+def connect(body):
+    page = read_page(body.get("url"))
+    return {"ok": page["status"] == 200, "url": page["url"], "status": page["status"], "title": page["title"], "chars": len(page["text"])}
+
+
+# ---------- AI ----------
+def provider_name():
+    return "gemini" if os.environ.get("GEMINI_API_KEY") else "openai" if os.environ.get("OPENAI_API_KEY") else ""
+
+
+def ask(prompt, system=None):
+    name = provider_name()
+    if not name:
+        raise providers.ProviderError("не задан ключ нейросети")
+    return getattr(providers, name)(prompt, system)
+
+
+def no_ai(error):
+    return any(k in str(error) for k in ("не задан", "insufficient_quota", "RESOURCE_EXHAUSTED"))
+
+
 # ---------- AI-visibility check ----------
 def run_check(body):
     company = str(body.get("company", "")).strip()[:60]
@@ -130,9 +170,9 @@ def run_check(body):
     grid, answers, sources, errors, used = [], [], {}, 0, None
     for q in questions:
         try:
-            text, urls, model = providers.openai(q, system)
+            text, urls, model = ask(q, system)
         except providers.ProviderError as e:
-            if "OPENAI_API_KEY" in str(e) or "insufficient_quota" in str(e):
+            if no_ai(e):
                 raise
             errors += 1
             grid.append(None)
@@ -156,19 +196,38 @@ AGENTS = {
     "bio": "Ты SMM-специалист. Предложи три варианта описания профиля Instagram до 150 знаков: ниша и город словами, одно отличие, способ связи. Неизвестное отметь как [что вписать].",
     "compare": "Ты маркетолог. Составь план страницы сравнения компании с конкурентом-лидером из данных: только проверяемые критерии, без оценок конкурента. Факты, которых нет, отметь как [что вписать].",
     "pitch": "Ты специалист по связям с изданиями. Напиши короткое вежливое письмо автору подборки или каталога с предложением добавить компанию. Факты, которых нет в данных, отметь как [что вписать]. Без преувеличений.",
+    "chat": "Ты ассистент Körin для владельца бизнеса и маркетолога в Казахстане. Помогаешь сделать так, чтобы нейросети чаще называли компанию: тексты, письма, планы, разбор сайта и отзывов. Опирайся на данные кабинета и прочитанные страницы. Не выдумывай фактов о компании: чего нет в данных, отметь как [что вписать].",
     "plan": "Ты руководитель проекта. Составь план работ на 4 недели, чтобы нейросети начали чаще называть компанию: по неделям, с ответственным и результатом. Опирайся на данные кабинета.",
 }
 
 
 def run_agent(body):
+    """An agent first reads the real pages from the connectors, then writes. Every step is reported."""
     task = body.get("task")
     if task not in AGENTS:
         raise BadRequest("Неизвестный агент.")
-    context = json.dumps(body.get("context", {}), ensure_ascii=False)[:4000]
-    question = str(body.get("question", ""))[:500]
-    prompt = f"Данные кабинета (JSON):\n{context}\n\nЗапрос пользователя: {question or 'выполни свою задачу'}\n\nОтвечай по-русски, коротко и по делу."
-    text, _, model = providers.openai(prompt, AGENTS[task])
-    return {"text": text, "model": model}
+    ctx = body.get("context") if isinstance(body.get("context"), dict) else {}
+    links = ctx.get("links") if isinstance(ctx.get("links"), dict) else {}
+    steps, material = [], []
+    for name, raw in list(links.items())[:4]:
+        try:
+            page = read_page(str(raw)[:300])
+        except BadRequest as e:
+            steps.append({"text": f"{str(name)[:30]}: {e}", "ok": False})
+            continue
+        got = page["status"] == 200 and len(page["text"]) >= 200
+        steps.append({"text": f"{str(name)[:30]}: прочитал {len(page['text'])} знаков" if got else f"{str(name)[:30]}: страница не отдала текст (код {page['status'] or 'нет ответа'})", "ok": got})
+        if got:
+            material.append(f"Страница «{str(name)[:30]}» ({page['url']}), заголовок: {page['title']}\n{page['text'][:2500]}")
+    if ctx.get("not_named_on"):
+        steps.append({"text": f"Взял из замера вопросы, где компанию не назвали: {len(ctx['not_named_on'])}", "ok": True})
+    context = json.dumps({k: v for k, v in ctx.items() if k != "links"}, ensure_ascii=False)[:4000]
+    question = str(body.get("question", ""))[:1000]
+    pages = "\n\n".join(material)[:9000]
+    prompt = f"Данные кабинета (JSON):\n{context}\n\n{'Прочитанные страницы:' + chr(10) + pages + chr(10) + chr(10) if pages else ''}Запрос пользователя: {question or 'выполни свою задачу'}\n\nОтвечай по-русски, коротко и по делу."
+    text, _, model = ask(prompt, AGENTS[task])
+    steps.append({"text": f"Текст написала нейросеть {model}", "ok": True})
+    return {"text": text, "model": model, "steps": steps}
 
 
 # ---------- HTTP ----------
@@ -185,7 +244,7 @@ def allowed(ip, limit=30, window=3600):
     return True
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent}
+ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -209,7 +268,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/api/health":
-            return self._send(200, {"ok": True, "ai": bool(os.environ.get("OPENAI_API_KEY"))})
+            return self._send(200, {"ok": True, "ai": bool(provider_name()), "provider": provider_name()})
         self._send(404, {"error": "Не найдено."})
 
     def do_POST(self):
@@ -231,7 +290,7 @@ class Handler(BaseHTTPRequestHandler):
         except json.JSONDecodeError:
             self._send(400, {"error": "Запрос не в формате JSON."})
         except providers.ProviderError as e:
-            msg = "ИИ не подключён: на сервере нет ключа или закончился баланс." if ("OPENAI_API_KEY" in str(e) or "insufficient_quota" in str(e)) else "Нейросеть не ответила. Попробуйте позже."
+            msg = "ИИ не подключён: на сервере нет ключа или закончился баланс." if no_ai(e) else "Нейросеть не ответила. Попробуйте позже."
             self._send(503, {"error": msg})
 
     def log_message(self, fmt, *args):

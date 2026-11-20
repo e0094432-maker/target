@@ -110,6 +110,32 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(code, 503)
         self.assertIn("ИИ не подключён", data["error"])
 
+    def test_connector_is_checked_by_reading_the_page(self):
+        site = f"http://127.0.0.1:{self.site.server_port}/"
+        code, data, _ = post(self.api.server_port, "/api/connect", {"url": site})
+        self.assertEqual((code, data["ok"], data["status"]), (200, True, 200))
+        self.assertGreater(data["chars"], 100)
+        code, data, _ = post(self.api.server_port, "/api/connect", {"url": site + "missing"})
+        self.assertEqual((code, data["ok"]), (200, False))
+
+    def test_agent_reads_connected_pages_before_writing(self):
+        seen = {}
+
+        def fake(prompt, system=None):
+            seen["prompt"] = prompt
+            return "готово", [], "test-model"
+
+        real, app.ask = app.ask, fake
+        try:
+            site = f"http://127.0.0.1:{self.site.server_port}/"
+            code, data, _ = post(self.api.server_port, "/api/agent", {"task": "chat", "question": "что улучшить?", "context": {"company": "A", "links": {"Сайт": site, "2ГИС": site + "missing"}}})
+        finally:
+            app.ask = real
+        self.assertEqual((code, data["text"]), (200, "готово"))
+        self.assertEqual([s["ok"] for s in data["steps"]], [True, False, True])
+        self.assertIn("Прочитанные страницы", seen["prompt"])
+        self.assertIn("что улучшить?", seen["prompt"])
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))
