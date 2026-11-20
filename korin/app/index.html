@@ -8,7 +8,7 @@
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('korin-theme-v4')||'dark'}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fff;--side:#fafafa;--card:#fff;--sub:#f6f6f7;--line:#ebebee;--line2:#dcdce0;--ink:#0f1114;--text:#2a2d33;--muted:#6f737b;--dim:#9a9ea6;--acc:#2f5bff;--acc-bg:#eef2ff;--lime:#c9f560;--lime-ink:#1c2600;--ok:#0f7b4f;--ok-bg:#e6f6ee;--bad:#c2331f;--bad-bg:#fdecea;--warn:#8a5a00;--warn-bg:#fff5db;--btn:#0f1114;--btn-ink:#fff;--hero:linear-gradient(135deg,#f3f6ff,#fff 60%);--shadow:0 1px 2px rgba(15,17,20,.04),0 8px 24px -12px rgba(15,17,20,.12);
   --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
@@ -555,6 +555,19 @@ h1,.head h1,.ch h1{font-weight:500;letter-spacing:-.03em}
 [data-theme=dark]{--lime:rgba(201,245,96,.15);--lime-ink:#d9f99d;--warn:#e7b65a;--warn-bg:rgba(231,182,90,.13)}
 [data-theme=dark] .rank.me i{background:#c9f560}
 [data-theme=dark] .wsw i{background:rgba(201,245,96,.15);color:#d9f99d}
+
+/* ---------- Körin's own face ---------- */
+:root{--sans:"Onest",system-ui,sans-serif;--head:"Onest",system-ui,sans-serif}
+[data-theme=dark]{--bg:#070a08;--side:#070a08;--card:#0d110e;--sub:#151a16;--line:#1c221d;--line2:#2a322b;--ink:#eef3ea;--text:#cfd6cc;--muted:#9aa398;--dim:#6f786d;--btn:#c9f560;--btn-ink:#10140a}
+[data-theme=dark] .btn{background:#111612}
+[data-theme=dark] .btn-p,[data-theme=dark] .btn-p:hover{background:#c9f560;color:#10140a;border-color:#c9f560}
+h1,.head h1,.ch h1{font-weight:600}
+.btn{border-radius:999px;padding:0 13px}
+.ib{padding:0}
+.box,.kcol,.kcard,.kpi,.agent,.conn,.onb,.bub,.composer{border-radius:16px}
+.logo i{background:#c9f560}.logo i::before{background:var(--bg)}
+.sl.on svg{color:#c9f560}
+[data-theme=light] .logo i{background:#111613}
 </style>
 </head>
 <body>

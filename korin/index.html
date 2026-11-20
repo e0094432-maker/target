@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#05060f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#08090a;--panel:#0f1011;--panel2:#151618;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);--text:#f7f8f8;--muted:#8a8f98;--dim:#62666d;--acc:#5b8cff;--acc2:#8fb0ff;--lime:#c9f560;--lime-ink:#141a00;--bad:#ff6b5e;
   --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--max:1180px}
@@ -334,6 +334,54 @@ section{padding-bottom:120px}
 .lv-s i{width:14px;height:14px;border-radius:4px;border:1px solid #333;flex:none;display:grid;place-items:center;font-style:normal;font-size:10px;color:#000}
 .lv-s.done i{background:var(--ac);border-color:var(--ac)}
 @media (min-width:900px){.live{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);min-height:400px}.lv-side{border-top:0;border-left:1px solid #232323}.lv-chat,.lv-side{padding:28px}}
+
+/* ---------- Körin's own face ---------- */
+:root{--bg:#070a08;--panel:#0d110e;--panel2:#121713;--line:#1c221d;--line2:#2a322b;--text:#eef3ea;--muted:#9aa398;--dim:#6f786d;--ac:#c9f560;--sans:"Onest",system-ui,sans-serif;--head:"Onest",system-ui,sans-serif}
+body{background:var(--bg);font-family:var(--sans)}
+h1,h2,.logo,.num,.huge{font-family:var(--head)}
+h1{font-weight:600;letter-spacing:-.035em;line-height:1.05;font-size:clamp(34px,5vw,60px)}
+h2{font-weight:600;letter-spacing:-.03em;color:var(--text)}
+header{background:rgba(7,10,8,.85)}
+.hero::before{background:radial-gradient(50% 60% at 85% 10%,rgba(201,245,96,.1),transparent 70%)}
+section>.wrap::before,section>.wrap::after{display:none}
+.btn{border-radius:999px}
+header .btn{height:34px;padding:0 14px}
+.btn-w,.btn-w:hover{background:var(--ac);color:#10140a;border-color:var(--ac);font-weight:600}
+.btn-w:hover{background:#d8fb7e}
+.logo i{background:var(--ac)}.logo i::before{background:var(--bg)}
+.badge{border-radius:999px;background:var(--panel)}.badge b{border-radius:999px}
+#eng{color:var(--ac)}
+.check{border-radius:999px;padding-left:8px;background:var(--panel);border-color:var(--line2)}
+.check:focus-within{border-color:var(--ac)}
+.cell,.pane,.cta,.tile,.step,.win,.qc-box{background:var(--panel);border-color:var(--line);border-radius:20px}
+.win{border-radius:20px}
+.lv-side{background:var(--panel2);border-color:var(--line)}
+.lv-q{background:#1b221c;border-radius:16px 16px 4px 16px}
+.lv-b u{background:#1b221c}.lv-b i{background:#3a443b}
+.v,.node i{background:var(--panel2)}
+.node,.core{background:var(--panel)}
+.core i,.pts li::before{background:var(--ac)}
+.strip{border-color:var(--line)}
+.live{grid-template-columns:1fr!important}
+.lv-side{border-left:0!important;border-top:1px solid var(--line)}
+/* radar */
+.web{height:auto;min-height:0;padding:88px 0!important;overflow:visible;border-color:var(--line)}
+.web-g{display:grid;gap:40px;align-items:center}
+.web h2{max-width:none;text-align:left;font-size:clamp(28px,4vw,48px);line-height:1.12}
+.radar{position:relative;width:100%;max-width:520px;aspect-ratio:1;margin:0 auto}
+.web .radar canvas{position:absolute;inset:0;width:100%;height:100%}
+@media (min-width:960px){
+  .hero{padding-top:72px}
+  .hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:56px;align-items:center;align-content:center;text-align:left}
+  .hero .wrap>*{grid-column:1;justify-self:start;margin-left:0;margin-right:0}
+  .hero .wrap{grid-template-rows:1fr repeat(5,auto) 1fr}
+  .hero .wrap>:nth-child(1){grid-row:2}.hero .wrap>:nth-child(2){grid-row:3}.hero .wrap>:nth-child(3){grid-row:4}.hero .wrap>:nth-child(4){grid-row:5}.hero .wrap>:nth-child(5){grid-row:6}
+  .hero .wrap>.stage{grid-column:2;grid-row:1/-1;justify-self:stretch;margin-top:0}
+  .hero .lead{max-width:520px}
+  .hero .check{width:100%;max-width:520px}
+  .hero .fine{text-align:left;max-width:520px}
+  .web-g{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}
+}
 </style>
 </head>
 <body>
@@ -366,7 +414,7 @@ section{padding-bottom:120px}
 
 <div class="strip"><div class="wrap rv"><p>Проверяем ответы трёх нейросетей, на русском и казахском</p><div><span>ChatGPT</span><span>Gemini</span><span>Perplexity</span></div></div></div>
 
-<section class="web" id="web" aria-label="Откуда нейросеть берёт ответы"><canvas id="net" aria-hidden="true"></canvas><div class="say"><h2 id="webText">Нейросеть собирает ответ из десятков сайтов. Körin показывает, из каких — и есть ли там вы</h2></div></section>
+<section class="web" id="web" aria-label="Откуда нейросеть берёт ответы"><div class="wrap web-g"><h2 id="webText">Нейросеть называет тех, кто ближе к центру. Körin показывает, где вы сейчас — и как подойти ближе</h2><div class="radar"><canvas id="net" aria-hidden="true"></canvas></div></div></section>
 
 <section id="product"><div class="wrap">
   <span class="eyebrow rv">Продукт</span>
@@ -440,7 +488,7 @@ section{padding-bottom:120px}
 <script>
 /* Два языка: английский по умолчанию, русский по кнопке */
 const EN = {"Продукт": "Product", "ИИ-агенты": "AI agents", "Коннекторы": "Connectors", "Как работает": "How it works", "Замер": "Get a check", "Открыть кабинет": "Open workspace", "Казахстан": "Kazakhstan", "Аналитика ответов нейросетей": "AI answer analytics", "Узнайте, кого": "See who", "советует вместо вас": "recommends instead of you", "Клиенты спрашивают совета у нейросетей. Körin показывает, называют ли они вашу компанию, и даёт три шага, как попасть в ответы.": "Customers ask AI for advice. Körin shows whether it names your company and gives you three steps to get into the answers.", "Проверить бизнес": "Check my business", "Бесплатно и без регистрации: зададим нейросети три вопроса про вашу нишу и покажем ответы дословно.": "Free, no sign-up: we ask the AI three questions about your niche and show the answers word for word.", "körin · обзор · пример": "körin · overview · example", "Вас назвали": "You were named", "из 30 ответов": "of 30 answers", "Вы на 4-м месте из 5. В двух вопросах вместо вас называют": "You rank 4th of 5. In two questions the AI names", "English Hub и Lingua Plus": "English Hub and Lingua Plus", "Кто забирает ваших клиентов": "Who takes your customers", "Вы": "You", "Сделайте на этой неделе": "Do this week", "Открыть сайт ботам нейросетей": "Open the site to AI crawlers", "Собрать отзывы на 2ГИС": "Collect reviews on 2GIS", "Сделать страницу вопросов и ответов": "Publish a Q&A page", "Попасть в городские подборки": "Get into local roundups", "Проверяем ответы трёх нейросетей, на русском и казахском": "We check three AI engines, in Russian and Kazakh", "Не отчёт, а ответ на вопрос": "Not a report. An answer to", "«почему советуют не нас»": "“why do they recommend someone else”", "Ответы дословно": "Answers word for word", "Каждый ответ нейросети сохраняется. Откройте и прочитайте, кого она назвала и почему.": "Every AI answer is saved. Open it and read who was named and why.", "Какие курсы английского в Алматы подойдут ребёнку?": "Which English courses in Almaty suit a child?", "— много свежих отзывов на 2ГИС.": "— many fresh reviews on 2GIS.", "— на сайте расписаны программы и цены.": "— programmes and prices are on the site.", "— упоминается в городских подборках.": "— featured in local roundups.", "Вашей компании в этом ответе нет": "Your company is not in this answer", "Дробь, а не процент": "A fraction, not a percentage", "«3 из 10 ответов» понятнее и честнее, чем «видимость 30%».": "“3 of 10 answers” is clearer and more honest than “30% visibility”.", "из 10": "of 10", "Сайт для нейросетей": "A site AI can read", "Пускает ли сайт их ботов и читается ли главная страница.": "Whether the site lets their crawlers in and the home page is readable.", "открыт": "open", "закрыт": "blocked", "Три шага на неделю": "Three steps a week", "С готовым текстом и кнопкой: отзывы, страница вопросов, письмо в подборку.": "With ready text and a button: reviews, a Q&A page, a pitch to a roundup.", "Запросить отзывы в WhatsApp": "Ask for reviews on WhatsApp", "Собрать страницу вопросов": "Build a Q&A page", "Написать в подборку": "Pitch a roundup", "Русский и қазақша": "Russian and Kazakh", "Казахские вопросы составляются отдельно, а не переводятся.": "Kazakh questions are written separately, not translated.", "Команда, которая работает над вашей видимостью": "A team that works on your visibility", "Семь агентов, у каждого одна работа: следить за ответами нейросетей, объяснять цифры, проверять сайт, собирать отзывы, писать страницы и письма.": "Seven agents, one job each: watch AI answers, explain the numbers, audit the site, collect reviews, write pages and emails.", "Работают по расписанию или по кнопке": "Run on a schedule or on demand", "Берут данные из ваших коннекторов": "Use data from your connectors", "Отдают готовый результат, а не совет": "Deliver finished work, not advice", "Посмотреть агентов": "See the agents", "Агент показывает по шагам, какие страницы открыл и откуда взял ответ.": "Each agent shows step by step which pages it opened and where the answer came from.", "Наблюдатель": "Watcher", "Аналитик": "Analyst", "Аудитор сайта": "Site auditor", "Менеджер отзывов": "Review manager", "Редактор сайта": "Site editor", "PR-агент": "PR agent", "SMM-агент": "Social agent", "Подключается к площадкам,": "Connects to the places", "где живёт ваш бизнес": "where your business lives", "Сайт, карты, соцсети, CRM и мессенджеры. Агенты берут оттуда данные и туда же отдают результат.": "Website, maps, social, CRM and messengers. Agents read from them and deliver results back.", "Google Карты": "Google Maps", "2ГИС": "2GIS", "Яндекс Карты": "Yandex Maps", "Kaspi Магазин": "Kaspi Shop", "Битрикс24": "Bitrix24", "Сейчас работают коннекторы по открытой ссылке. Вход через аккаунт для остальных сервисов в разработке.": "Connectors by public link work today. Account sign-in for the other services is in development.", "Замер, причина, действие": "Measure, cause, action", "Задаём вопросы ваших клиентов": "We ask your customers’ questions", "Так, как их задают в вашем городе. Нейросети отвечают, мы сохраняем каждый ответ.": "The way people ask them in your city. The AI answers, we save every answer.", "Показываем, кого назвали": "We show who was named", "Вас, конкурентов и сайты, с которых нейросеть взяла ответ.": "You, your competitors and the sites the AI took the answer from.", "Даём действия и повторяем": "We give actions and repeat", "Три шага на неделю. Через неделю новый замер покажет, что изменилось.": "Three steps a week. A new check a week later shows what changed.", "Хотите настоящий замер": "Want a real check", "для своей компании?": "for your company?", "Оставьте название и WhatsApp. Сделаем первый замер вручную и пришлём ответы нейросетей.": "Leave your company name and WhatsApp. We will run the first check by hand and send you the AI answers.", "Получить замер": "Get my check", "Körin · сервис ТОО «FORGE THE FUTURE», БИН 250640005875, г. Алматы.": "Körin · a service by FORGE THE FUTURE LLP, BIN 250640005875, Almaty.", "Независимый сервис. Не связан с OpenAI, Google и Perplexity. Не гарантирует упоминаний в ответах нейросетей. Примеры на странице вымышленные.": "An independent service. Not affiliated with OpenAI, Google or Perplexity. Mentions in AI answers are not guaranteed. Examples on this page are fictional.", "Меню": "Menu", "Название вашей компании": "Your company name", "Откуда нейросеть берёт ответы": "Where the AI gets its answers", "Компания и город": "Company and city", "Закрыть": "Close"};
-const WEB = ["AI builds its answer from dozens of sites. Körin shows which ones — and whether you are there", "Нейросеть собирает ответ из десятков сайтов. Körin показывает, из каких — и есть ли там вы"];
+const WEB = ["AI names those closest to the centre. Körin shows where you are now — and how to move closer", "Нейросеть называет тех, кто ближе к центру. Körin показывает, где вы сейчас — и как подойти ближе"];
 let lang = 'en'; try { lang = localStorage.getItem('korin-lang') || 'en' } catch (e) {}
 const L = (ru, en) => lang === 'en' ? en : ru;
 const RU_TITLE = document.title, RU_DESC = document.querySelector('meta[name=description]').content, i18n = [];
@@ -496,31 +544,36 @@ const $ = s => document.querySelector(s);
   new IntersectionObserver(e => { if (e[0].isIntersecting) { if (!run) play() } }, { threshold: .15 }).observe(box);
 })();
 
-/* Сеть источников: точки, линии между соседями, часть точек — логотипы площадок */
+/* Радар видимости: в центре нейросеть, чем ближе компания к центру, тем чаще её называют. Точка «Вы» идёт внутрь */
 (() => {
   const sec = document.getElementById('web'), cv = document.getElementById('net'), h2 = document.getElementById('webText'); if (!sec || !cv) return;
   let words = []; const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const reveal = () => { const r = sec.getBoundingClientRect(), k = Math.min(1, Math.max(0, (innerHeight * .85 - r.top) / (innerHeight * .6))); words.forEach((w, i) => w.classList.toggle('on', still || i < Math.round(k * words.length))) };
+  const reveal = () => { const r = sec.getBoundingClientRect(), k = Math.min(1, Math.max(0, (innerHeight * .9 - r.top) / (innerHeight * .5))); words.forEach((w, i) => w.classList.toggle('on', still || i < Math.round(k * words.length))) };
   window.setWebText = t => { h2.innerHTML = t.split(' ').map(w => `<span>${w}</span>`).join(' '); words = [...h2.children]; reveal() };
   addEventListener('scroll', reveal, { passive: true }); setWebText(h2.textContent);
-  // логотипы берём из блока коннекторов на этой же странице
   const icons = [...document.querySelectorAll('.tile .lgo')].map(l => { const path = l.querySelector('path'); if (!path) return null; const bg = getComputedStyle(l).backgroundColor, fill = path.getAttribute('fill'); return { p: new Path2D(path.getAttribute('d')), c: /255, 255, 255/.test(bg) || /gradient/.test(l.getAttribute('style') || '') ? (fill === '#fff' ? '#e1306c' : fill) : bg } }).filter(Boolean);
-  const ctx = cv.getContext('2d'); let W = 0, H = 0, pts = [], run = false, raf = 0;
-  const size = () => { const d = Math.min(2, devicePixelRatio || 1); W = sec.clientWidth; H = sec.clientHeight; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
-    const n = Math.round(Math.min(110, W * H / 9000)); pts = Array.from({ length: n }, (_, i) => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22, ic: icons.length && i % 4 === 0 ? icons[(i / 4) % icons.length | 0] : null, s: 13 + Math.random() * 9, ph: Math.random() })) };
+  const src = icons.map((ic, i) => ({ ic, a: i * 2.4 + .6, r: .56 + (i % 3) * .14 }));
+  const rivals = [['English Hub', .2, 4.0], ['Lingua Plus', .31, 1.1], ['Bright School', .43, 2.6]];
+  const ctx = cv.getContext('2d'); let W = 0, run = false, raf = 0;
+  const size = () => { const d = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; cv.width = cv.height = W * d; ctx.setTransform(d, 0, 0, d, 0, 0) };
   const draw = () => {
-    ctx.clearRect(0, 0, W, H); const R = Math.min(170, W / 4.5);
-    for (const a of pts) { a.x += a.vx; a.y += a.vy; if (a.x < -20) a.x = W + 20; if (a.x > W + 20) a.x = -20; if (a.y < -20) a.y = H + 20; if (a.y > H + 20) a.y = -20 }
-    // ближе к центру сеть бледнее, чтобы текст читался
-    const dim = (x, y) => { const dx = (x - W / 2) / (W * .34), dy = (y - H / 2) / (H * .3); return Math.min(1, .16 + (dx * dx + dy * dy) * .8) };
-    ctx.lineWidth = 1;
-    for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy); if (d < R) { ctx.strokeStyle = `rgba(255,255,255,${(1 - d / R) * .16 * Math.min(dim(a.x, a.y), dim(b.x, b.y))})`; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke() } }
-    for (const a of pts) { const k = dim(a.x, a.y); ctx.globalAlpha = k;
-      if (a.ic) { ctx.save(); ctx.translate(a.x - a.s / 2, a.y - a.s / 2); ctx.scale(a.s / 24, a.s / 24); ctx.fillStyle = a.ic.c; ctx.fill(a.ic.p); ctx.restore() }
-      else { ctx.fillStyle = 'rgba(237,242,245,.5)'; ctx.beginPath(); ctx.arc(a.x, a.y, 1.4, 0, 6.3); ctx.fill() } }
-    const now = performance.now() / 5200;
-    for (const a of pts) if (a.ic) { const t = (now + a.ph) % 1, x = a.x + (W / 2 - a.x) * t, y = a.y + (H / 2 - a.y) * t; ctx.globalAlpha = Math.sin(t * Math.PI) * .7 * dim(x, y); ctx.fillStyle = '#c9f560'; ctx.beginPath(); ctx.arc(x, y, 1.6, 0, 6.3); ctx.fill() }
-    ctx.globalAlpha = 1; if (run && !still) raf = requestAnimationFrame(draw);
+    const t = still ? 9000 : performance.now(), c = W / 2, R = W / 2 - 16, sw = t / 4200 % 6.283;
+    ctx.clearRect(0, 0, W, W); ctx.lineWidth = 1;
+    for (let k = 1; k <= 4; k++) { ctx.strokeStyle = `rgba(238,243,234,${k === 4 ? .16 : .08})`; ctx.setLineDash(k === 4 ? [] : [3, 5]); ctx.beginPath(); ctx.arc(c, c, R * k / 4, 0, 6.283); ctx.stroke() }
+    ctx.setLineDash([]);
+    for (let j = 0; j < 46; j++) { ctx.fillStyle = `rgba(201,245,96,${.11 * (1 - j / 46)})`; ctx.beginPath(); ctx.moveTo(c, c); ctx.arc(c, c, R, sw - j * .025 - .025, sw - j * .025 + .004); ctx.fill() }
+    ctx.strokeStyle = 'rgba(201,245,96,.55)'; ctx.beginPath(); ctx.moveTo(c, c); ctx.lineTo(c + Math.cos(sw) * R, c + Math.sin(sw) * R); ctx.stroke();
+    const glow = a => { let d = (sw - a) % 6.283; if (d < 0) d += 6.283; return Math.max(0, 1 - d / 1.6) };
+    for (const s of src) { const x = c + Math.cos(s.a) * R * s.r, y = c + Math.sin(s.a) * R * s.r, z = 17; ctx.globalAlpha = .3 + .7 * glow(s.a); ctx.save(); ctx.translate(x - z / 2, y - z / 2); ctx.scale(z / 24, z / 24); ctx.fillStyle = s.ic.c; ctx.fill(s.ic.p); ctx.restore() }
+    ctx.globalAlpha = 1; ctx.font = '500 12px Onest, sans-serif'; ctx.textBaseline = 'middle';
+    for (const [n, r, a] of rivals) { const x = c + Math.cos(a) * R * r, y = c + Math.sin(a) * R * r; ctx.fillStyle = 'rgba(238,243,234,.85)'; ctx.beginPath(); ctx.arc(x, y, 4, 0, 6.283); ctx.fill(); ctx.fillStyle = 'rgba(238,243,234,.6)'; ctx.fillText(n, x + 9, y) }
+    // «Вы»: снаружи внутрь за девять секунд, потом пауза и заново
+    const ph = t % 13000 / 9000, k = Math.min(1, ph), e = 1 - Math.pow(1 - k, 3), ry = .93 - .57 * e, ay = 5.35 - e * .5, x = c + Math.cos(ay) * R * ry, y = c + Math.sin(ay) * R * ry;
+    ctx.fillStyle = 'rgba(201,245,96,.18)'; ctx.beginPath(); ctx.arc(x, y, 11 + Math.sin(t / 300) * 2, 0, 6.283); ctx.fill();
+    ctx.fillStyle = '#c9f560'; ctx.beginPath(); ctx.arc(x, y, 5, 0, 6.283); ctx.fill(); ctx.font = '600 12.5px Onest, sans-serif'; ctx.fillText(lang === 'en' ? 'You' : 'Вы', x + 12, y);
+    ctx.fillStyle = '#0d110e'; ctx.strokeStyle = 'rgba(238,243,234,.25)'; ctx.beginPath(); ctx.arc(c, c, 20, 0, 6.283); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#eef3ea'; ctx.font = '600 12px Onest, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(lang === 'en' ? 'AI' : 'ИИ', c, c + 1); ctx.textAlign = 'left';
+    if (run && !still) raf = requestAnimationFrame(draw);
   };
   size(); draw(); addEventListener('resize', () => { size(); if (!run) draw() });
   new IntersectionObserver(e => { run = e[0].isIntersecting; cancelAnimationFrame(raf); if (run) draw() }).observe(sec);
