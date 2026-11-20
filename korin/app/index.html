@@ -1,18 +1,18 @@
 <!doctype html>
-<html lang="ru" data-theme="dark">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Körin — кабинет</title>
 <meta name="robots" content="noindex">
-<script>try{document.documentElement.dataset.theme=localStorage.getItem('korin-theme-v2')||'dark'}catch(e){}</script>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('korin-theme-v3')||'light'}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#fff;--side:#fafafa;--card:#fff;--sub:#f6f6f7;--line:#ebebee;--line2:#dcdce0;--ink:#0f1114;--text:#2a2d33;--muted:#6f737b;--dim:#9a9ea6;--acc:#2f5bff;--acc-bg:#eef2ff;--lime:#c9f560;--lime-ink:#1c2600;--ok:#0f7b4f;--ok-bg:#e6f6ee;--bad:#c2331f;--bad-bg:#fdecea;--warn:#8a5a00;--warn-bg:#fff5db;--btn:#0f1114;--btn-ink:#fff;--hero:linear-gradient(135deg,#f3f6ff,#fff 60%);--shadow:0 1px 2px rgba(15,17,20,.04),0 8px 24px -12px rgba(15,17,20,.12);
-  --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
-[data-theme=dark]{--bg:#0b0c0e;--side:#0f1012;--card:#121316;--sub:#17181b;--line:#222428;--line2:#2f3237;--ink:#f7f8f8;--text:#d5d7db;--muted:#8a8f98;--dim:#62666d;--acc:#7aa2ff;--acc-bg:rgba(91,140,255,.14);--ok:#7ee0a8;--ok-bg:rgba(60,200,130,.14);--bad:#ff9d93;--bad-bg:rgba(255,107,94,.14);--warn:#f5c56b;--warn-bg:rgba(245,197,107,.13);--btn:#fff;--btn-ink:#0b0c0e;--hero:radial-gradient(120% 160% at 0 0,rgba(91,140,255,.2),transparent 60%),#15161a;--shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px -12px rgba(0,0,0,.7);color-scheme:dark}
+:root{--bg:#f6f7fb;--side:#fff;--card:#fff;--sub:#f1f3f9;--line:#e3e7f2;--line2:#d3d9ea;--ink:#0b1437;--text:#27304f;--muted:#5d6785;--dim:#8f98b3;--acc:#2355ff;--acc-h:#1238c9;--acc-bg:#eef2ff;--lime:#dfe7ff;--lime-ink:#1238c9;--ok:#0b8a50;--ok-bg:#e3f7ec;--bad:#d13a2f;--bad-bg:#fdecea;--warn:#93540a;--warn-bg:#fff4dd;--btn:#2355ff;--btn-ink:#fff;--hero:#fff;--shadow:0 1px 2px rgba(11,20,55,.05),0 12px 32px -12px rgba(11,20,55,.14);
+  --sans:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
+[data-theme=dark]{--bg:#0b0c0e;--side:#0f1012;--card:#121316;--sub:#17181b;--line:#222428;--line2:#2f3237;--ink:#f7f8f8;--text:#d5d7db;--muted:#8a8f98;--dim:#62666d;--acc:#7aa2ff;--acc-bg:rgba(91,140,255,.14);--ok:#7ee0a8;--ok-bg:rgba(60,200,130,.14);--bad:#ff9d93;--bad-bg:rgba(255,107,94,.14);--warn:#f5c56b;--warn-bg:rgba(245,197,107,.13);--acc-h:#9bb8ff;--lime:#c9f560;--lime-ink:#1c2600;--btn:#fff;--btn-ink:#0b0c0e;--hero:radial-gradient(120% 160% at 0 0,rgba(91,140,255,.2),transparent 60%),#15161a;--shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px -12px rgba(0,0,0,.7);color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--text);font:400 14.5px/1.5 var(--sans);-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01"}
@@ -181,6 +181,82 @@ tr.me td{background:var(--acc-bg);font-weight:600;color:var(--ink)}
 .lg.own{background:var(--sub);border:1px solid var(--line)}.lg.own svg{stroke:var(--ink)}
 .lg.lite{border:1px solid var(--line)}
 .agent .av{background:var(--sub);border:1px solid var(--line);color:var(--ink)}
+
+/* ---------- light blue workspace ---------- */
+body{font-size:15px;font-feature-settings:normal}
+h1{font-size:28px;font-weight:800;letter-spacing:-.035em;line-height:1.1}
+h2{font-size:16px;font-weight:700;letter-spacing:-.015em}
+h4{font-size:15px;font-weight:600}
+.btn{height:36px;border-radius:10px;font-weight:600;font-size:14px;padding:0 14px}
+.btn-p:hover{background:var(--acc-h);border-color:var(--acc-h);opacity:1}
+.btn-lg{height:46px;border-radius:12px;font-size:15px}
+.ib{width:36px;padding:0}
+.tag{border-radius:999px;padding:2px 10px;font-weight:600}
+.logo{font-weight:800;font-size:18px;letter-spacing:-.03em}
+.logo i{width:26px;height:26px;border-radius:8px;background:var(--acc)}
+.logo i::before{width:10px;height:10px;background:none;border:2.5px solid #fff;box-sizing:border-box}
+.top{height:58px;background:var(--card)}
+.tabs{background:var(--card)}
+.tabs a.on{color:var(--acc)}
+.seg{border-radius:11px;padding:3px;border-color:transparent}
+.seg button,.seg a{border-radius:8px;padding:6px 13px;font-size:13.5px;font-weight:600}
+.seg [aria-pressed=true],.seg a.on{box-shadow:0 1px 2px rgba(11,20,55,.14)}
+.box,.agent,.conn{border-radius:14px;box-shadow:0 1px 2px rgba(11,20,55,.04)}
+.box{padding:20px}
+.box>h2{margin-bottom:16px}
+.box>h2 a{font-weight:600}
+.av{background:var(--acc-bg);border-color:transparent;color:var(--acc);border-radius:10px}
+.agent .av{background:var(--acc-bg);border-color:transparent;color:var(--acc)}
+.rank u{height:8px}
+.rank i{background:#c9d1e6}
+.rank em{color:var(--ink);font-weight:500}
+.inp{height:42px;border-radius:10px}
+.onb{border-radius:18px}
+.onb h1{font-size:26px}
+.onb .st i.on{background:var(--acc)}
+.sw input:checked+i{background:var(--acc)}
+.note{border-radius:12px;font-weight:500}
+.tw{margin:0 -20px;padding:0 20px}
+.lg.own{background:var(--acc-bg);border-color:transparent}.lg.own svg{stroke:var(--acc)}
+[data-theme=dark] .rank i{background:var(--line2)}
+[data-theme=dark] .logo i{background:var(--acc)}
+
+/* Overview */
+.head{margin-bottom:20px}
+.head p{font-size:15px;margin-top:6px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0;display:grid;gap:6px;align-content:start;box-shadow:0 1px 2px rgba(11,20,55,.04)}
+.kpi small{font-size:13px;font-weight:600;color:var(--muted)}
+.kpi b{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--ink)}
+.kpi b span{font-size:15px;font-weight:600;letter-spacing:-.01em;color:var(--muted);margin-left:6px}
+.kpi p{font-size:13px;color:var(--muted);line-height:1.4}
+.kpi a{font-size:13px;font-weight:600;color:var(--acc)}
+.kpi:last-child{grid-column:1/-1}
+.kpi.main{grid-column:1/-1;background:var(--acc);border-color:var(--acc);box-shadow:0 14px 30px -14px rgba(35,85,255,.7)}
+.kpi.main small,.kpi.main p{color:rgba(255,255,255,.82)}
+.kpi.main b{font-size:46px;color:#fff}.kpi.main b span{color:rgba(255,255,255,.82)}
+.engs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.engs span{font-size:12.5px;font-weight:600;color:#fff;background:rgba(255,255,255,.16);border-radius:999px;padding:3px 10px}
+.say{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin-top:12px}
+.say p{font-size:16px;line-height:1.5;color:var(--ink);font-weight:500}
+.say .btn{grid-column:2;justify-self:start}
+@media (min-width:1000px){
+  .side{padding:16px 12px}
+  .side a.n{height:38px;border-radius:10px;font-size:14.5px;font-weight:600;padding:0 10px}
+  .side a.n:hover{background:var(--sub)}
+  .side a.n.on{background:var(--acc-bg);color:var(--acc)}
+  .side a.n.on em{color:var(--acc)}
+  .side h5{font-size:12px;font-weight:600;margin:18px 10px 6px}
+  .ws b{font-size:15px;font-weight:700}
+  .side .help{border-radius:12px;background:var(--sub);border-color:transparent}
+  main{padding:30px 32px 60px}
+  h1{font-size:32px}
+  .kpis{grid-template-columns:1.5fr 1fr 1fr 1fr}
+  .kpi{padding:22px}
+  .kpi.main,.kpi:last-child{grid-column:auto}
+  .say{grid-template-columns:40px minmax(0,1fr) auto}
+  .say .btn{grid-column:auto}
+}
 </style>
 </head>
 <body>
@@ -323,12 +399,19 @@ const todos = () => { const g = gaps()[0], src = sources(), lead = ranked().find
 
 function viewOverview(){
   const r = ranked(), mine = hits(0), place = r.findIndex(x => x[2]) + 1, g = gaps(), top = r.filter(x => !x[2]).slice(0, 2).map(x => x[0]), max = Math.max(...r.map(x => x[1]), 1);
-  const diag = mine === 0 ? `Нейросети ни разу не назвали вас. Чаще всего советуют <span class="mark">${esc(top.join(' и '))}</span>.` : g.length ? `Вы на ${place}-м месте из ${r.length}. В ${g.length} вопросах из ${data.qs.length} вместо вас называют <span class="mark">${esc(top.join(' и '))}</span>.` : `Вы на ${place}-м месте из ${r.length}. Вас называют везде, где называют конкурентов.`;
-  const on = AGENTS.filter(a => agentOn(a[0])).length, cn = CONNECTORS.filter(c => connected(c[1])).length;
-  return `${banner()}<div class="hero"><div><small>Вас назвали</small><div class="frac">${mine}<span>из ${total()} ответов</span></div>${data.engines.length > 1 ? `<p class="mono" style="margin-top:10px">${data.engines.map(e => `${ENG[e]} ${data.eng[e].grid.filter(x => x[0]).length}/${data.qs.length}`).join(' · ')}</p>` : ''}</div><p class="diag">${diag}</p><div>${segHtml()}<p class="mono" style="margin-top:8px">${esc(meta())}</p></div></div>
+  const diag = mine === 0 ? `Нейросети ни разу не назвали вас. Чаще всего советуют <span class="mark">${esc(top.join(' и '))}</span>.` : g.length ? `В ${g.length} вопросах из ${data.qs.length} вместо вас называют <span class="mark">${esc(top.join(' и '))}</span>.` : `Вас называют везде, где называют конкурентов.`;
+  const on = AGENTS.filter(a => agentOn(a[0])).length, cn = CONNECTORS.filter(c => connected(c[1])).length, left = todos().filter(t => !st.done[t.id]).length;
+  return `${banner()}<div class="head"><div><h1>Обзор</h1><p>${esc(meta())}</p></div><span class="sp"></span>${segHtml()}</div>
+  <div class="kpis">
+    <div class="kpi main"><small>Вас назвали</small><b>${mine}<span>из ${total()} ответов</span></b>${data.engines.length > 1 ? `<div class="engs">${data.engines.map(e => `<span>${ENG[e]} ${data.eng[e].grid.filter(x => x[0]).length}/${data.qs.length}</span>`).join('')}</div>` : '<p>во всех ответах нейросети</p>'}</div>
+    <div class="kpi"><small>Место среди конкурентов</small><b>${place}<span>из ${r.length}</span></b><a href="#/serp/rivals">Сравнить</a></div>
+    <div class="kpi"><small>Вопросы без вас</small><b>${g.length}<span>из ${data.qs.length}</span></b><a href="#/serp/questions">Посмотреть</a></div>
+    <div class="kpi"><small>Задач осталось</small><b>${left}</b><a href="#/tasks">Открыть задачи</a></div>
+  </div>
+  <div class="say"><span class="av" style="width:40px;height:40px">${ic('bot')}</span><p>${diag}</p><a class="btn btn-p" href="#/tasks">Что с этим делать</a></div>
   <div class="grid work"><div class="box"><h2>Сделать на этой неделе <a href="#/tasks">Все задачи</a></h2>${todos().slice(0, 3).map(t => `<div class="rowi"><span class="av">${ic(t.icon)}</span><div><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p></div><button class="btn" data-run="${t.agent}">${ic('play')}Поручить агенту</button></div>`).join('')}</div>
   <div class="box"><h2>Кто забирает ваших клиентов <a href="#/serp/rivals">Подробнее</a></h2>${r.map(x => `<div class="rank${x[2] ? ' me' : ''}"><span>${esc(x[0])}${x[2] ? ' · вы' : ''}</span><u><i style="width:${x[1] / max * 100}%"></i></u><em>${x[1]}/${total()}</em></div>`).join('')}</div></div>
-  <div class="grid two"><div class="box"><h2>ИИ-агенты <a href="#/agents">${on} из ${AGENTS.length} включены</a></h2>${AGENTS.slice(0, 4).map(a => `<div class="rowi"><span class="av">${ic(a[2])}</span><div><h4>${a[1]}</h4><p>${a[3]}</p></div><span class="dot${agentOn(a[0]) ? ' on' : ''}" title="${agentOn(a[0]) ? 'включён' : 'на паузе'}"></span></div>`).join('')}</div>
+  <div class="grid two"><div class="box"><h2>ИИ-агенты <a href="#/agents">${on} из ${AGENTS.length} включены</a></h2>${AGENTS.slice(0, 4).map(a => `<div class="rowi"><span class="av">${ic(a[2])}</span><div><h4>${a[1]}</h4><p>${a[3]}</p></div><span class="tag ${agentOn(a[0]) ? 'acc' : ''}">${agentOn(a[0]) ? 'включён' : 'пауза'}</span></div>`).join('')}</div>
   <div class="box"><h2>Коннекторы <a href="#/connectors">${cn} подключено</a></h2>${CONNECTORS.filter(c => c[5] === 'link').slice(0, 4).map(c => `<div class="rowi" style="grid-template-columns:40px 1fr auto">${logo(c)}<div><h4>${c[2]}</h4><p>${connected(c[1]) ? esc(String(st.conn[c[1]]).slice(0, 34)) : 'не подключён'}</p></div><button class="btn" data-conn="${c[1]}">${connected(c[1]) ? 'Изменить' : 'Подключить'}</button></div>`).join('')}</div></div>
   <div class="grid"><div class="box"><h2>Где вас не назвали <a href="#/serp/questions">Все вопросы</a></h2>${g.length ? g.slice(0, 3).map(x => `<div class="qrow"><b>${esc(x.q)}</b><div class="who">вместо вас: <b>${esc(x.who.join(', '))}</b></div><div class="dots">${dotsHtml(x.qi)}<button class="lnk" data-ans="${x.qi}">Читать ответ</button></div></div>`).join('') : '<p class="muted">Таких вопросов в этом замере нет.</p>'}</div></div>`;
 }
@@ -410,7 +493,7 @@ function closeDrawer(){ $('#drawer').classList.remove('open'); $('#scrim').class
 
 /* ---------- Каркас ---------- */
 const themeBtn = wide => `<button class="btn${wide ? '' : ' ib'}" data-theme-toggle aria-label="Сменить тему">${ic(document.documentElement.dataset.theme === 'dark' ? 'sun' : 'moon')}${wide ? (document.documentElement.dataset.theme === 'dark' ? 'Светлая тема' : 'Тёмная тема') : ''}</button>`;
-function bindTheme(){ $$('[data-theme-toggle]').forEach(b => b.onclick = () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.setItem('korin-theme-v2', t) } catch (e) {} st.ready ? render() : onboarding() }) }
+function bindTheme(){ $$('[data-theme-toggle]').forEach(b => b.onclick = () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.setItem('korin-theme-v3', t) } catch (e) {} st.ready ? render() : onboarding() }) }
 const NAV = [['Мониторинг', 'overview', 'home', 'Обзор'], ['Мониторинг', 'serp', 'list', 'Выдача'], ['Автоматизация', 'agents', 'bot', 'ИИ-агенты'], ['Автоматизация', 'tasks', 'check', 'Задачи'], ['Данные', 'connectors', 'plug', 'Коннекторы'], ['Данные', 'site', 'globe', 'Сайт для ИИ'], ['Кабинет', 'settings', 'gear', 'Настройки']];
 const VIEWS = { overview: viewOverview, agents: viewAgents, tasks: viewTasks, connectors: viewConnectors, site: viewSite, settings: viewSettings };
 function render(){
