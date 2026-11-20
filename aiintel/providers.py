@@ -24,7 +24,7 @@ def _post(url, headers, payload, timeout=180, retries=3):
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return json.loads(r.read())
         except urllib.error.HTTPError as e:
-            detail = e.read().decode(errors="replace")[:300]
+            detail = e.read().decode(errors="replace")[:1500]
             # an empty balance also comes back as 429; waiting will not help
             if e.code in (429, 500, 502, 503, 504) and attempt < retries and "insufficient_quota" not in detail:
                 time.sleep(2 ** attempt * 2)
@@ -75,8 +75,8 @@ def perplexity(prompt, system=None):
     return data["choices"][0]["message"].get("content") or "", urls, data.get("model", model)
 
 
-def gemini(prompt, system=None, search=None):
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+def gemini(prompt, system=None, search=None, model=None, retries=3, timeout=180):
+    model = model or os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
     payload = {"contents": [{"role": "user", "parts": [{"text": prompt}]}]}
     if system:
         payload["systemInstruction"] = {"parts": [{"text": system}]}
@@ -86,6 +86,8 @@ def gemini(prompt, system=None, search=None):
         f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
         {"x-goog-api-key": _key("GEMINI_API_KEY")},
         payload,
+        timeout=timeout,
+        retries=retries,
     )
     cand = (data.get("candidates") or [{}])[0]
     text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))

@@ -178,6 +178,39 @@ class ApiTest(unittest.TestCase):
             app.ask = real
         self.assertEqual((code, len(data["rivals"])), (200, 3))
 
+    def test_check_goes_one_question_at_a_time(self):
+        real, app.ask = app.ask, lambda prompt, system=None: ("Советую Beta, у них отзывы на 2gis.kz", ["https://2gis.kz/x"], "test-model")
+        app._qcache.clear()
+        try:
+            code, data, _ = post(self.api.server_port, "/api/check-one", {"company": "Alfa", "rivals": ["Beta"], "city": "Алматы", "question": "кого посоветуешь?"})
+        finally:
+            app.ask = real
+        self.assertEqual((code, data["row"], data["sources"]), (200, [False, True], ["2gis.kz"]))
+
+    def test_model_falls_back_without_search_and_remembers(self):
+        calls = []
+
+        def fake(prompt, system=None, search=None, model=None, retries=3, timeout=180):
+            calls.append((model, search))
+            if search:
+                raise app.providers.ProviderError("HTTP 429: quota")
+            return "ок", [], model
+
+        real, app.providers.gemini = app.providers.gemini, fake
+        os.environ["GEMINI_API_KEY"] = "k"
+        app._ai.update(model=None, no_search_until=0)
+        try:
+            first = app.ask("q")
+            second = app.ask("q")
+        finally:
+            app.providers.gemini = real
+            del os.environ["GEMINI_API_KEY"]
+            app._ai.update(model=None, no_search_until=0)
+        self.assertEqual(first[0], "ок")
+        self.assertEqual(calls[-1], (first[2], False))
+        self.assertEqual(len(calls), 5)  # three tries with search, one without, then straight to no-search
+        self.assertTrue(app.out_of_quota("HTTP 429: quota"))
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))

@@ -153,24 +153,52 @@ def provider_name():
     return "gemini" if os.environ.get("GEMINI_API_KEY") else "openai" if os.environ.get("OPENAI_API_KEY") else ""
 
 
+_ai = {"model": None, "no_search_until": 0}
+
+
+def gemini_models():
+    first = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    rest = [m.strip() for m in os.environ.get("GEMINI_FALLBACKS", "gemini-2.5-flash-lite,gemini-2.0-flash").split(",") if m.strip()]
+    order = [first, *[m for m in rest if m != first]]
+    if _ai["model"] in order:  # the one that answered last time goes first
+        order.remove(_ai["model"])
+        order.insert(0, _ai["model"])
+    return order
+
+
 def ask(prompt, system=None):
+    """One answer, quickly. A person is waiting on the page, so no long retries:
+    try with web search, then without it, on each model in turn; remember what worked."""
     name = provider_name()
     if not name:
         raise providers.ProviderError("не задан ключ нейросети")
     if name != "gemini":
         return providers.openai(prompt, system)
-    try:
-        return providers.gemini(prompt, system)
-    except providers.ProviderError as e:
-        if no_ai(e):
-            raise
-        # some keys cannot use search grounding: answer from the model alone rather than fail
-        print(f"gemini with search failed, retrying without: {e}", flush=True)
-        return providers.gemini(prompt, system, search=False)
+    with_search = time.time() > _ai["no_search_until"]
+    last = None
+    for search in ([True, False] if with_search else [False]):
+        for model in gemini_models():
+            try:
+                out = providers.gemini(prompt, system, search=search, model=model, retries=0, timeout=60)
+            except providers.ProviderError as e:
+                if "не задан" in str(e):
+                    raise
+                last = e
+                print(f"gemini {model} search={search} failed: {str(e)[:700]}", flush=True)
+                continue
+            _ai["model"] = model
+            if with_search and not search:
+                _ai["no_search_until"] = time.time() + 900  # this key cannot search right now; stop asking for a while
+            return out
+    raise last
 
 
 def no_ai(error):
-    return any(k in str(error) for k in ("не задан", "insufficient_quota", "RESOURCE_EXHAUSTED"))
+    return "не задан" in str(error) or "insufficient_quota" in str(error)
+
+
+def out_of_quota(error):
+    return any(k in str(error) for k in ("HTTP 429", "RESOURCE_EXHAUSTED", "quota"))
 
 
 # ---------- AI-visibility check ----------
@@ -208,7 +236,7 @@ def run_check(body):
 # The model's answer depends on the question and the city, not on who asks.
 # So one paid call serves every company in the same niche for three days.
 QUICK_TTL = 72 * 3600
-QUICK_PER_DAY = int(os.environ.get("KORIN_QUICK_PER_DAY", "200"))  # real model calls a day, cache hits are free
+QUICK_PER_DAY = int(os.environ.get("KORIN_QUICK_PER_DAY", "400"))  # real model calls a day, cache hits are free
 _quick = {"day": "", "n": 0}
 _qcache, _qlocks, _qguard = {}, {}, threading.Lock()
 
@@ -299,6 +327,22 @@ def suggest(body):
     return {"rivals": clean_names(text, company), "model": model}
 
 
+# ---------- real check, one question per request ----------
+def check_one(body):
+    """One question of the check. The page asks them one after another and shows progress."""
+    company = str(body.get("company", "")).strip()[:60]
+    rivals = [str(r).strip()[:60] for r in body.get("rivals", []) if str(r).strip()][:5]
+    question = re.sub(r"\s+", " ", str(body.get("question", ""))).strip()[:200]
+    city = str(body.get("city", "Алматы")).strip()[:40] or "Алматы"
+    if not company or not rivals or not question:
+        raise BadRequest("Нужны компания, конкуренты и вопрос.")
+    names = [company, *rivals]
+    companies = [{"id": i, "name": n, "aliases": []} for i, n in enumerate(names)]
+    text, urls, model, cached = cached_answer(question, city)
+    mentioned = {m["company_id"] for m in detect.find_mentions(text, companies)}
+    return {"row": [i in mentioned for i in range(len(names))], "answer": text[:4000], "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)}), "model": model, "cached": cached}
+
+
 # ---------- agents ----------
 AGENTS = {
     "why": "Ты аналитик видимости в нейросетях. По данным кабинета объясни простым языком, почему компанию называют реже конкурентов, и дай три первых шага. Не выдумывай фактов о компании.",
@@ -356,7 +400,7 @@ def allowed(ip, limit=30, window=3600):
     return True
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest}
+ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -406,7 +450,7 @@ class Handler(BaseHTTPRequestHandler):
                 print(f"unexpected error on {self.path}: {type(e).__name__}: {e}", flush=True)
                 return self._send(500, {"error": "На сервере ошибка. Мы её уже видим в журнале."})
             print(f"provider error on {self.path}: {e}", flush=True)
-            msg = "ИИ не подключён: на сервере нет ключа или закончился баланс." if no_ai(e) else "Нейросеть не ответила. Попробуйте позже."
+            msg = "ИИ не подключён: на сервере нет ключа или закончился баланс." if no_ai(e) else "Бесплатный лимит нейросети исчерпан. Подождите минуту и попробуйте снова; если не помогает — лимит на сегодня закончился." if out_of_quota(e) else "Нейросеть не ответила. Попробуйте позже."
             self._send(503, {"error": msg})
 
     def log_message(self, fmt, *args):
