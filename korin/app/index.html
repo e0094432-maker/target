@@ -389,6 +389,27 @@ main.fx .in{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:cal
   .composer{bottom:18px}
   .chat{min-height:calc(100dvh - 130px)}
 }
+
+/* ---------- working cycle: overview, plan board, report ---------- */
+.kpis{margin-top:12px}
+.kpi:last-child{grid-column:auto}
+.trend{display:grid;gap:8px}
+.trend .rank{grid-template-columns:minmax(90px,150px) 1fr auto;margin:4px 0}
+.rep{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;justify-content:space-between}
+.rep p{color:var(--muted);font-size:14px;max-width:560px}
+.kan{display:grid;gap:14px;align-items:start}
+.kcol{border:1px solid var(--line);border-radius:20px;padding:14px;background:var(--panel,rgba(255,255,255,.02));min-width:0}
+.kcol>h2{display:flex;justify-content:space-between;align-items:center;margin:2px 4px 12px}
+.kcol>h2 span{font:500 12px var(--mono);color:var(--muted)}
+.kcard{border:1px solid var(--line);border-radius:16px;background:var(--card);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);padding:14px;display:grid;gap:8px;margin-top:10px;min-width:0}
+.kcard h4{font-size:14.5px;line-height:1.35}
+.kcard p{font-size:13px;color:var(--muted)}
+.kcard .meta .btn{height:30px;font-size:12.5px;padding:0 10px}
+.kcol .none{font-size:13px;color:var(--dim);padding:10px 4px}
+.kcol.done .kcard h4{color:var(--muted)}
+.bar .hm{display:none}
+@media (min-width:640px){.bar .hm{display:inline}}
+@media (min-width:1000px){.kan{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -513,7 +534,7 @@ function onboarding(){
     $('#next').onclick = () => { if (!st.rivals.length) return err('Добавьте хотя бы одного конкурента.'); st.step = 3; store.save(st); onboarding() };
   }
   if (s === 3) $('#run').onclick = async () => {
-    const done = () => { st.ready = true; store.save(st); load(); location.hash = '#/overview'; app() };
+    const done = () => { st.ready = true; store.save(st); load(); if (!data.sample) pushHist(); location.hash = '#/overview'; app() };
     if (!AI) return done();
     $('#run').disabled = true; $('#pg').style.width = '35%'; $('#pgt').textContent = 'Спрашиваем нейросеть…';
     try { const r = await call('/api/check', { company: st.company, rivals: st.rivals, city: st.city, questions: questionsFor() }); st.real = { ...r, at: Date.now() }; $('#pg').style.width = '100%'; done() }
@@ -535,30 +556,46 @@ const todos = () => { const g = gaps()[0], src = sources(), lead = ranked().find
 ] };
 
 const orb = (a, cls = '') => `<span class="orb ${cls}${agentOn(a[0]) ? '' : ' off'}" style="--h:${-AGENTS.indexOf(a) * 14}deg">${ic(a[2])}</span>`;
+const STAT = [['todo', 'К выполнению'], ['doing', 'В работе'], ['done', 'Готово']];
+const statOf = id => (st.stat || {})[id] || (st.done[id] ? 'done' : 'todo');
+const pushHist = () => { st.history = [...(st.history || []), { t: Date.now(), m: hits(0), n: total() }].slice(-12); store.save(st) };
+const day = t => new Date(t).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
 function viewOverview(){
-  const r = ranked(), mine = hits(0), g = gaps(), top = r.filter(x => !x[2]).slice(0, 2).map(x => x[0]), max = Math.max(...r.map(x => x[1]), 1);
+  const r = ranked(), mine = hits(0), place = r.findIndex(x => x[2]) + 1, g = gaps(), top = r.filter(x => !x[2]).slice(0, 2).map(x => x[0]), max = Math.max(...r.map(x => x[1]), 1);
+  const all = r.reduce((a, x) => a + x[1], 0), share = all ? Math.round(mine / all * 100) : 0;
   const diag = mine === 0 ? `Нейросети ни разу не назвали вас. Чаще всего советуют <span class="mark">${esc(top.join(' и '))}</span>.` : g.length ? `В ${g.length} вопросах из ${data.qs.length} вместо вас называют <span class="mark">${esc(top.join(' и '))}</span>.` : `Вас называют везде, где называют конкурентов.`;
-  const sug = todos().filter(t => t.agent && !st.done[t.id]).slice(0, 3);
+  const open = todos().filter(t => statOf(t.id) !== 'done'), doing = open.filter(t => statOf(t.id) === 'doing').length, h = data.sample ? [] : (st.history || []);
   return `${banner()}<section class="stage in"><div class="core"><i></i><i></i><span class="orb xl">${ic('bot')}</span></div>
     <div class="stage-t"><small>Вас назвали</small><div class="frac"><b data-count="${mine}">${mine}</b><span>из ${total()} ответов</span></div><p class="diag">${diag}</p><div class="stage-b">${segHtml()}<span class="mono">${esc(meta())}</span></div></div></section>
-  <form class="composer home" id="homeask"><input id="hq" maxlength="500" placeholder="Поручите задачу агентам: например, «напиши просьбу об отзыве»" aria-label="Задача для агентов"><button class="btn btn-p">${ic('send')}Поручить</button></form>
-  <div class="sect"><h2>Ваша команда агентов</h2><a href="#/agents">Все агенты</a></div>
-  <div class="team">${AGENTS.map((a, i) => `<a class="mate in" style="--i:${i + 1}" href="#/agents/${a[0]}">${orb(a)}<b>${a[1]}</b><small>${agentOn(a[0]) ? a[3] : 'на паузе'}</small></a>`).join('')}</div>
-  ${sug.length ? `<div class="sect"><h2>Агенты предлагают</h2><a href="#/tasks">Все задачи</a></div>
-  <div class="sugs">${sug.map((t, i) => { const a = AGENTS.find(x => x[0] === t.agent); return `<article class="sug in" style="--i:${i + 4}"><header>${orb(a, 'sm')}<span>${a[1]}</span></header><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p><button class="btn btn-p" data-run="${t.agent}">${ic('play')}Запустить</button></article>` }).join('')}</div>` : ''}
-  <div class="sect"><h2>Что отвечают нейросети</h2><a href="#/serp/questions">Все ответы</a></div>
-  <div class="grid two" style="margin-top:0"><div class="box"><h2>Кого называют чаще</h2>${r.map(x => `<div class="rank${x[2] ? ' me' : ''}"><span>${esc(x[0])}${x[2] ? ' · вы' : ''}</span><u><i style="width:${x[1] / max * 100}%"></i></u><em>${x[1]}/${total()}</em></div>`).join('')}</div>
-  <div class="box"><h2>Где вас не назвали</h2>${g.length ? g.slice(0, 2).map(x => `<div class="qrow"><b>${esc(x.q)}</b><div class="who">вместо вас: <b>${esc(x.who.join(', '))}</b></div><div class="dots">${dotsHtml(x.qi)}<button class="lnk" data-ans="${x.qi}">Читать ответ</button></div></div>`).join('') : '<p class="muted">Таких вопросов в этом замере нет.</p>'}</div></div>
-  <div class="sect"><h2>Подключения</h2><a href="#/connectors">Все подключения</a></div>
-  <div class="cstrip">${CONNECTORS.filter(c => c[5] === 'link').map(c => `<button type="button" class="cchip" data-conn="${c[1]}">${logo(c)}<span>${c[2]}<br><small>${connected(c[1]) ? 'подключён' : 'подключить'}</small></span></button>`).join('')}</div>`;
+  <div class="kpis">
+    <div class="kpi in" style="--i:1"><small>Доля среди конкурентов</small><b>${share}<span>%</span></b><p>ваши упоминания из всех ${all}</p></div>
+    <div class="kpi in" style="--i:2"><small>Место</small><b>${place}<span>из ${r.length}</span></b><a href="#/serp/rivals">Конкуренты</a></div>
+    <div class="kpi in" style="--i:3"><small>Запросы без вас</small><b>${g.length}<span>из ${data.qs.length}</span></b><a href="#/serp/questions">Посмотреть</a></div>
+    <div class="kpi in" style="--i:4"><small>План работ</small><b>${open.length}<span>${doing ? `в работе ${doing}` : 'дел'}</span></b><a href="#/tasks">Открыть план</a></div>
+  </div>
+  <div class="grid work"><div class="box"><h2>Сделать сейчас <a href="#/tasks">Весь план</a></h2>${open.slice(0, 3).map(t => `<div class="rowi"><span class="av">${ic(t.icon)}</span><div><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p></div>${t.agent ? `<button class="btn" data-run="${t.agent}">${ic('play')}Сделать</button>` : `<a class="btn" href="#/tasks">В план</a>`}</div>`).join('') || '<p class="muted">Все дела из плана сделаны.</p>'}</div>
+  <div class="box"><h2>Кто обгоняет <a href="#/serp/rivals">Подробнее</a></h2>${r.map(x => `<div class="rank${x[2] ? ' me' : ''}"><span>${esc(x[0])}${x[2] ? ' · вы' : ''}</span><u><i style="width:${x[1] / max * 100}%"></i></u><em>${x[1]}/${total()}</em></div>`).join('')}</div></div>
+  <div class="grid two"><div class="box"><h2>Динамика по замерам</h2>${h.length > 1 ? `<div class="trend">${h.map(x => `<div class="rank me"><span>${day(x.t)}</span><u><i style="width:${x.m / x.n * 100}%"></i></u><em>${x.m}/${x.n}</em></div>`).join('')}</div><p class="mono" style="margin-top:10px">Разница в один ответ между замерами — норма: нейросеть каждый раз отвечает заново.</p>` : `<p class="muted">График появится после второго настоящего замера. Сейчас замер запускается кнопкой у помощника «Наблюдатель».</p>`}</div>
+  <div class="box rep"><div><h2 style="margin-bottom:8px">Отчёт руководителю</h2><p>Три главные цифры, кто обогнал и что сделано. Готовый текст для WhatsApp или Telegram.</p></div><button class="btn btn-p" id="report">${ic('send')}Собрать отчёт</button></div></div>
+  <div class="grid"><div class="box"><h2>Где вас не назвали <a href="#/serp/questions">Все запросы</a></h2>${g.length ? g.slice(0, 3).map(x => `<div class="qrow"><b>${esc(x.q)}</b><div class="who">вместо вас: <b>${esc(x.who.join(', '))}</b></div><div class="dots">${dotsHtml(x.qi)}<button class="lnk" data-ans="${x.qi}">Читать ответ</button></div></div>`).join('') : '<p class="muted">Таких запросов в этом замере нет.</p>'}</div></div>`;
+}
+function openReport(){
+  if (data.sample) return drawer('Отчёт руководителю', `<p>Сейчас в кабинете пример на вымышленной школе, отправлять его руководителю нельзя.</p><p class="muted">Запустите настоящий замер у помощника «Наблюдатель», и отчёт соберётся по вашей компании.</p>`, `<button class="btn btn-p" data-run="watch">Запустить замер</button>`);
+  const r = ranked(), g = gaps(), t = todos(), names = k => t.filter(x => statOf(x.id) === k).map(x => x.t);
+  const text = [`Видимость «${me()}» в нейросетях · ${day(data.at)}`, '', `Нас назвали в ${hits(0)} из ${total()} ответов. Место ${r.findIndex(x => x[2]) + 1} из ${r.length}.`, `Чаще называют: ${r.filter(x => !x[2]).slice(0, 3).map(x => `${x[0]} (${x[1]})`).join(', ')}.`,
+    g.length ? `Не назвали в запросах: ${g.slice(0, 3).map(x => '«' + x.q + '»').join('; ')}.` : 'Нас называют везде, где называют конкурентов.', '',
+    names('done').length ? `Сделано: ${names('done').join('; ')}.` : 'Сделано: пока ничего.', names('doing').length ? `В работе: ${names('doing').join('; ')}.` : '', `Дальше: ${names('todo').slice(0, 2).join('; ') || 'план выполнен'}.`].filter((x, i, a) => x !== '' || a[i - 1] !== '').join('\n');
+  drawer('Отчёт руководителю', `<p class="mono">по замеру ${esc(meta())} · проверьте перед отправкой</p><textarea class="ans" id="rout" rows="13" style="width:100%;resize:vertical;font:inherit">${esc(text)}</textarea>`, `<button class="btn btn-p" id="rcopy">Скопировать</button><a class="btn" id="rwa" target="_blank" rel="noopener">WhatsApp</a><a class="btn" id="rtg" target="_blank" rel="noopener">Telegram</a>`);
+  const set = () => { const v = encodeURIComponent($('#rout').value); $('#rwa').href = 'https://wa.me/?text=' + v; $('#rtg').href = 'https://t.me/share/url?url=' + encodeURIComponent('https://kenesai.asia/korin/') + '&text=' + v }; set(); $('#rout').oninput = set;
+  $('#rcopy').onclick = async () => { try { await navigator.clipboard.writeText($('#rout').value); $('#rcopy').textContent = 'Скопировано' } catch (e) { $('#rout').select() } };
 }
 function viewSerp(tab){
-  const tabs = `<div class="seg" style="margin-bottom:14px;width:fit-content">${[['questions', 'Вопросы'], ['rivals', 'Конкуренты'], ['sources', 'Источники']].map(t => `<a href="#/serp/${t[0]}" class="${t[0] === tab ? 'on' : ''}">${t[1]}</a>`).join('')}</div>`;
+  const tabs = '', HEAD = { questions: ['Запросы', 'Что отвечают нейросети на вопросы ваших клиентов'], sources: ['Источники', 'Сайты, откуда нейросети берут ответы в вашей нише. Это список, где о вас должно быть написано'], rivals: ['Конкуренты', 'Кого и сколько раз назвали вместо вас'] }[tab];
   let body = '';
   if (tab === 'questions') body = `<div class="box">${data.qs.map((q, qi) => { const who = data.names.filter((n, i) => i && data.engines.some(e => data.eng[e].grid[qi][i])); return `<div class="qrow"><b>${esc(q)}</b><div class="dots">${dotsHtml(qi)}<button class="lnk" data-ans="${qi}">Читать ответ</button></div>${who.length ? `<div class="who">называют: ${esc(who.join(', '))}</div>` : ''}</div>` }).join('')}</div>`;
   if (tab === 'rivals') body = `<div class="box"><div class="tw"><table><tr><th>Компания</th>${data.engines.map(e => `<th class="n">${ENG[e]}</th>`).join('')}</tr>${data.names.map((n, i) => [n, data.engines.map(e => data.eng[e].grid.filter(g => g[i]).length), i === 0]).sort((a, b) => b[1].reduce((x, y) => x + y, 0) - a[1].reduce((x, y) => x + y, 0)).map(x => `<tr class="${x[2] ? 'me' : ''}"><td>${esc(x[0])}${x[2] ? ' · вы' : ''}</td>${x[1].map(v => `<td class="n">${v}/${data.qs.length}</td>`).join('')}</tr>`).join('')}</table></div><p class="mono" style="margin-top:12px">В скольких ответах из ${data.qs.length} назвали компанию</p></div>`;
   if (tab === 'sources') { const s = sources(), max = s[0] ? s[0][1] : 1; body = `<div class="box"><h2>Сайты, на которые ссылаются нейросети</h2>${s.length ? s.map(x => `<div class="rank"><span>${esc(x[0])}</span><u><i style="width:${x[1] / max * 100}%;background:var(--acc)"></i></u><em>${x[1]}</em></div>`).join('') : '<p class="muted">В этом замере нейросеть не дала ссылок.</p>'}<p class="muted" style="margin-top:12px;font-size:13.5px">Чем больше о вас написано на сайтах сверху списка, тем чаще нейросеть вас называет. Это наблюдение, а не гарантия.</p></div>` }
-  return `${banner()}<div class="head"><div><h1>Ответы нейросетей</h1><p>${esc(meta())}</p></div><span class="sp"></span>${tab === 'rivals' ? '' : segHtml()}</div>${tabs}${body}`;
+  return `${banner()}<div class="head"><div><h1>${HEAD[0]}</h1><p>${HEAD[1]}</p><p class="mono" style="margin-top:6px">${esc(meta())}</p></div><span class="sp"></span>${tab === 'rivals' ? '' : segHtml()}</div>${tabs}${body}`;
 }
 const CHAT = ['chat', 'Ассистент', 'bot', 'Любая задача', [], 'Спросите что угодно: текст, письмо, план, разбор сайта. Читает ваши подключённые страницы.'];
 const TEAM = [CHAT, ...AGENTS];
@@ -582,8 +619,9 @@ function viewAgents(sel){
   <p class="stat"><span class="dot${SRV ? ' on' : ''}"></span>${AI ? 'нейросеть подключена: агенты читают ваши страницы и пишут сами' : SRV ? 'сервер работает, нейросеть ещё не подключена: проверка сайта и подключений настоящая, тексты по заготовкам' : 'сервер не ответил: показываю заготовки'}</p></section></div>`;
 }
 function viewTasks(){
-  return `${banner()}<div class="head"><div><h1>Задачи</h1><p>Что повышает шанс, что нейросеть вас назовёт</p></div></div>
-  <div class="box">${todos().map(t => `<div class="rowi" style="align-items:start"><span class="av">${ic(t.icon)}</span><div><h4 style="${st.done[t.id] ? 'text-decoration:line-through;color:var(--muted)' : ''}">${esc(t.t)}</h4><p>${esc(t.d)}</p><label style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);margin-top:8px"><input type="checkbox" data-task="${t.id}" ${st.done[t.id] ? 'checked' : ''} style="accent-color:var(--acc)">Сделано</label></div>${t.agent ? `<button class="btn" data-run="${t.agent}">${ic('play')}Поручить агенту</button>` : '<span></span>'}</div>`).join('')}</div>`;
+  const t = todos(), move = (id, k, label, p) => `<button class="btn${p ? ' btn-p' : ''}" data-move="${id}:${k}">${label}</button>`;
+  return `${banner()}<div class="head"><div><h1>План работ</h1><p>Каждое дело повышает шанс, что нейросеть вас назовёт</p></div></div>
+  <div class="kan">${STAT.map(([k, label]) => { const list = t.filter(x => statOf(x.id) === k); return `<section class="kcol ${k}"><h2>${label}<span>${list.length}</span></h2>${list.map(x => `<article class="kcard"><h4>${esc(x.t)}</h4><p>${esc(x.d)}</p>${k === 'done' ? `<p class="mono">${(st.doneAt || {})[x.id] ? 'сделано ' + day(st.doneAt[x.id]) + ' · ' : ''}эффект покажет следующий замер</p>` : ''}<div class="meta">${x.agent && k !== 'done' ? `<button class="btn" data-run="${x.agent}">${ic('play')}Сделать с помощником</button>` : ''}${k === 'todo' ? move(x.id, 'doing', 'В работу', 1) : k === 'doing' ? move(x.id, 'done', 'Готово', 1) + move(x.id, 'todo', 'Вернуть') : move(x.id, 'doing', 'Вернуть в работу')}</div></article>`).join('') || '<p class="none">Пусто</p>'}</section>` }).join('')}</div>`;
 }
 const cstat = id => { const i = (st.cinfo || {})[id]; return !i || i.err ? '<span class="tag ok">подключён</span><span class="tag">не проверен</span>' : i.ok ? '<span class="tag ok">подключён</span><span class="tag acc">проверен</span>' : `<span class="tag warn">страница не открылась${i.status ? ' · код ' + i.status : ''}</span>` };
 function viewConnectors(){
@@ -599,6 +637,7 @@ function viewSite(){
 }
 function viewSettings(){
   return `<div class="head"><div><h1>Настройки</h1><p>Компания и конкуренты</p></div></div>
+  <div class="cstrip" style="margin-bottom:14px"><a class="cchip" href="#/agents"><span class="av">${ic('bot')}</span><span>Помощник<br><small>чат и готовые тексты</small></span></a><a class="cchip" href="#/connectors"><span class="av">${ic('plug')}</span><span>Подключения<br><small>сайт, карты, соцсети</small></span></a><a class="cchip" href="#/site"><span class="av">${ic('globe')}</span><span>Проверка сайта<br><small>боты нейросетей и Bing</small></span></a><a class="cchip" href="#/serp/rivals"><span class="av">${ic('chart')}</span><span>Конкуренты<br><small>кого называют чаще</small></span></a></div>
   <div class="grid two" style="margin-top:0"><div class="box"><h2>Компания</h2><p style="color:var(--ink);font-weight:600">${esc(st.company)}</p><p class="muted">${esc(st.niche)} · ${esc(st.city)}</p><h2 style="margin-top:20px">Конкуренты</h2><div class="chips">${st.rivals.map(r => `<span style="padding-right:11px">${esc(r)}</span>`).join('')}</div></div>
   <div class="box"><h2>Оформление</h2><p class="muted" style="margin-bottom:10px">Светлая или тёмная тема. Переключается и кнопкой в шапке.</p>${themeBtn(true)}<h2 style="margin-top:22px">Начать заново</h2><p class="muted" style="margin-bottom:10px">Удалит компанию, коннекторы и журнал из этого браузера.</p><button class="btn" id="reset">Сбросить</button></div></div>`;
 }
@@ -661,7 +700,7 @@ async function doWatch(step, pause){
   step(`Задаю нейросети 10 вопросов про «${st.niche}», ${st.city}`);
   step('Это занимает одну–три минуты, не закрывайте страницу');
   const r = await call('/api/check', { company: st.company, rivals: st.rivals, city: st.city, questions: questionsFor() });
-  st.real = { ...r, at: Date.now() }; store.save(st); load();
+  st.real = { ...r, at: Date.now() }; store.save(st); load(); pushHist();
   step('Считаю, кого назвали в ответах');
   return { kind: 'live', model: r.model, text: `Готово. Вас назвали в ${hits(0)} из ${total()} ответов. Подробности на главной и в разделе «Ответы».` };
 }
@@ -686,22 +725,23 @@ function closeDrawer(){ runSeq++; $('#drawer').classList.remove('open'); $('#scr
 /* ---------- Каркас ---------- */
 const themeBtn = wide => `<button class="btn${wide ? '' : ' ib'}" data-theme-toggle aria-label="Сменить тему">${ic(document.documentElement.dataset.theme === 'dark' ? 'sun' : 'moon')}${wide ? (document.documentElement.dataset.theme === 'dark' ? 'Светлая тема' : 'Тёмная тема') : ''}</button>`;
 function bindTheme(){ $$('[data-theme-toggle]').forEach(b => b.onclick = () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.setItem('korin-theme-v4', t) } catch (e) {} st.ready ? render() : onboarding() }) }
-const NAV = [['Мониторинг', 'overview', 'home', 'Главная'], ['Мониторинг', 'serp', 'list', 'Ответы'], ['Автоматизация', 'agents', 'bot', 'Агенты'], ['Автоматизация', 'tasks', 'check', 'Задачи'], ['Данные', 'connectors', 'plug', 'Коннекторы'], ['Данные', 'site', 'globe', 'Сайт для ИИ'], ['Кабинет', 'settings', 'gear', 'Настройки']];
+const NAV = [['Мониторинг', 'overview', 'home', 'Обзор'], ['Мониторинг', 'serp', 'list', 'Ответы'], ['Автоматизация', 'agents', 'bot', 'Агенты'], ['Автоматизация', 'tasks', 'check', 'Задачи'], ['Данные', 'connectors', 'plug', 'Коннекторы'], ['Данные', 'site', 'globe', 'Сайт для ИИ'], ['Кабинет', 'settings', 'gear', 'Настройки']];
 const VIEWS = { overview: viewOverview, agents: viewAgents, tasks: viewTasks, connectors: viewConnectors, site: viewSite, settings: viewSettings };
 let lastRoute = '';
 function render(){
   const [route = 'overview', sub] = location.hash.replace('#/', '').split('/');
   const cur = NAV.some(n => n[1] === route) ? route : 'overview', title = NAV.find(n => n[1] === cur)[3];
   const view = cur === 'serp' ? viewSerp(['questions', 'rivals', 'sources'].includes(sub) ? sub : 'questions') : VIEWS[cur](sub);
-  const badge = { agents: AGENTS.filter(a => agentOn(a[0])).length, connectors: CONNECTORS.filter(c => connected(c[1])).length || '', tasks: todos().filter(t => !st.done[t.id]).length };
-  const top = [['overview', 'Главная'], ['agents', 'Агенты'], ['serp', 'Ответы'], ['connectors', 'Подключения'], ['tasks', 'Задачи']];
-  const mob = [['overview', 'home', 'Главная'], ['agents', 'bot', 'Агенты'], ['serp', 'list', 'Ответы'], ['connectors', 'plug', 'Подключения'], ['settings', 'more', 'Ещё']];
+  const badge = { agents: AGENTS.filter(a => agentOn(a[0])).length, connectors: CONNECTORS.filter(c => connected(c[1])).length || '', tasks: todos().filter(t => statOf(t.id) !== 'done').length };
+  const tab = cur === 'serp' ? (['questions', 'rivals', 'sources'].includes(sub) ? sub : 'questions') : '';
+  const top = [['overview', 'Обзор', cur === 'overview'], ['serp/questions', 'Запросы', tab === 'questions'], ['serp/sources', 'Источники', tab === 'sources'], ['tasks', 'План', cur === 'tasks'], ['serp/rivals', 'Конкуренты', tab === 'rivals']];
+  const mob = [['overview', 'home', 'Обзор', cur === 'overview'], ['serp/questions', 'list', 'Запросы', tab === 'questions'], ['serp/sources', 'globe', 'Источники', tab === 'sources'], ['tasks', 'check', 'План', cur === 'tasks'], ['settings', 'more', 'Ещё', !['overview', 'tasks'].includes(cur) && !['questions', 'sources'].includes(tab)]];
   const enter = lastRoute !== cur; lastRoute = cur;
   $('#root').innerHTML = `<div class="shell"><header class="bar"><a class="logo" href="../"><i></i>Körin</a>
-  <nav class="pill" aria-label="Разделы">${top.map(n => `<a href="#/${n[0]}" class="${n[0] === cur || (n[0] === 'serp' && cur === 'site') ? 'on' : ''}" ${n[0] === cur ? 'aria-current="page"' : ''}>${n[1]}${badge[n[0]] && n[0] !== 'connectors' ? `<em>${badge[n[0]]}</em>` : ''}</a>`).join('')}</nav>
-  <span class="sp"></span><span class="whoami"><b>${esc(st.company || 'Körin')}</b></span>${data.sample ? '<span class="tag warn">пример</span>' : ''}<a class="btn ib" href="#/settings" aria-label="Настройки">${ic('more')}</a>${themeBtn()}</header>
+  <nav class="pill" aria-label="Разделы">${top.map(n => `<a href="#/${n[0]}" class="${n[2] ? 'on' : ''}" ${n[2] ? 'aria-current="page"' : ''}>${n[1]}${n[0] === 'tasks' && badge.tasks ? `<em>${badge.tasks}</em>` : ''}</a>`).join('')}</nav>
+  <span class="sp"></span><span class="whoami"><b>${esc(st.company || 'Körin')}</b></span>${data.sample ? '<span class="tag warn">пример</span>' : ''}<a class="btn" href="#/agents" aria-label="Помощник">${ic('bot')}<span class="hm">Помощник</span></a><a class="btn ib" href="#/settings" aria-label="Настройки">${ic('more')}</a>${themeBtn()}</header>
   <main class="${enter ? 'fx' : ''}" aria-label="${title}">${view}</main></div>
-  <nav class="tabs" aria-label="Разделы">${mob.map(n => `<a href="#/${n[0]}" class="${n[0] === cur || (n[0] === 'settings' && ['tasks', 'site'].includes(cur)) ? 'on' : ''}">${ic(n[1])}<span>${n[2]}</span></a>`).join('')}</nav>`;
+  <nav class="tabs" aria-label="Разделы">${mob.map(n => `<a href="#/${n[0]}" class="${n[3] ? 'on' : ''}">${ic(n[1])}<span>${n[2]}</span></a>`).join('')}</nav>`;
   if (enter && FX) $$('[data-count]').forEach(el => { const n = +el.dataset.count, t0 = performance.now(); const f = t => { const k = Math.min(1, (t - t0) / 800); el.textContent = Math.round(n * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f) }; requestAnimationFrame(f) });
   bindTheme();
   const cm = $('#composer');
@@ -712,14 +752,14 @@ function render(){
     if ($('.msg')) scrollTo(0, document.body.scrollHeight);
     if (typeLast && FX) { const el = [...$$('.msg.a .txt')].pop(); if (el) { const html = el.innerHTML, text = el.textContent; let i = 0; const n = Math.max(2, Math.ceil(text.length / 70)); el.textContent = ''; const tm = setInterval(() => { i += n; if (i >= text.length || !el.isConnected) { clearInterval(tm); el.innerHTML = html } else el.textContent = text.slice(0, i) }, 16) } }
     typeLast = false }
-  const ha = $('#homeask'); if (ha) ha.onsubmit = e => { e.preventDefault(); const v = $('#hq').value; if (v.trim()) { location.hash = '#/agents/chat'; send('chat', v) } };
   $$('[data-eng]').forEach(b => b.onclick = () => { engine = b.dataset.eng; render() });
   $$('[data-run]').forEach(b => b.onclick = () => runAgent(b.dataset.run));
   $$('[data-conn]').forEach(b => b.onclick = () => openConnector(b.dataset.conn));
   $$('[data-notify]').forEach(b => b.onclick = () => { st.notify[b.dataset.notify] = !st.notify[b.dataset.notify]; store.save(st); render() });
   $$('[data-agent]').forEach(c => c.onchange = () => { st.agents[c.dataset.agent] = c.checked; store.save(st); render() });
   $$('[data-ans]').forEach(b => b.onclick = () => openAnswer(+b.dataset.ans));
-  $$('[data-task]').forEach(c => c.onchange = () => { st.done[c.dataset.task] = c.checked; store.save(st); render() });
+  $$('[data-move]').forEach(b => b.onclick = () => { const [id, k] = b.dataset.move.split(':'); st.stat = st.stat || {}; st.doneAt = st.doneAt || {}; st.stat[id] = k; st.done[id] = k === 'done'; if (k === 'done') st.doneAt[id] = Date.now(); store.save(st); render() });
+  const rp = $('#report'); if (rp) rp.onclick = openReport;
   const rs = $('#reset'); if (rs) rs.onclick = () => { store.clear(); location.href = location.pathname };
   const au = $('#audit'); if (au) au.onsubmit = async e => { e.preventDefault(); const v = au.querySelector('input').value.trim(); st.conn.site = v; store.save(st); const out = $('#auditOut');
     if (!API) { out.innerHTML = `<div class="empty">Сайт ${esc(v)} не проверялся: сервер Körin ещё не запущен. Адрес сохранён как коннектор «Сайт».</div>`; return }
