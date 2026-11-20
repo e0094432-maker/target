@@ -299,6 +299,41 @@ header .btn{height:32px;padding:0 12px}
 .btn-w,.btn-w:hover{color:#222}
 section{padding-bottom:120px}
 @media (max-width:719px){section{padding-bottom:72px}}
+
+/* ---------- own identity: lime accent, live scene, solid guides ---------- */
+:root{--lime:rgba(201,245,96,.15);--lime-ink:#d9f99d;--ac:#c9f560}
+.badge b{background:var(--lime);color:var(--lime-ink)}
+.mark,.qc-ans mark{background:var(--lime);color:var(--lime-ink)}
+.r.me i,.t.on i{background:var(--ac)}
+#eng.out{opacity:0;transform:none;filter:blur(14px)}
+@media (min-width:1000px){section>.wrap::before,section>.wrap::after{border-left:1px solid #171717}}
+.win{transform:none;-webkit-mask:none;mask:none;box-shadow:none;border-color:#232323;border-radius:12px}
+.live{display:grid;gap:0;padding:0!important;min-height:380px}
+.lv-chat{padding:22px;display:grid;gap:14px;align-content:start;min-width:0}
+.lv-lab{font:400 12px var(--mono,monospace);color:var(--dim);display:flex;align-items:center;gap:8px}
+.lv-lab i{width:6px;height:6px;border-radius:50%;background:var(--ac)}
+.lv-q{justify-self:end;max-width:86%;background:#242426;border-radius:12px 12px 3px 12px;padding:10px 14px;font-size:14.5px;line-height:1.45;color:var(--text);min-height:22px}
+.lv-a{font-size:14.5px;line-height:1.65;color:#d1d1d1;min-height:120px}
+.lv-a b{font-weight:500;color:var(--text)}
+.lv-a span{opacity:0;filter:blur(6px);transition:opacity .35s,filter .35s}
+.lv-a span.on{opacity:1;filter:none}
+.lv-tag{justify-self:start;font-size:12.5px;font-weight:500;color:#ff9d93;background:rgba(255,107,94,.13);border-radius:6px;padding:4px 10px;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}
+.lv-tag.on{opacity:1;transform:none}
+.lv-side{border-top:1px solid #232323;background:#0e0e10;padding:22px;display:grid;gap:16px;align-content:start;opacity:.25;transition:opacity .5s;min-width:0}
+.lv-side.on{opacity:1}
+.lv-side small{font:400 12px var(--mono,monospace);color:var(--dim)}
+.lv-n{font-size:44px;font-weight:500;letter-spacing:-.04em;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
+.lv-n span{font-size:14px;font-weight:400;letter-spacing:0;color:var(--muted);margin-left:8px}
+.lv-b{display:grid;grid-template-columns:minmax(0,110px) 1fr;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+.lv-b span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lv-b u{height:5px;border-radius:9px;background:#1a1a1c;overflow:hidden;display:block}
+.lv-b i{display:block;height:100%;width:0;border-radius:9px;background:#3a3a3d;transition:width .8s cubic-bezier(.25,.46,.45,.94)}
+.lv-b.me{color:var(--text)}.lv-b.me i{background:var(--ac)}
+.lv-s{display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--muted);opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.lv-s.on{opacity:1;transform:none}
+.lv-s i{width:14px;height:14px;border-radius:4px;border:1px solid #333;flex:none;display:grid;place-items:center;font-style:normal;font-size:10px;color:#000}
+.lv-s.done i{background:var(--ac);border-color:var(--ac)}
+@media (min-width:900px){.live{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);min-height:400px}.lv-side{border-top:0;border-left:1px solid #232323}.lv-chat,.lv-side{padding:28px}}
 </style>
 </head>
 <body>
@@ -322,25 +357,8 @@ section{padding-bottom:120px}
 
     <div class="stage rv" style="--d:.26s" aria-hidden="true">
       <div class="win">
-        <div class="win-top"><i></i><i></i><i></i><span>körin · обзор · пример</span></div>
-        <div class="win-body">
-          <div class="v"><div><small>Вас назвали</small><div class="num">11<span>из 30 ответов</span></div></div><p>Вы на 4-м месте из 5. В двух вопросах вместо вас называют <span class="mark">English Hub и Lingua Plus</span>.</p></div>
-          <div class="cols">
-            <div class="pane"><h3>Кто забирает ваших клиентов</h3>
-              <div class="r"><span>English Hub</span><u><i style="width:63%"></i></u><em>19/30</em></div>
-              <div class="r"><span>Lingua Plus</span><u><i style="width:57%"></i></u><em>17/30</em></div>
-              <div class="r"><span>Bright School</span><u><i style="width:43%"></i></u><em>13/30</em></div>
-              <div class="r me"><span>Вы</span><u><i style="width:37%"></i></u><em>11/30</em></div>
-              <div class="r"><span>Oxford Street</span><u><i style="width:23%"></i></u><em>7/30</em></div>
-            </div>
-            <div class="pane"><h3>Сделайте на этой неделе</h3>
-              <div class="t on"><i></i>Открыть сайт ботам нейросетей</div>
-              <div class="t"><i></i>Собрать отзывы на 2ГИС</div>
-              <div class="t"><i></i>Сделать страницу вопросов и ответов</div>
-              <div class="t"><i></i>Попасть в городские подборки</div>
-            </div>
-          </div>
-        </div>
+        <div class="win-top"><i></i><i></i><i></i><span id="sceneCap">körin</span></div>
+        <div class="win-body live" id="scene"></div>
       </div>
     </div>
   </div>
@@ -434,12 +452,50 @@ function setLang(l){ lang = l; try { localStorage.setItem('korin-lang', l) } cat
   document.title = L(RU_TITLE, 'Körin — see who ChatGPT recommends instead of you');
   document.querySelector('meta[name=description]').content = L(RU_DESC, 'Körin checks whether ChatGPT, Gemini and Perplexity name your company, who they recommend instead, and what to do about it. For businesses in Kazakhstan.');
   const b = document.getElementById('langBtn'); if (b) b.textContent = l === 'en' ? 'RU' : 'EN';
-  if (window.setWebText) setWebText(WEB[l === 'en' ? 0 : 1]) }
+  if (window.setWebText) setWebText(WEB[l === 'en' ? 0 : 1]); if (window.restartScene && document.getElementById('scene').children.length) restartScene() }
 document.getElementById('langBtn').onclick = () => setLang(lang === 'en' ? 'ru' : 'en');
 addEventListener('DOMContentLoaded', () => setLang(lang)); if (document.readyState !== 'loading') setTimeout(() => setLang(lang));
 
 const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9kvzA8WbfzVFvVA4UfU5bKlHRZ3G1pCIDZ2kY0nP1CG/exec';
 const $ = s => document.querySelector(s);
+/* Живая сцена: клиент спрашивает нейросеть, она отвечает, Körin показывает итог и шаги */
+(() => {
+  const box = document.getElementById('scene'); if (!box) return;
+  const SC = [
+    { eng: 'ChatGPT', q: ['Какие курсы английского в Алматы подойдут ребёнку?', 'Which English courses in Almaty suit a child?'],
+      a: [['English Hub', 'много свежих отзывов на 2ГИС.', 'many fresh reviews on 2GIS.'], ['Lingua Plus', 'на сайте расписаны программы и цены.', 'programmes and prices are on the site.'], ['Bright School', 'упоминается в городских подборках.', 'featured in local roundups.']],
+      n: 11, bars: [['English Hub', 63], ['Lingua Plus', 57], ['Bright School', 43], [0, 37]], steps: [['Открыть сайт ботам нейросетей', 'Open the site to AI crawlers'], ['Собрать отзывы на 2ГИС', 'Collect reviews on 2GIS'], ['Сделать страницу вопросов и ответов', 'Publish a Q&A page']] },
+    { eng: 'Gemini', q: ['Где заказать кухню в Астане недорого?', 'Where to order an affordable kitchen in Astana?'],
+      a: [['Zeta Mebel', 'цены и сроки указаны на сайте.', 'prices and lead times are on the site.'], ['Bella Casa', 'высокий рейтинг в Google Картах.', 'high rating on Google Maps.'], ['Dom Line', 'есть страница с ответами на вопросы.', 'has a page answering common questions.']],
+      n: 4, bars: [['Zeta Mebel', 70], ['Bella Casa', 53], ['Dom Line', 40], [0, 13]], steps: [['Написать цены на сайте', 'Put prices on the site'], ['Сделать страницы под узкие запросы', 'Build pages for narrow queries'], ['Добавить сайт в Bing', 'Add the site to Bing']] }
+  ];
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches, wait = ms => new Promise(r => setTimeout(r, still ? 0 : ms));
+  let run = 0, i = 0;
+  async function play(){
+    const me = ++run, sc = SC[i++ % SC.length], k = lang === 'en' ? 1 : 0, alive = () => me === run;
+    document.getElementById('sceneCap').textContent = 'körin · ' + L('пример', 'example');
+    box.innerHTML = `<div class="lv-chat"><div class="lv-lab"><i></i>${sc.eng}</div><div class="lv-q"></div><div class="lv-a"></div><div class="lv-tag">${L('Вашей компании в этом ответе нет', 'Your company is not in this answer')}</div></div>
+      <div class="lv-side"><small>${L('Вас назвали', 'You were named')}</small><div class="lv-n"><b style="font-weight:500">0</b><span>${L('из 30 ответов', 'of 30 answers')}</span></div>
+      <div style="display:grid;gap:9px">${sc.bars.map(b => `<div class="lv-b${b[0] ? '' : ' me'}"><span>${b[0] || L('Вы', 'You')}</span><u><i data-w="${b[1]}"></i></u></div>`).join('')}</div>
+      <div style="display:grid;gap:9px">${sc.steps.map(x => `<div class="lv-s"><i></i>${x[k]}</div>`).join('')}</div></div>`;
+    const q = box.querySelector('.lv-q'), a = box.querySelector('.lv-a'), side = box.querySelector('.lv-side'), text = sc.q[k];
+    for (let c = 1; c <= text.length; c++) { if (!alive()) return; q.textContent = text.slice(0, c); await wait(22) }
+    await wait(500); if (!alive()) return;
+    a.innerHTML = sc.a.map((x, n) => `<div>${[`${n + 1}.`, ...x[0].split(' ').map(w => `<b>${w}</b>`), '—', ...x[k + 1].split(' ')].map(w => `<span>${w}</span>`).join(' ')}</div>`).join('');
+    for (const w of a.querySelectorAll('span')) { if (!alive()) return; w.classList.add('on'); await wait(70) }
+    await wait(350); if (!alive()) return; box.querySelector('.lv-tag').classList.add('on');
+    await wait(600); if (!alive()) return; side.classList.add('on');
+    const num = side.querySelector('.lv-n b'); for (let v = 0; v <= sc.n; v++) { if (!alive()) return; num.textContent = v; await wait(45) }
+    side.querySelectorAll('.lv-b i').forEach(el => el.style.width = el.dataset.w + '%');
+    await wait(700);
+    for (const st of side.querySelectorAll('.lv-s')) { if (!alive()) return; st.classList.add('on'); await wait(380) }
+    await wait(600); if (!alive()) return; const first = side.querySelector('.lv-s'); first.classList.add('done'); first.firstChild.textContent = '✓';
+    await wait(3800); if (alive() && !still) play();
+  }
+  window.restartScene = () => { i = 0; play() };
+  new IntersectionObserver(e => { if (e[0].isIntersecting) { if (!run) play() } }, { threshold: .15 }).observe(box);
+})();
+
 /* Сеть источников: точки, линии между соседями, часть точек — логотипы площадок */
 (() => {
   const sec = document.getElementById('web'), cv = document.getElementById('net'), h2 = document.getElementById('webText'); if (!sec || !cv) return;
@@ -451,7 +507,7 @@ const $ = s => document.querySelector(s);
   const icons = [...document.querySelectorAll('.tile .lgo')].map(l => { const path = l.querySelector('path'); if (!path) return null; const bg = getComputedStyle(l).backgroundColor, fill = path.getAttribute('fill'); return { p: new Path2D(path.getAttribute('d')), c: /255, 255, 255/.test(bg) || /gradient/.test(l.getAttribute('style') || '') ? (fill === '#fff' ? '#e1306c' : fill) : bg } }).filter(Boolean);
   const ctx = cv.getContext('2d'); let W = 0, H = 0, pts = [], run = false, raf = 0;
   const size = () => { const d = Math.min(2, devicePixelRatio || 1); W = sec.clientWidth; H = sec.clientHeight; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
-    const n = Math.round(Math.min(110, W * H / 9000)); pts = Array.from({ length: n }, (_, i) => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22, ic: icons.length && i % 4 === 0 ? icons[(i / 4) % icons.length | 0] : null, s: 13 + Math.random() * 9 })) };
+    const n = Math.round(Math.min(110, W * H / 9000)); pts = Array.from({ length: n }, (_, i) => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22, ic: icons.length && i % 4 === 0 ? icons[(i / 4) % icons.length | 0] : null, s: 13 + Math.random() * 9, ph: Math.random() })) };
   const draw = () => {
     ctx.clearRect(0, 0, W, H); const R = Math.min(170, W / 4.5);
     for (const a of pts) { a.x += a.vx; a.y += a.vy; if (a.x < -20) a.x = W + 20; if (a.x > W + 20) a.x = -20; if (a.y < -20) a.y = H + 20; if (a.y > H + 20) a.y = -20 }
@@ -462,6 +518,8 @@ const $ = s => document.querySelector(s);
     for (const a of pts) { const k = dim(a.x, a.y); ctx.globalAlpha = k;
       if (a.ic) { ctx.save(); ctx.translate(a.x - a.s / 2, a.y - a.s / 2); ctx.scale(a.s / 24, a.s / 24); ctx.fillStyle = a.ic.c; ctx.fill(a.ic.p); ctx.restore() }
       else { ctx.fillStyle = 'rgba(237,242,245,.5)'; ctx.beginPath(); ctx.arc(a.x, a.y, 1.4, 0, 6.3); ctx.fill() } }
+    const now = performance.now() / 5200;
+    for (const a of pts) if (a.ic) { const t = (now + a.ph) % 1, x = a.x + (W / 2 - a.x) * t, y = a.y + (H / 2 - a.y) * t; ctx.globalAlpha = Math.sin(t * Math.PI) * .7 * dim(x, y); ctx.fillStyle = '#c9f560'; ctx.beginPath(); ctx.arc(x, y, 1.6, 0, 6.3); ctx.fill() }
     ctx.globalAlpha = 1; if (run && !still) raf = requestAnimationFrame(draw);
   };
   size(); draw(); addEventListener('resize', () => { size(); if (!run) draw() });
