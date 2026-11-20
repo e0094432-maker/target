@@ -95,6 +95,8 @@ class ApiTest(unittest.TestCase):
         self.assertEqual((bots["GPTBot"], bots["OAI-SearchBot"], bots["ClaudeBot"]), (False, True, True))
         checks = {c["id"]: c["ok"] for c in data["checks"]}
         self.assertTrue(checks["robots"] and checks["open"] and checks["price"])
+        self.assertFalse(checks["sitemap"])
+        self.assertTrue(bots["bingbot"])
         self.assertEqual(headers["Access-Control-Allow-Origin"], "https://kenesai.asia")
 
     def test_foreign_origin_gets_no_cors_header(self):

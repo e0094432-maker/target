@@ -7,3 +7,8 @@ Allow: /
 
 User-agent: OAI-SearchBot
 Allow: /
+
+User-agent: bingbot
+Allow: /
+
+Sitemap: https://kenesai.asia/sitemap.xml
