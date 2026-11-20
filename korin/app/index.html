@@ -621,14 +621,14 @@ const logo = c => { const L = LOGOS[c[1]], W = WORD[c[1]];
 
 /* ИИ-агенты: каждый делает одну работу по расписанию или по кнопке */
 const AGENTS = [
-  ['watch', 'Наблюдатель', 'eye', 'Каждый понедельник, 09:00', [], 'Раз в неделю задаёт нейросетям вопросы ваших клиентов и считает, кого назвали.'],
-  ['why', 'Аналитик', 'chart', 'После каждого замера', [], 'Объясняет простыми словами, почему конкурентов называют чаще, и выделяет главное.'],
-  ['audit', 'Аудитор сайта', 'globe', 'Каждый понедельник, 09:10', ['site'], 'Проверяет, пускает ли сайт ботов нейросетей и читается ли главная страница.'],
-  ['reviews', 'Менеджер отзывов', 'star', 'По кнопке', ['gis', 'gmaps'], 'Готовит сообщение клиенту с просьбой об отзыве и ссылкой на вашу карточку.'],
-  ['faq', 'Редактор сайта', 'file', 'По кнопке', ['site'], 'Пишет страницу вопросов и ответов под те вопросы, где вас не называют.'],
-  ['pitch', 'PR-агент', 'send', 'По кнопке', [], 'Пишет в издания и каталоги, где уже упомянуты ваши конкуренты.'],
-  ['narrow', 'Узкие запросы', 'list', 'По кнопке', ['site'], 'Придумывает длинные точные запросы под вашу нишу и пишет план страницы под самый сильный.'],
-  ['bio', 'SMM-агент', 'cam', 'По кнопке', ['ig'], 'Переписывает описание профиля так, чтобы нейросеть понимала нишу и город.']
+  ['watch', 'Проверка ответов', 'eye', 'Каждый понедельник, 09:00', [], 'Спрашивает нейросеть, как ваши клиенты, и считает, кого она назвала.'],
+  ['why', 'Объяснение', 'chart', 'После каждого проверки', [], 'Объясняет простыми словами, почему называют конкурентов.'],
+  ['audit', 'Проверка сайта', 'globe', 'Каждый понедельник, 09:10', ['site'], 'Проверяет, видит ли нейросеть ваш сайт.'],
+  ['reviews', 'Отзывы', 'star', 'По кнопке', ['gis', 'gmaps'], 'Пишет клиенту просьбу оставить отзыв.'],
+  ['faq', 'Тексты для сайта', 'file', 'По кнопке', ['site'], 'Пишет для сайта страницу с ответами на вопросы клиентов.'],
+  ['pitch', 'Письма', 'send', 'По кнопке', [], 'Пишет письмо в каталог или издание, где уже есть конкуренты.'],
+  ['narrow', 'Точные запросы', 'list', 'По кнопке', ['site'], 'Подбирает точные запросы клиентов и план страницы под них.'],
+  ['bio', 'Instagram', 'cam', 'По кнопке', ['ig'], 'Пишет описание профиля, понятное нейросети.']
 ];
 
 /* ---------- Пример: вымышленная школа и вымышленные конкуренты ---------- */
@@ -663,7 +663,7 @@ const gaps = () => data.qs.map((q, qi) => { const who = new Set(), me = engs().s
 const sources = () => { const m = {}; engs().forEach(e => data.eng[e].src.forEach(([d, n]) => m[d] = (m[d] || 0) + n)); return Object.entries(m).sort((a, b) => b[1] - a[1]) };
 const meta = () => data.sample ? 'пример · вымышленные компании' : `${total()} ответов · ${data.qs.length} вопросов · ${new Date(data.at).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
 const segHtml = () => data.engines.length < 2 ? '' : `<div class="seg" role="group" aria-label="Нейросеть">${['all', ...data.engines].map(e => `<button type="button" data-eng="${e}" aria-pressed="${e === engine}">${e === 'all' ? 'Все' : ENG[e]}</button>`).join('')}</div>`;
-const banner = () => data.sample ? `<div class="note">Пример кабинета на вымышленной школе «Hello Kids». ${AI ? `Нейросеть подключена: можно сделать настоящий замер для «${esc(st.company)}». <button class="btn btn-p" data-run="watch" style="margin-left:8px">Запустить настоящий замер</button>` : st.company ? `Замер для «${esc(st.company)}» появится, когда сервис начнёт опрашивать нейросети.` : ''}</div>` : '';
+const banner = () => data.sample ? `<div class="note">Пример кабинета на вымышленной школе «Hello Kids». ${AI ? `Нейросеть подключена: можно сделать настоящую проверку для «${esc(st.company)}». <button class="btn btn-p" data-run="watch" style="margin-left:8px">Запустить настоящую проверку</button>` : st.company ? `Проверка для «${esc(st.company)}» появится, когда сервис начнёт опрашивать нейросети.` : ''}</div>` : '';
 const me = () => data.sample ? (st.company || 'Ваша компания') : data.label;
 const agentOn = id => st.agents[id] !== false;
 const connected = id => !!st.conn[id];
@@ -683,10 +683,10 @@ function onboarding(){
     <div class="field"><label for="o4">Название конкурента</label><div class="add"><input class="inp" id="o4" maxlength="40" placeholder="Например, Lingua Plus"><button class="btn" id="addr" style="height:38px">Добавить</button></div></div>
     <div class="chips">${st.rivals.map((r, i) => `<span>${esc(r)}<button data-del="${i}" aria-label="Убрать">×</button></span>`).join('')}</div>
     <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="next">Дальше</button></div>`;
-  if (s === 3) b = AI ? `<h1>Запускаем первый замер</h1><p class="muted" style="margin-top:8px">Зададим нейросети 10 вопросов про «${esc(st.niche)}» в городе ${esc(st.city)}. Это займёт пару минут.</p>
+  if (s === 3) b = AI ? `<h1>Запускаем первую проверку</h1><p class="muted" style="margin-top:8px">Зададим нейросети 10 вопросов про «${esc(st.niche)}» в городе ${esc(st.city)}. Это займёт пару минут.</p>
     <div class="prog"><i id="pg"></i></div><p class="muted" id="pgt">Готово к запуску</p>
-    <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="run">Запустить замер</button></div>`
-    : `<h1>Замер пока не запущен</h1><p style="margin-top:10px">Сервис ещё не опрашивает нейросети, поэтому настоящих цифр для «${esc(st.company)}» нет. Выдумывать их мы не будем.</p><p class="muted" style="margin-top:10px">Покажем пример кабинета на вымышленной школе: агенты, коннекторы и отчёт выглядят так же.</p>
+    <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="run">Запустить проверку</button></div>`
+    : `<h1>Проверка пока не запущена</h1><p style="margin-top:10px">Сервис ещё не опрашивает нейросети, поэтому настоящих цифр для «${esc(st.company)}» нет. Выдумывать их мы не будем.</p><p class="muted" style="margin-top:10px">Покажем пример кабинета на вымышленной школе: помощники и отчёт выглядят так же.</p>
     <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="run">Открыть кабинет</button></div>`;
   $('#root').innerHTML = `<div class="top"><a class="logo" href="../"><i></i>Körin</a><span class="sp"></span>${themeBtn()}</div><div style="padding:0 14px 40px"><div class="onb">${bar}${b}<p id="err" style="color:var(--bad);margin-top:12px;min-height:20px;font-size:13.5px"></p></div></div>`;
   bindTheme();
@@ -708,7 +708,7 @@ function onboarding(){
     if (!AI) return done();
     $('#run').disabled = true; $('#pg').style.width = '35%'; $('#pgt').textContent = 'Спрашиваем нейросеть…';
     try { const r = await call('/api/check', { company: st.company, rivals: st.rivals, city: st.city, questions: questionsFor() }); st.real = { ...r, at: Date.now() }; $('#pg').style.width = '100%'; done() }
-    catch (e) { $('#run').disabled = false; $('#pg').style.width = '0'; $('#pgt').textContent = ''; err('Замер не удался: ' + e.message + ' Можно открыть пример кабинета.'); $('#run').textContent = 'Открыть кабинет'; $('#run').onclick = done }
+    catch (e) { $('#run').disabled = false; $('#pg').style.width = '0'; $('#pgt').textContent = ''; err('Проверка не удалась: ' + e.message + ' Можно открыть пример кабинета.'); $('#run').textContent = 'Открыть кабинет'; $('#run').onclick = done }
   };
 }
 
@@ -740,16 +740,16 @@ function viewOverview(){
     <dl class="facts"><div><dt>Место</dt><dd>${place} из ${r.length}</dd></div><div><dt>Доля упоминаний</dt><dd>${share}%</dd></div><div><dt>Вопросы без вас</dt><dd>${g.length} из ${data.qs.length}</dd></div></dl></div>
     <div><h2 style="margin-bottom:14px">Кого называют</h2>${r.map(x => `<div class="rank${x[2] ? ' me' : ''}"><span>${esc(x[0])}${x[2] ? ' · вы' : ''}</span><u><i style="width:${x[1] / max * 100}%"></i></u><em>${x[1]}/${total()}</em></div>`).join('')}</div></div>
   <div class="box"><h2>Что сделать сейчас <a href="#/tasks">Весь план</a></h2>${open.slice(0, 3).map(t => `<div class="rowi"><span class="av">${ic(t.icon)}</span><div><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p></div>${t.agent ? `<button class="btn" data-run="${t.agent}">Сделать</button>` : `<a class="btn" href="#/tasks">В план</a>`}</div>`).join('') || '<p class="muted">Все дела из плана сделаны.</p>'}</div>
-  <div class="box"><h2>Где вас не назвали <a href="#/serp/questions">Все вопросы</a></h2>${g.length ? g.slice(0, 3).map(x => `<div class="qrow"><b>${esc(x.q)}</b><div class="who">вместо вас: <b>${esc(x.who.join(', '))}</b></div><div class="dots">${dotsHtml(x.qi)}<button class="lnk" data-ans="${x.qi}">Читать ответ</button></div></div>`).join('') : '<p class="muted">Таких вопросов в этом замере нет.</p>'}</div>
-  ${h.length > 1 ? `<div class="box"><h2>Динамика по замерам</h2><div class="trend">${h.map(x => `<div class="rank me"><span>${day(x.t)}</span><u><i style="width:${x.m / x.n * 100}%"></i></u><em>${x.m}/${x.n}</em></div>`).join('')}</div><p class="mono" style="margin-top:10px">Разница в один ответ между замерами — норма.</p></div>` : ''}`;
+  <div class="box"><h2>Где вас не назвали <a href="#/serp/questions">Все вопросы</a></h2>${g.length ? g.slice(0, 3).map(x => `<div class="qrow"><b>${esc(x.q)}</b><div class="who">вместо вас: <b>${esc(x.who.join(', '))}</b></div><div class="dots">${dotsHtml(x.qi)}<button class="lnk" data-ans="${x.qi}">Читать ответ</button></div></div>`).join('') : '<p class="muted">Таких вопросов в этой проверке нет.</p>'}</div>
+  ${h.length > 1 ? `<div class="box"><h2>Динамика по проверкам</h2><div class="trend">${h.map(x => `<div class="rank me"><span>${day(x.t)}</span><u><i style="width:${x.m / x.n * 100}%"></i></u><em>${x.m}/${x.n}</em></div>`).join('')}</div><p class="mono" style="margin-top:10px">Разница в один ответ между проверками — норма.</p></div>` : ''}`;
 }
 function openReport(){
-  if (data.sample) return drawer('Отчёт руководителю', `<p>Сейчас в кабинете пример на вымышленной школе, отправлять его руководителю нельзя.</p><p class="muted">Запустите настоящий замер у помощника «Наблюдатель», и отчёт соберётся по вашей компании.</p>`, `<button class="btn btn-p" data-run="watch">Запустить замер</button>`);
+  if (data.sample) return drawer('Отчёт руководителю', `<p>Сейчас в кабинете пример на вымышленной школе, отправлять его руководителю нельзя.</p><p class="muted">Запустите настоящую проверку у помощника «Проверка ответов», и отчёт соберётся по вашей компании.</p>`, `<button class="btn btn-p" data-run="watch">Запустить проверку</button>`);
   const r = ranked(), g = gaps(), t = todos(), names = k => t.filter(x => statOf(x.id) === k).map(x => x.t);
   const text = [`Видимость «${me()}» в нейросетях · ${day(data.at)}`, '', `Нас назвали в ${hits(0)} из ${total()} ответов. Место ${r.findIndex(x => x[2]) + 1} из ${r.length}.`, `Чаще называют: ${r.filter(x => !x[2]).slice(0, 3).map(x => `${x[0]} (${x[1]})`).join(', ')}.`,
     g.length ? `Не назвали в запросах: ${g.slice(0, 3).map(x => '«' + x.q + '»').join('; ')}.` : 'Нас называют везде, где называют конкурентов.', '',
     names('done').length ? `Сделано: ${names('done').join('; ')}.` : 'Сделано: пока ничего.', names('doing').length ? `В работе: ${names('doing').join('; ')}.` : '', `Дальше: ${names('todo').slice(0, 2).join('; ') || 'план выполнен'}.`].filter((x, i, a) => x !== '' || a[i - 1] !== '').join('\n');
-  drawer('Отчёт руководителю', `<p class="mono">по замеру ${esc(meta())} · проверьте перед отправкой</p><textarea class="ans" id="rout" rows="13" style="width:100%;resize:vertical;font:inherit">${esc(text)}</textarea>`, `<button class="btn btn-p" id="rcopy">Скопировать</button><a class="btn" id="rwa" target="_blank" rel="noopener">WhatsApp</a><a class="btn" id="rtg" target="_blank" rel="noopener">Telegram</a>`);
+  drawer('Отчёт руководителю', `<p class="mono">по проверке ${esc(meta())} · проверьте перед отправкой</p><textarea class="ans" id="rout" rows="13" style="width:100%;resize:vertical;font:inherit">${esc(text)}</textarea>`, `<button class="btn btn-p" id="rcopy">Скопировать</button><a class="btn" id="rwa" target="_blank" rel="noopener">WhatsApp</a><a class="btn" id="rtg" target="_blank" rel="noopener">Telegram</a>`);
   const set = () => { const v = encodeURIComponent($('#rout').value); $('#rwa').href = 'https://wa.me/?text=' + v; $('#rtg').href = 'https://t.me/share/url?url=' + encodeURIComponent('https://kenesai.asia/korin/') + '&text=' + v }; set(); $('#rout').oninput = set;
   $('#rcopy').onclick = async () => { try { await navigator.clipboard.writeText($('#rout').value); $('#rcopy').textContent = 'Скопировано' } catch (e) { $('#rout').select() } };
 }
@@ -758,12 +758,12 @@ function viewSerp(tab){
   let body = '';
   if (tab === 'questions') body = `<div class="box">${data.qs.map((q, qi) => { const who = data.names.filter((n, i) => i && data.engines.some(e => data.eng[e].grid[qi][i])); return `<div class="qrow"><b>${esc(q)}</b><div class="dots">${dotsHtml(qi)}<button class="lnk" data-ans="${qi}">Читать ответ</button></div>${who.length ? `<div class="who">называют: ${esc(who.join(', '))}</div>` : ''}</div>` }).join('')}</div>`;
   if (tab === 'rivals') body = `<div class="box"><div class="tw"><table><tr><th>Компания</th>${data.engines.map(e => `<th class="n">${ENG[e]}</th>`).join('')}</tr>${data.names.map((n, i) => [n, data.engines.map(e => data.eng[e].grid.filter(g => g[i]).length), i === 0]).sort((a, b) => b[1].reduce((x, y) => x + y, 0) - a[1].reduce((x, y) => x + y, 0)).map(x => `<tr class="${x[2] ? 'me' : ''}"><td>${esc(x[0])}${x[2] ? ' · вы' : ''}</td>${x[1].map(v => `<td class="n">${v}/${data.qs.length}</td>`).join('')}</tr>`).join('')}</table></div><p class="mono" style="margin-top:12px">В скольких ответах из ${data.qs.length} назвали компанию</p></div>`;
-  if (tab === 'sources') { const s = sources(), max = s[0] ? s[0][1] : 1; body = `<div class="box"><h2>Сайты, на которые ссылаются нейросети</h2>${s.length ? s.map(x => `<div class="rank"><span>${esc(x[0])}</span><u><i style="width:${x[1] / max * 100}%;background:var(--acc)"></i></u><em>${x[1]}</em></div>`).join('') : '<p class="muted">В этом замере нейросеть не дала ссылок.</p>'}<p class="muted" style="margin-top:12px;font-size:13.5px">Чем больше о вас написано на сайтах сверху списка, тем чаще нейросеть вас называет. Это наблюдение, а не гарантия.</p></div>` }
+  if (tab === 'sources') { const s = sources(), max = s[0] ? s[0][1] : 1; body = `<div class="box"><h2>Сайты, на которые ссылаются нейросети</h2>${s.length ? s.map(x => `<div class="rank"><span>${esc(x[0])}</span><u><i style="width:${x[1] / max * 100}%;background:var(--acc)"></i></u><em>${x[1]}</em></div>`).join('') : '<p class="muted">В этой проверке нейросеть не дала ссылок.</p>'}<p class="muted" style="margin-top:12px;font-size:13.5px">Чем больше о вас написано на сайтах сверху списка, тем чаще нейросеть вас называет. Это наблюдение, а не гарантия.</p></div>` }
   return `${banner()}<div class="head"><div><h1>${HEAD[0]}</h1><p>${HEAD[1]}</p><p class="mono" style="margin-top:6px">${esc(meta())}</p></div><span class="sp"></span>${tab === 'rivals' ? '' : segHtml()}</div>${tabs}${body}`;
 }
-const CHAT = ['chat', 'Ассистент', 'bot', 'Любая задача', [], 'Спросите что угодно: текст, письмо, план, разбор сайта. Читает ваши подключённые страницы.'];
+const CHAT = ['chat', 'Помощник', 'bot', 'Любая задача', [], 'Напишите задачу своими словами. Он прочитает ваш сайт и ответит.'];
 const TEAM = [CHAT, ...AGENTS];
-const ASK = { chat: ['Что сделать в первую очередь?', 'Составь план на 4 недели', 'Что улучшить на моём сайте?'], watch: ['Запусти новый замер'], why: ['Почему меня называют реже конкурентов?'], audit: ['Проверь мой сайт'], reviews: ['Напиши просьбу об отзыве для клиента'], faq: ['Напиши страницу вопросов и ответов'], pitch: ['Напиши письмо автору подборки'], narrow: ['Придумай узкие запросы под мою нишу'], bio: ['Перепиши описание профиля Instagram'] };
+const ASK = { chat: ['Что сделать в первую очередь?', 'Составь план на 4 недели', 'Что улучшить на моём сайте?'], watch: ['Запусти новую проверку'], why: ['Почему меня называют реже конкурентов?'], audit: ['Проверь мой сайт'], reviews: ['Напиши просьбу об отзыве для клиента'], faq: ['Напиши страницу вопросов и ответов'], pitch: ['Напиши письмо автору подборки'], narrow: ['Придумай узкие запросы под мою нишу'], bio: ['Перепиши описание профиля Instagram'] };
 const TASK = { chat: 'chat', why: 'why', reviews: 'review', faq: 'faq', pitch: 'pitch', bio: 'bio', narrow: 'narrow' };
 const KIND = { live: 'ответ нейросети', tpl: 'заготовка, без нейросети', audit: 'настоящая проверка сайта', err: 'ошибка', need: 'нужно подключение' };
 const md = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
@@ -785,17 +785,17 @@ function viewAgents(sel){
 function viewTasks(){
   const t = todos(), move = (id, k, label, p) => `<button class="btn${p ? ' btn-p' : ''}" data-move="${id}:${k}">${label}</button>`;
   return `${banner()}<div class="head"><div><h1>План работ</h1><p>Каждое дело повышает шанс, что нейросеть вас назовёт</p></div></div>
-  <div class="kan">${STAT.map(([k, label]) => { const list = t.filter(x => statOf(x.id) === k); return `<section class="kcol ${k}"><h2>${label}<span>${list.length}</span></h2>${list.map(x => `<article class="kcard"><h4>${esc(x.t)}</h4><p>${esc(x.d)}</p>${k === 'done' ? `<p class="mono">${(st.doneAt || {})[x.id] ? 'сделано ' + day(st.doneAt[x.id]) + ' · ' : ''}эффект покажет следующий замер</p>` : ''}<div class="meta">${x.agent && k !== 'done' ? `<button class="btn" data-run="${x.agent}">${ic('play')}Сделать с помощником</button>` : ''}${k === 'todo' ? move(x.id, 'doing', 'В работу', 1) : k === 'doing' ? move(x.id, 'done', 'Готово', 1) + move(x.id, 'todo', 'Вернуть') : move(x.id, 'doing', 'Вернуть в работу')}</div></article>`).join('') || '<p class="none">Пусто</p>'}</section>` }).join('')}</div>`;
+  <div class="kan">${STAT.map(([k, label]) => { const list = t.filter(x => statOf(x.id) === k); return `<section class="kcol ${k}"><h2>${label}<span>${list.length}</span></h2>${list.map(x => `<article class="kcard"><h4>${esc(x.t)}</h4><p>${esc(x.d)}</p>${k === 'done' ? `<p class="mono">${(st.doneAt || {})[x.id] ? 'сделано ' + day(st.doneAt[x.id]) + ' · ' : ''}эффект покажет следующая проверка</p>` : ''}<div class="meta">${x.agent && k !== 'done' ? `<button class="btn" data-run="${x.agent}">${ic('play')}Сделать с помощником</button>` : ''}${k === 'todo' ? move(x.id, 'doing', 'В работу', 1) : k === 'doing' ? move(x.id, 'done', 'Готово', 1) + move(x.id, 'todo', 'Вернуть') : move(x.id, 'doing', 'Вернуть в работу')}</div></article>`).join('') || '<p class="none">Пусто</p>'}</section>` }).join('')}</div>`;
 }
 const cstat = id => { const i = (st.cinfo || {})[id]; return !i || i.err ? '<span class="tag ok">подключён</span><span class="tag">не проверен</span>' : i.ok ? '<span class="tag ok">подключён</span><span class="tag acc">проверен</span>' : `<span class="tag warn">страница не открылась${i.status ? ' · код ' + i.status : ''}</span>` };
 function viewConnectors(){
   const cats = [...new Set(CONNECTORS.map(c => c[0]))];
-  return `<div class="head"><div><h1>Коннекторы</h1><p>Подключите площадки, чтобы агенты работали с вашими данными</p></div></div>
+  return `<div class="head"><div><h1>Подключения</h1><p>Подключите площадки, чтобы агенты работали с вашими данными</p></div></div>
   ${cats.map(cat => `<p class="cat">${cat}</p><div class="cards">${CONNECTORS.filter(c => c[0] === cat).map(c => `<div class="conn">${logo(c)}<div><h4>${c[2]} ${connected(c[1]) ? cstat(c[1]) : c[5] === 'soon' ? '<span class="tag">скоро</span>' : ''}</h4><p>${connected(c[1]) && (st.cinfo || {})[c[1]] && st.cinfo[c[1]].title ? 'Прочитано: «' + esc(st.cinfo[c[1]].title) + '»' : c[6]}</p>${c[5] === 'link' ? `<button class="btn${connected(c[1]) ? '' : ' btn-p'}" data-conn="${c[1]}">${connected(c[1]) ? 'Изменить ссылку' : 'Подключить'}</button>` : `<button class="btn" data-notify="${c[1]}">${st.notify[c[1]] ? 'Сообщим, когда появится ✓' : 'Сообщить, когда появится'}</button>`}</div></div>`).join('')}</div>`).join('')}
-  <p class="muted" style="font-size:13.5px;margin-top:18px">Сейчас коннекторы работают по открытой ссылке: входа в ваши аккаунты нет, читается только то, что видно всем. Вход через аккаунт появится для сервисов с пометкой «скоро».</p>`;
+  <p class="muted" style="font-size:13.5px;margin-top:18px">Сейчас подключение работает по открытой ссылке: входа в ваши аккаунты нет, читается только то, что видно всем. Вход через аккаунт появится для сервисов с пометкой «скоро».</p>`;
 }
 function viewSite(){
-  return `<div class="head"><div><h1>Сайт для ИИ</h1><p>Могут ли нейросети прочитать ваш сайт</p></div></div>
+  return `<div class="head"><div><h1>Проверка сайта</h1><p>Могут ли нейросети прочитать ваш сайт</p></div></div>
   <form class="add" id="audit" style="margin-bottom:12px;max-width:560px"><input class="inp" maxlength="200" value="${esc(st.conn.site || '')}" placeholder="Адрес сайта, например example.kz" aria-label="Адрес сайта" required><button class="btn btn-p" style="height:38px">Проверить</button></form>
   <div id="auditOut"><div class="empty">${API ? 'Введите адрес сайта. Проверим, пускает ли он ботов нейросетей и читается ли главная страница.' : 'Проверка заработает, когда будет запущен сервер Körin. Она читает файл robots.txt для ботов ChatGPT, Gemini, Perplexity и Claude и семь признаков главной страницы.'}</div></div>`;
 }
@@ -803,7 +803,7 @@ function viewSettings(){
   return `<div class="head"><div><h1>Настройки</h1><p>Компания и конкуренты</p></div></div>
   <div class="cstrip" style="margin-bottom:14px"><a class="cchip" href="#/agents"><span class="av">${ic('bot')}</span><span>Помощник<br><small>чат и готовые тексты</small></span></a><a class="cchip" href="#/connectors"><span class="av">${ic('plug')}</span><span>Подключения<br><small>сайт, карты, соцсети</small></span></a><a class="cchip" href="#/site"><span class="av">${ic('globe')}</span><span>Проверка сайта<br><small>боты нейросетей и Bing</small></span></a><a class="cchip" href="#/serp/rivals"><span class="av">${ic('chart')}</span><span>Конкуренты<br><small>кого называют чаще</small></span></a></div>
   <div class="grid two" style="margin-top:0"><div class="box"><h2>Компания</h2><p style="color:var(--ink);font-weight:600">${esc(st.company)}</p><p class="muted">${esc(st.niche)} · ${esc(st.city)}</p><h2 style="margin-top:20px">Конкуренты</h2><div class="chips">${st.rivals.map(r => `<span style="padding-right:11px">${esc(r)}</span>`).join('')}</div></div>
-  <div class="box"><h2>Оформление</h2><p class="muted" style="margin-bottom:10px">Светлая или тёмная тема. Переключается и кнопкой в шапке.</p>${themeBtn(true)}<h2 style="margin-top:22px">Начать заново</h2><p class="muted" style="margin-bottom:10px">Удалит компанию, коннекторы и журнал из этого браузера.</p><button class="btn" id="reset">Сбросить</button></div></div>`;
+  <div class="box"><h2>Оформление</h2><p class="muted" style="margin-bottom:10px">Светлая или тёмная тема. Переключается и кнопкой в шапке.</p>${themeBtn(true)}<h2 style="margin-top:22px">Начать заново</h2><p class="muted" style="margin-bottom:10px">Удалит компанию, подключения и переписку из этого браузера.</p><button class="btn" id="reset">Сбросить</button></div></div>`;
 }
 
 /* ---------- Запуск агентов ---------- */
@@ -836,7 +836,7 @@ async function send(id, q){
 async function doWrite(id, q, step, pause){
   const links = {}; CONNECTORS.forEach(c => { if (c[5] === 'link' && connected(c[1])) links[c[2]] = st.conn[c[1]] });
   const o = OUT[id], names = Object.keys(links);
-  if (data.sample) step('Замера для вашей компании ещё нет, работаю без него', false); else step(`Беру данные замера: ${total()} ответов нейросетей`);
+  if (data.sample) step('Проверки для вашей компании ещё нет, работаю без него', false); else step(`Беру данные проверки: ${total()} ответов нейросетей`);
   await pause();
   if (AI) {
     step(names.length ? `Открываю подключённые страницы: ${names.join(', ')}` : 'Подключённых страниц нет: добавьте сайт или карты, и я их прочитаю', !!names.length);
@@ -848,7 +848,7 @@ async function doWrite(id, q, step, pause){
       return { kind: 'live', text: d.text, model: d.model };
     } catch (e) { step('Нейросеть не ответила: ' + e.message, false); await pause() }
   } else { step('Нейросеть ещё не подключена к серверу', false); await pause() }
-  if (!o) return { kind: 'tpl', text: 'На свободные вопросы я отвечаю через нейросеть, а она ещё не подключена к серверу.\n\nЧто уже работает по-настоящему:\n— «Аудитор сайта» читает ваш сайт и показывает, пускает ли он ботов нейросетей;\n— подключения проверяются: сервер открывает вашу ссылку;\n— остальные агенты дают заготовки текстов.' };
+  if (!o) return { kind: 'tpl', text: 'На свободные вопросы я отвечаю через нейросеть, а она ещё не подключена к серверу.\n\nЧто уже работает по-настоящему:\n— «Проверка сайта» читает ваш сайт и показывает, пускает ли он ботов нейросетей;\n— подключения проверяются: сервер открывает вашу ссылку;\n— остальные агенты дают заготовки текстов.' };
   step('Собираю заготовку из ваших данных'); await pause();
   return { kind: 'tpl', text: o.text(), hint: o.hint };
 }
@@ -860,7 +860,7 @@ async function doAudit(step, pause){
   return { kind: 'audit', audit: d, text: '' };
 }
 async function doWatch(step, pause){
-  if (!AI) { step('Нейросеть ещё не подключена к серверу', false); await pause(); return { kind: 'tpl', text: 'Замер — это 10 вопросов ваших клиентов, которые я задаю нейросети и считаю, кого она назвала.\n\nЗапущу его, как только к серверу подключат нейросеть. Выдумывать цифры для вашей компании я не буду, поэтому сейчас в кабинете пример.' } }
+  if (!AI) { step('Нейросеть ещё не подключена к серверу', false); await pause(); return { kind: 'tpl', text: 'Проверка — это 10 вопросов ваших клиентов, которые я задаю нейросети и считаю, кого она назвала.\n\nЗапущу его, как только к серверу подключат нейросеть. Выдумывать цифры для вашей компании я не буду, поэтому сейчас в кабинете пример.' } }
   step(`Задаю нейросети 10 вопросов про «${st.niche}», ${st.city}`);
   step('Это занимает одну–три минуты, не закрывайте страницу');
   const r = await call('/api/check', { company: st.company, rivals: st.rivals, city: st.city, questions: questionsFor() });
@@ -889,7 +889,7 @@ function closeDrawer(){ runSeq++; $('#drawer').classList.remove('open'); $('#scr
 /* ---------- Каркас ---------- */
 const themeBtn = wide => `<button class="btn${wide ? '' : ' ib'}" data-theme-toggle aria-label="Сменить тему">${ic(document.documentElement.dataset.theme === 'dark' ? 'sun' : 'moon')}${wide ? (document.documentElement.dataset.theme === 'dark' ? 'Светлая тема' : 'Тёмная тема') : ''}</button>`;
 function bindTheme(){ $$('[data-theme-toggle]').forEach(b => b.onclick = () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.setItem('korin-theme-v4', t) } catch (e) {} st.ready ? render() : onboarding() }) }
-const NAV = [['Мониторинг', 'overview', 'home', 'Обзор'], ['Мониторинг', 'serp', 'list', 'Ответы'], ['Автоматизация', 'agents', 'bot', 'Агенты'], ['Автоматизация', 'tasks', 'check', 'Задачи'], ['Данные', 'connectors', 'plug', 'Коннекторы'], ['Данные', 'site', 'globe', 'Сайт для ИИ'], ['Кабинет', 'settings', 'gear', 'Настройки']];
+const NAV = [['Мониторинг', 'overview', 'home', 'Обзор'], ['Мониторинг', 'serp', 'list', 'Ответы'], ['Автоматизация', 'agents', 'bot', 'Агенты'], ['Автоматизация', 'tasks', 'check', 'Задачи'], ['Данные', 'connectors', 'plug', 'Подключения'], ['Данные', 'site', 'globe', 'Сайт для ИИ'], ['Кабинет', 'settings', 'gear', 'Настройки']];
 const VIEWS = { overview: viewOverview, agents: viewAgents, tasks: viewTasks, connectors: viewConnectors, site: viewSite, settings: viewSettings };
 let lastRoute = '';
 function render(){
@@ -933,7 +933,7 @@ function render(){
   const rp = $('#report'); if (rp) rp.onclick = openReport;
   const rs = $('#reset'); if (rs) rs.onclick = () => { store.clear(); location.href = location.pathname };
   const au = $('#audit'); if (au) au.onsubmit = async e => { e.preventDefault(); const v = au.querySelector('input').value.trim(); st.conn.site = v; store.save(st); const out = $('#auditOut');
-    if (!API) { out.innerHTML = `<div class="empty">Сайт ${esc(v)} не проверялся: сервер Körin ещё не запущен. Адрес сохранён как коннектор «Сайт».</div>`; return }
+    if (!API) { out.innerHTML = `<div class="empty">Сайт ${esc(v)} не проверялся: сервер Körin ещё не запущен. Адрес сохранён в подключениях.</div>`; return }
     out.innerHTML = '<div class="empty">Проверяем…</div>';
     try { const d = await call('/api/site-audit', { url: v }); out.innerHTML = `<p class="mono" style="margin-bottom:10px">проверено: ${esc(d.url)}</p><div class="grid two" style="margin-top:0"><div class="box"><h2>Доступ ботов</h2><div class="tw"><table>${d.bots.map(b => `<tr><td><b style="font-weight:500;color:var(--ink)">${esc(b.bot)}</b><div class="muted" style="font-size:13px">${esc(b.what)}</div></td><td class="n"><span class="tag ${b.allowed ? 'ok' : 'no'}">${b.allowed ? 'открыт' : 'закрыт'}</span></td></tr>`).join('')}</table></div></div><div class="box"><h2>Главная страница</h2><div class="tw"><table>${d.checks.map(c => `<tr><td>${esc(c.label)}<div class="muted" style="font-size:13px">${esc(c.detail)}</div></td><td class="n"><span class="tag ${c.ok ? 'ok' : 'no'}">${c.ok ? 'в порядке' : 'исправить'}</span></td></tr>`).join('')}</table></div></div></div><p class="muted" style="font-size:13.5px;margin-top:12px">Открытый доступ ботам не гарантирует, что нейросеть вас назовёт: это условие, без которого она не прочитает сайт.</p>` }
     catch (err) { out.innerHTML = `<div class="empty" style="color:var(--bad)">Не получилось проверить: ${esc(err.message)}</div>` } };
