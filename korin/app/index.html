@@ -410,6 +410,102 @@ main.fx .in{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:cal
 .bar .hm{display:none}
 @media (min-width:640px){.bar .hm{display:inline}}
 @media (min-width:1000px){.kan{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* ---------- product panel: flat, neutral, one accent ---------- */
+:root{--bg:#fafafa;--side:#fff;--card:#fff;--sub:#f4f4f5;--line:#e7e7e9;--line2:#d6d6d9;--ink:#111113;--text:#33343a;--muted:#6d6e76;--dim:#9a9ba3;--acc:#4f5bd5;--acc-bg:rgba(79,91,213,.1);--lime:rgba(79,91,213,.12);--lime-ink:#3944b8;--ok:#0f7b4f;--ok-bg:#e6f6ee;--bad:#c2331f;--bad-bg:#fdecea;--warn:#8a5a00;--warn-bg:#fff5db;--btn:#111113;--btn-ink:#fff;--hero:#fff;--g:linear-gradient(#4f5bd5,#4f5bd5);--glow:transparent;--head:var(--sans);--shadow:0 12px 40px -16px rgba(0,0,0,.25)}
+[data-theme=dark]{--bg:#0a0a0b;--side:#0a0a0b;--card:#111113;--sub:#19191c;--line:#222226;--line2:#33333a;--ink:#ededef;--text:#c7c7cc;--muted:#8b8b93;--dim:#5f5f67;--acc:#8b96ff;--acc-bg:rgba(139,150,255,.14);--lime:rgba(139,150,255,.18);--lime-ink:#c5caff;--ok:#6fd49b;--ok-bg:rgba(60,200,130,.13);--bad:#ff8f84;--bad-bg:rgba(255,107,94,.13);--warn:#e7b65a;--warn-bg:rgba(231,182,90,.12);--btn:#ededef;--btn-ink:#0a0a0b;--hero:#111113;--g:linear-gradient(#6f7cff,#6f7cff);--glow:transparent;--shadow:0 16px 50px -16px rgba(0,0,0,.8)}
+body::before,[data-theme=dark] body::after,[data-theme=dark] body::before{display:none}
+body{font-size:14px;line-height:1.5}
+*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+@keyframes rise{from{opacity:0;transform:translateY(4px)}}
+main.fx .in{animation-duration:.3s;animation-delay:0s}
+h1,h2,.frac,.logo,.ws b,.onb h1,.kpi b{font-family:var(--sans)}
+h1,.head h1,.ch h1{font-size:20px;font-weight:600;letter-spacing:-.02em;background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--ink);width:auto}
+h2,.sect h2{font-size:13.5px;font-weight:600;letter-spacing:0;color:var(--ink)}
+h4{font-size:14px;font-weight:500}
+.head{margin-bottom:18px;align-items:center}
+.head p{font-size:13.5px;margin-top:3px}
+.logo{font-weight:600;font-size:15px;letter-spacing:-.01em}
+.logo i{width:20px;height:20px;border-radius:6px;background:var(--ink);box-shadow:none}
+.logo i::before{background:var(--bg);border:0;width:6px;height:6px}
+.bar{height:52px;background:var(--bg);border-bottom:1px solid var(--line)}
+.pill{border:0;background:none;padding:0;gap:2px;margin-left:16px}
+.pill a{height:30px;padding:0 11px;border-radius:7px;font-size:13.5px}
+.pill a:hover{background:var(--sub)}
+.pill a.on{background:var(--sub);color:var(--ink);box-shadow:none}
+.tabs{background:var(--bg)}.tabs a.on,.tabs a.on svg{color:var(--ink)}
+main{max-width:1040px;padding:22px 16px 100px}
+.btn{height:32px;border-radius:8px;font-size:13px;font-weight:500;padding:0 11px;background:var(--card);box-shadow:none}
+.btn-p,.btn-p:hover{background:var(--btn);color:var(--btn-ink);border-color:var(--btn);box-shadow:none;filter:none}
+.btn-p:hover{opacity:.86}
+.btn-lg{height:40px;font-size:14px;border-radius:9px}
+.ib{width:32px}
+.box,.kcol,.kcard,.kpi,.agent,.conn,.onb,.say,.bub,.sug,.mate,.cchip{border-radius:12px;box-shadow:none;background:var(--card)}
+.box{padding:18px}
+.box>h2{margin-bottom:12px}
+.box>h2 a,.sect a{font-size:13px;font-weight:500;color:var(--muted);font-family:var(--sans)}
+.box>h2 a:hover{color:var(--ink)}
+.note{background:var(--sub);color:var(--muted);border:1px solid var(--line);font-size:13px;border-radius:10px}
+.note .btn{margin:4px 0 0 0!important}
+.tag{border-radius:6px;font-size:12px}
+.seg{border-radius:8px}.seg button,.seg a{border-radius:6px;padding:4px 10px;font-size:13px}
+.av{border-radius:8px;background:var(--sub);color:var(--muted)}
+.rank u{height:6px}.rank i{background:var(--line2)}
+.mark{background:var(--lime);color:var(--lime-ink);border-radius:4px;padding:0 5px;font-weight:500}
+.dot.on{background:#3ecf8e;box-shadow:none}
+.drawer{background:var(--card)}
+.lnk{font-size:13px}
+/* agent avatar: a plain tile */
+.orb,.orb.sm,.hello .orb,.think .orb{filter:none;background:var(--sub);border:1px solid var(--line);color:var(--ink);box-shadow:none;border-radius:9px;animation:none;width:34px;height:34px}
+.orb::before{display:none}
+.orb svg.i,.hello .orb svg.i{width:17px;height:17px;filter:none;stroke-width:1.7}
+.orb.sm{width:28px;height:28px}.orb.sm svg.i{width:15px;height:15px}
+.hello .orb{width:44px;height:44px;border-radius:12px}
+.orb.off{opacity:.5}
+.msg.a.work .orb{animation:none}
+.ro{border-radius:8px;padding:7px 9px;gap:10px}
+.ro.on{background:var(--sub);box-shadow:none}
+.ro b{font-weight:500}
+.hello{padding:8vh 0 3vh;gap:8px}.hello h2{font-size:16px;margin-top:6px}.hello p{font-size:14px}
+.ch{padding-bottom:14px}
+.txt{font-size:14.5px}
+.msg.u p{font-size:14.5px;border-radius:12px 12px 3px 12px;box-shadow:none;padding:9px 13px}
+.bub{border-radius:3px 12px 12px 12px;padding:14px 16px}
+.asks button{font-size:13px;padding:6px 12px;border-radius:8px;background:var(--card);border-color:var(--line)}
+.asks button:hover{transform:none;border-color:var(--line2)}
+.composer{border-radius:12px;box-shadow:none;background:var(--card);padding:8px 8px 8px 14px}
+.composer:focus-within{box-shadow:0 0 0 3px var(--acc-bg)}
+.composer textarea{font-size:14.5px}
+.composer .btn{height:34px;border-radius:8px}
+.stat{font-size:11.5px}
+.kcol{padding:12px;background:none}
+.kcard{padding:12px;margin-top:8px}
+.kcard h4{font-size:14px}
+.cchip{border-radius:10px}.cchip:hover{transform:none}
+.agent:hover,.sug:hover,.mate:hover{box-shadow:none;transform:none}
+
+/* overview */
+.sum{display:grid;gap:22px}
+.sum small{font-size:12.5px;font-weight:500;color:var(--muted)}
+.big{font-size:44px;font-weight:600;letter-spacing:-.04em;line-height:1;color:var(--ink);margin-top:8px;font-variant-numeric:tabular-nums}
+.big span{font-size:15px;font-weight:400;letter-spacing:0;color:var(--muted);margin-left:8px}
+.sum .diag{font-size:15px;color:var(--text);margin-top:12px;max-width:440px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 28px;margin:18px 0 0;padding-top:16px;border-top:1px solid var(--line)}
+.facts dt{font-size:12px;color:var(--muted)}
+.facts dd{margin:2px 0 0;font-size:15px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.sum .rank{margin:9px 0;font-size:13.5px}
+.box+.box,.sum+.box{margin-top:12px}
+.rowi{padding:11px 0}
+.rowi p{font-size:13px}
+@media (min-width:1000px){
+  .bar{padding:0 24px;height:52px}
+  main{padding:28px 24px 60px}
+  h1,.head h1{font-size:22px}
+  .sum{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px}
+  .sum>div+div{border-left:1px solid var(--line);padding-left:36px}
+  .desk{grid-template-columns:230px minmax(0,1fr);gap:28px}
+  .roster{top:76px}
+}
 </style>
 </head>
 <body>
@@ -564,20 +660,14 @@ function viewOverview(){
   const r = ranked(), mine = hits(0), place = r.findIndex(x => x[2]) + 1, g = gaps(), top = r.filter(x => !x[2]).slice(0, 2).map(x => x[0]), max = Math.max(...r.map(x => x[1]), 1);
   const all = r.reduce((a, x) => a + x[1], 0), share = all ? Math.round(mine / all * 100) : 0;
   const diag = mine === 0 ? `Нейросети ни разу не назвали вас. Чаще всего советуют <span class="mark">${esc(top.join(' и '))}</span>.` : g.length ? `В ${g.length} вопросах из ${data.qs.length} вместо вас называют <span class="mark">${esc(top.join(' и '))}</span>.` : `Вас называют везде, где называют конкурентов.`;
-  const open = todos().filter(t => statOf(t.id) !== 'done'), doing = open.filter(t => statOf(t.id) === 'doing').length, h = data.sample ? [] : (st.history || []);
-  return `${banner()}<section class="stage in"><div class="core"><i></i><i></i><span class="orb xl">${ic('bot')}</span></div>
-    <div class="stage-t"><small>Вас назвали</small><div class="frac"><b data-count="${mine}">${mine}</b><span>из ${total()} ответов</span></div><p class="diag">${diag}</p><div class="stage-b">${segHtml()}<span class="mono">${esc(meta())}</span></div></div></section>
-  <div class="kpis">
-    <div class="kpi in" style="--i:1"><small>Доля среди конкурентов</small><b>${share}<span>%</span></b><p>ваши упоминания из всех ${all}</p></div>
-    <div class="kpi in" style="--i:2"><small>Место</small><b>${place}<span>из ${r.length}</span></b><a href="#/serp/rivals">Конкуренты</a></div>
-    <div class="kpi in" style="--i:3"><small>Запросы без вас</small><b>${g.length}<span>из ${data.qs.length}</span></b><a href="#/serp/questions">Посмотреть</a></div>
-    <div class="kpi in" style="--i:4"><small>План работ</small><b>${open.length}<span>${doing ? `в работе ${doing}` : 'дел'}</span></b><a href="#/tasks">Открыть план</a></div>
-  </div>
-  <div class="grid work"><div class="box"><h2>Сделать сейчас <a href="#/tasks">Весь план</a></h2>${open.slice(0, 3).map(t => `<div class="rowi"><span class="av">${ic(t.icon)}</span><div><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p></div>${t.agent ? `<button class="btn" data-run="${t.agent}">${ic('play')}Сделать</button>` : `<a class="btn" href="#/tasks">В план</a>`}</div>`).join('') || '<p class="muted">Все дела из плана сделаны.</p>'}</div>
-  <div class="box"><h2>Кто обгоняет <a href="#/serp/rivals">Подробнее</a></h2>${r.map(x => `<div class="rank${x[2] ? ' me' : ''}"><span>${esc(x[0])}${x[2] ? ' · вы' : ''}</span><u><i style="width:${x[1] / max * 100}%"></i></u><em>${x[1]}/${total()}</em></div>`).join('')}</div></div>
-  <div class="grid two"><div class="box"><h2>Динамика по замерам</h2>${h.length > 1 ? `<div class="trend">${h.map(x => `<div class="rank me"><span>${day(x.t)}</span><u><i style="width:${x.m / x.n * 100}%"></i></u><em>${x.m}/${x.n}</em></div>`).join('')}</div><p class="mono" style="margin-top:10px">Разница в один ответ между замерами — норма: нейросеть каждый раз отвечает заново.</p>` : `<p class="muted">График появится после второго настоящего замера. Сейчас замер запускается кнопкой у помощника «Наблюдатель».</p>`}</div>
-  <div class="box rep"><div><h2 style="margin-bottom:8px">Отчёт руководителю</h2><p>Три главные цифры, кто обогнал и что сделано. Готовый текст для WhatsApp или Telegram.</p></div><button class="btn btn-p" id="report">${ic('send')}Собрать отчёт</button></div></div>
-  <div class="grid"><div class="box"><h2>Где вас не назвали <a href="#/serp/questions">Все запросы</a></h2>${g.length ? g.slice(0, 3).map(x => `<div class="qrow"><b>${esc(x.q)}</b><div class="who">вместо вас: <b>${esc(x.who.join(', '))}</b></div><div class="dots">${dotsHtml(x.qi)}<button class="lnk" data-ans="${x.qi}">Читать ответ</button></div></div>`).join('') : '<p class="muted">Таких запросов в этом замере нет.</p>'}</div></div>`;
+  const open = todos().filter(t => statOf(t.id) !== 'done'), h = data.sample ? [] : (st.history || []);
+  return `${banner()}<div class="head"><div><h1>Обзор</h1><p class="mono">${esc(meta())}</p></div><span class="sp"></span>${segHtml()}<button class="btn" id="report">${ic('send')}Отчёт</button></div>
+  <div class="box sum in"><div><small>Вас назвали</small><div class="big"><b data-count="${mine}" style="font-weight:600">${mine}</b><span>из ${total()} ответов</span></div><p class="diag">${diag}</p>
+    <dl class="facts"><div><dt>Место</dt><dd>${place} из ${r.length}</dd></div><div><dt>Доля упоминаний</dt><dd>${share}%</dd></div><div><dt>Вопросы без вас</dt><dd>${g.length} из ${data.qs.length}</dd></div></dl></div>
+    <div><h2 style="margin-bottom:14px">Кого называют</h2>${r.map(x => `<div class="rank${x[2] ? ' me' : ''}"><span>${esc(x[0])}${x[2] ? ' · вы' : ''}</span><u><i style="width:${x[1] / max * 100}%"></i></u><em>${x[1]}/${total()}</em></div>`).join('')}</div></div>
+  <div class="box"><h2>Что сделать сейчас <a href="#/tasks">Весь план</a></h2>${open.slice(0, 3).map(t => `<div class="rowi"><span class="av">${ic(t.icon)}</span><div><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p></div>${t.agent ? `<button class="btn" data-run="${t.agent}">Сделать</button>` : `<a class="btn" href="#/tasks">В план</a>`}</div>`).join('') || '<p class="muted">Все дела из плана сделаны.</p>'}</div>
+  <div class="box"><h2>Где вас не назвали <a href="#/serp/questions">Все вопросы</a></h2>${g.length ? g.slice(0, 3).map(x => `<div class="qrow"><b>${esc(x.q)}</b><div class="who">вместо вас: <b>${esc(x.who.join(', '))}</b></div><div class="dots">${dotsHtml(x.qi)}<button class="lnk" data-ans="${x.qi}">Читать ответ</button></div></div>`).join('') : '<p class="muted">Таких вопросов в этом замере нет.</p>'}</div>
+  ${h.length > 1 ? `<div class="box"><h2>Динамика по замерам</h2><div class="trend">${h.map(x => `<div class="rank me"><span>${day(x.t)}</span><u><i style="width:${x.m / x.n * 100}%"></i></u><em>${x.m}/${x.n}</em></div>`).join('')}</div><p class="mono" style="margin-top:10px">Разница в один ответ между замерами — норма.</p></div>` : ''}`;
 }
 function openReport(){
   if (data.sample) return drawer('Отчёт руководителю', `<p>Сейчас в кабинете пример на вымышленной школе, отправлять его руководителю нельзя.</p><p class="muted">Запустите настоящий замер у помощника «Наблюдатель», и отчёт соберётся по вашей компании.</p>`, `<button class="btn btn-p" data-run="watch">Запустить замер</button>`);
@@ -590,7 +680,7 @@ function openReport(){
   $('#rcopy').onclick = async () => { try { await navigator.clipboard.writeText($('#rout').value); $('#rcopy').textContent = 'Скопировано' } catch (e) { $('#rout').select() } };
 }
 function viewSerp(tab){
-  const tabs = '', HEAD = { questions: ['Запросы', 'Что отвечают нейросети на вопросы ваших клиентов'], sources: ['Источники', 'Сайты, откуда нейросети берут ответы в вашей нише. Это список, где о вас должно быть написано'], rivals: ['Конкуренты', 'Кого и сколько раз назвали вместо вас'] }[tab];
+  const tabs = '', HEAD = { questions: ['Вопросы', 'Что отвечают нейросети на вопросы ваших клиентов'], sources: ['Источники', 'Сайты, откуда нейросети берут ответы в вашей нише. Это список, где о вас должно быть написано'], rivals: ['Конкуренты', 'Кого и сколько раз назвали вместо вас'] }[tab];
   let body = '';
   if (tab === 'questions') body = `<div class="box">${data.qs.map((q, qi) => { const who = data.names.filter((n, i) => i && data.engines.some(e => data.eng[e].grid[qi][i])); return `<div class="qrow"><b>${esc(q)}</b><div class="dots">${dotsHtml(qi)}<button class="lnk" data-ans="${qi}">Читать ответ</button></div>${who.length ? `<div class="who">называют: ${esc(who.join(', '))}</div>` : ''}</div>` }).join('')}</div>`;
   if (tab === 'rivals') body = `<div class="box"><div class="tw"><table><tr><th>Компания</th>${data.engines.map(e => `<th class="n">${ENG[e]}</th>`).join('')}</tr>${data.names.map((n, i) => [n, data.engines.map(e => data.eng[e].grid.filter(g => g[i]).length), i === 0]).sort((a, b) => b[1].reduce((x, y) => x + y, 0) - a[1].reduce((x, y) => x + y, 0)).map(x => `<tr class="${x[2] ? 'me' : ''}"><td>${esc(x[0])}${x[2] ? ' · вы' : ''}</td>${x[1].map(v => `<td class="n">${v}/${data.qs.length}</td>`).join('')}</tr>`).join('')}</table></div><p class="mono" style="margin-top:12px">В скольких ответах из ${data.qs.length} назвали компанию</p></div>`;
@@ -734,8 +824,8 @@ function render(){
   const view = cur === 'serp' ? viewSerp(['questions', 'rivals', 'sources'].includes(sub) ? sub : 'questions') : VIEWS[cur](sub);
   const badge = { agents: AGENTS.filter(a => agentOn(a[0])).length, connectors: CONNECTORS.filter(c => connected(c[1])).length || '', tasks: todos().filter(t => statOf(t.id) !== 'done').length };
   const tab = cur === 'serp' ? (['questions', 'rivals', 'sources'].includes(sub) ? sub : 'questions') : '';
-  const top = [['overview', 'Обзор', cur === 'overview'], ['serp/questions', 'Запросы', tab === 'questions'], ['serp/sources', 'Источники', tab === 'sources'], ['tasks', 'План', cur === 'tasks'], ['serp/rivals', 'Конкуренты', tab === 'rivals']];
-  const mob = [['overview', 'home', 'Обзор', cur === 'overview'], ['serp/questions', 'list', 'Запросы', tab === 'questions'], ['serp/sources', 'globe', 'Источники', tab === 'sources'], ['tasks', 'check', 'План', cur === 'tasks'], ['settings', 'more', 'Ещё', !['overview', 'tasks'].includes(cur) && !['questions', 'sources'].includes(tab)]];
+  const top = [['overview', 'Обзор', cur === 'overview'], ['serp/questions', 'Вопросы', tab === 'questions'], ['serp/sources', 'Источники', tab === 'sources'], ['tasks', 'План', cur === 'tasks'], ['serp/rivals', 'Конкуренты', tab === 'rivals']];
+  const mob = [['overview', 'home', 'Обзор', cur === 'overview'], ['serp/questions', 'list', 'Вопросы', tab === 'questions'], ['serp/sources', 'globe', 'Источники', tab === 'sources'], ['tasks', 'check', 'План', cur === 'tasks'], ['settings', 'more', 'Ещё', !['overview', 'tasks'].includes(cur) && !['questions', 'sources'].includes(tab)]];
   const enter = lastRoute !== cur; lastRoute = cur;
   $('#root').innerHTML = `<div class="shell"><header class="bar"><a class="logo" href="../"><i></i>Körin</a>
   <nav class="pill" aria-label="Разделы">${top.map(n => `<a href="#/${n[0]}" class="${n[2] ? 'on' : ''}" ${n[2] ? 'aria-current="page"' : ''}>${n[1]}${n[0] === 'tasks' && badge.tasks ? `<em>${badge.tasks}</em>` : ''}</a>`).join('')}</nav>
