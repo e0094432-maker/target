@@ -666,14 +666,15 @@ fetch(API + '/api/health').then(r => r.json()).then(d => { SRV = true; AI = !!d.
 const param = new URLSearchParams(location.search).get('company');
 if (!st) st = { company: param ? param.slice(0, 40) : '', niche: '', city: 'Алматы', rivals: [], conn: {}, notify: {}, agents: {}, runs: [], done: {}, ready: false, step: 1 };
 const load = () => { data = st.real ? fromReal(st.real) : sample(); if (engine !== 'all' && !data.engines.includes(engine)) engine = 'all'; if (data.engines.length < 2) engine = data.engines[0] };
-const questionsFor = () => [`${st.niche} в городе ${st.city}: что выбрать?`, `${st.niche}, ${st.city} — кого посоветуешь?`, `${st.niche}: кому можно доверять, ${st.city}?`, `${st.niche} недорого и качественно, ${st.city}`, `${st.niche} с хорошими отзывами, ${st.city}`, `${st.niche}, ${st.city}: сравни варианты`, `${st.niche} для семьи с детьми, ${st.city}`, `${st.niche}, ${st.city}: что сейчас самое популярное?`, `${st.city} қаласында ${st.niche}: қайсысын таңдаған дұрыс?`, `${st.city} қаласындағы ең сенімді ${st.niche} қайсы?`];
+const niceNiche = () => st.niche.trim().replace(/[.!?;:,]+$/, '');
+const questionsFor = () => [`${niceNiche()} в городе ${st.city}: что выбрать?`, `${niceNiche()}, ${st.city} — кого посоветуешь?`, `${niceNiche()}: кому можно доверять, ${st.city}?`, `${niceNiche()} недорого и качественно, ${st.city}`, `${niceNiche()} с хорошими отзывами, ${st.city}`, `${niceNiche()}, ${st.city}: сравни варианты`, `${niceNiche()} для семьи с детьми, ${st.city}`, `${niceNiche()}, ${st.city}: что сейчас самое популярное?`, `${st.city} қаласында ${niceNiche()}: қайсысын таңдаған дұрыс?`, `${st.city} қаласындағы ең сенімді ${niceNiche()} қайсы?`];
 
 const engs = () => engine === 'all' ? data.engines : [engine];
 const hits = i => engs().reduce((s, e) => s + data.eng[e].grid.filter(g => g[i]).length, 0);
 const total = () => engs().length * data.qs.length;
 const ranked = () => data.names.map((n, i) => [n, hits(i), i === 0]).sort((a, b) => b[1] - a[1]);
 const gaps = () => data.qs.map((q, qi) => { const who = new Set(), me = engs().some(e => data.eng[e].grid[qi][0]); engs().forEach(e => data.names.forEach((n, i) => { if (i && data.eng[e].grid[qi][i]) who.add(n) })); return { q, qi, me, who: [...who] } }).filter(g => !g.me && g.who.length);
-const sources = () => { const m = {}; engs().forEach(e => data.eng[e].src.forEach(([d, n]) => m[d] = (m[d] || 0) + n)); return Object.entries(m).sort((a, b) => b[1] - a[1]) };
+const sources = () => { const m = {}; engs().forEach(e => data.eng[e].src.forEach(([d, n]) => m[d] = (m[d] || 0) + n)); return Object.entries(m).filter(x => !/vertexaisearch/.test(x[0])).sort((a, b) => b[1] - a[1]) };
 const meta = () => data.sample ? 'пример · вымышленные компании' : `${total()} ответов · ${data.qs.length} вопросов · ${new Date(data.at).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
 const segHtml = () => data.engines.length < 2 ? '' : `<div class="seg" role="group" aria-label="Нейросеть">${['all', ...data.engines].map(e => `<button type="button" data-eng="${e}" aria-pressed="${e === engine}">${e === 'all' ? 'Все' : ENG[e]}</button>`).join('')}</div>`;
 const banner = () => data.sample ? `<div class="note">Пример кабинета на вымышленной школе «Hello Kids». ${AI ? `Нейросеть подключена: можно сделать настоящую проверку для «${esc(st.company)}». <button class="btn btn-p" data-run="watch" style="margin-left:8px">Запустить настоящую проверку</button>` : st.company ? `Проверка для «${esc(st.company)}» появится, когда сервис начнёт опрашивать нейросети.` : ''}</div>` : '';
@@ -728,8 +729,8 @@ function onboarding(){
 /* ---------- Экраны ---------- */
 const dotsHtml = qi => data.engines.map(e => `<span class="tag ${data.eng[e].grid[qi][0] ? 'ok' : 'no'}">${ENG[e]} ${data.eng[e].grid[qi][0] ? '✓' : '✕'}</span>`).join('');
 const todos = () => { const g = gaps()[0], src = sources(), lead = ranked().find(x => !x[2]); return [
-  { id: 'site', icon: 'globe', t: 'Проверить, пускает ли сайт ботов нейросетей', d: 'Если бот закрыт, нейросеть не прочитает ваши страницы.', agent: 'audit' },
-  { id: 'reviews', icon: 'star', t: src[0] ? `Собрать отзывы на ${src[0][0]}` : 'Собрать отзывы на картах', d: 'Отсюда нейросети чаще всего берут ответы про местный бизнес.', agent: 'reviews' },
+  { id: 'site', icon: 'globe', t: 'Проверить, видит ли нейросеть ваш сайт', d: 'Если сайт закрыт, нейросеть о вас ничего не узнает.', agent: 'audit' },
+  { id: 'reviews', icon: 'star', t: (rv => rv ? `Собрать отзывы на ${rv[0]}` : 'Собрать отзывы на 2ГИС и Google Картах')(src.find(x => /2gis|google|yandex|zoon|flamp/i.test(x[0]))), d: 'Отсюда нейросети чаще всего берут ответы про местный бизнес.', agent: 'reviews' },
   { id: 'faq', icon: 'file', t: 'Сделать страницу с ответами на вопросы клиентов', d: g ? `На вопрос «${g.q}» нейросети нечего взять с вашего сайта.` : 'Вопрос в заголовке, ответ в первом предложении.', agent: 'faq' },
   { id: 'pitch', icon: 'send', t: 'Попасть в подборки, где уже есть конкуренты', d: lead ? `${lead[0]} называют чаще всех. Напишите в издания, которые его упоминают.` : 'Напишите в издания своей ниши.', agent: 'pitch' },
   { id: 'bio', icon: 'cam', t: 'Переписать описание профиля в Instagram', d: 'Ниша и город должны быть написаны словами.', agent: 'bio' },

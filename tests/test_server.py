@@ -211,6 +211,11 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(len(calls), 5)  # three tries with search, one without, then straight to no-search
         self.assertTrue(app.out_of_quota("HTTP 429: quota"))
 
+    def test_name_typed_as_one_word_is_still_found(self):
+        cs = [{"id": 0, "name": "vegalegal", "aliases": []}, {"id": 1, "name": "GK and Partners", "aliases": []}]
+        self.assertEqual(app.named_ids("Советую Vega Legal и GK and Partners.", cs), {0, 1})
+        self.assertEqual(app.named_ids("Советую REVERA.", cs), set())
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))

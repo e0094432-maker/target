@@ -201,6 +201,23 @@ def out_of_quota(error):
     return any(k in str(error) for k in ("HTTP 429", "RESOURCE_EXHAUSTED", "quota"))
 
 
+# ---------- who was named ----------
+def _squash(t):
+    return re.sub(r"[^a-zа-яё0-9]", "", t.lower().replace("ё", "е"))
+
+
+def named_ids(text, companies):
+    """Ids of the companies named in the answer. Besides the exact name, catches a name typed
+    as one word when the model writes it as two («vegalegal» and «Vega Legal»)."""
+    ids = {m["company_id"] for m in detect.find_mentions(text, companies)}
+    flat = _squash(text)
+    for c in companies:
+        key = _squash(c["name"])
+        if len(key) >= 5 and key in flat:
+            ids.add(c["id"])
+    return ids
+
+
 # ---------- AI-visibility check ----------
 def run_check(body):
     company = str(body.get("company", "")).strip()[:60]
@@ -222,7 +239,7 @@ def run_check(body):
             grid.append(None)
             answers.append(None)
             continue
-        mentioned = {m["company_id"] for m in detect.find_mentions(text, companies)}
+        mentioned = named_ids(text, companies)
         grid.append([i in mentioned for i in range(len(names))])
         answers.append(text[:4000])
         used = model
@@ -282,7 +299,7 @@ def quick_check(body):
 
     def one(q):
         text, urls, model, cached = cached_answer(q, city)
-        return {"question": q, "answer": text[:3000], "named": bool(detect.find_mentions(text, me)), "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)})[:6], "model": model, "cached": cached}
+        return {"question": q, "answer": text[:3000], "named": bool(named_ids(text, me)), "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)})[:6], "model": model, "cached": cached}
 
     if body.get("i") is not None:
         if body["i"] not in (0, 1, 2):
@@ -339,7 +356,7 @@ def check_one(body):
     names = [company, *rivals]
     companies = [{"id": i, "name": n, "aliases": []} for i, n in enumerate(names)]
     text, urls, model, cached = cached_answer(question, city)
-    mentioned = {m["company_id"] for m in detect.find_mentions(text, companies)}
+    mentioned = named_ids(text, companies)
     return {"row": [i in mentioned for i in range(len(names))], "answer": text[:4000], "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)}), "model": model, "cached": cached}
 
 

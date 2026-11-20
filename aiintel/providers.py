@@ -5,6 +5,7 @@ OPENAI_MODEL / GEMINI_MODEL / PERPLEXITY_MODEL instead of editing code.
 """
 import hashlib
 import json
+import re
 import os
 import random
 import time
@@ -92,7 +93,15 @@ def gemini(prompt, system=None, search=None, model=None, retries=3, timeout=180)
     cand = (data.get("candidates") or [{}])[0]
     text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
     chunks = cand.get("groundingMetadata", {}).get("groundingChunks") or []
-    urls = [c["web"]["uri"] for c in chunks if c.get("web", {}).get("uri")]
+    # search results come as redirect links; the real site name is in the title
+    urls = []
+    for c in chunks:
+        web = c.get("web", {})
+        title = (web.get("title") or "").strip().lower()
+        if re.fullmatch(r"[a-z0-9а-яё.-]+\.[a-zа-яё]{2,}", title):
+            urls.append("https://" + title)
+        elif web.get("uri"):
+            urls.append(web["uri"])
     return text, urls, data.get("modelVersion", model)
 
 
