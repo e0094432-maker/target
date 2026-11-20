@@ -372,22 +372,27 @@ async function qcRun(company, niche, city){
   const cab = 'app/index.html?company=' + encodeURIComponent(company);
   qcTitle.textContent = 'Спрашиваем нейросеть';
   qcBody.innerHTML = `<div class="qc-wait"><div class="qc-orb"></div><p>Задаём три вопроса про «${escH(niche)}», ${escH(city)}.<br>Обычно это 20–60 секунд.</p></div>`;
-  try {
-    const r = await fetch(API + '/api/quick', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company, niche, city }) });
-    const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Ошибка сервера');
-    const hl = t => escH(t).split(escH(company)).join('<mark>' + escH(company) + '</mark>');
-    qcTitle.textContent = 'Ответы нейросети';
-    qcBody.innerHTML = `<p class="qc-sum">${d.named ? `Вас назвали в ${d.named} из ${d.asked} ответов` : `Вас не назвали ни в одном из ${d.asked} ответов`}</p>
-      ${d.results.map((x, i) => `<div class="qc-card"><h4>${escH(x.question)}</h4><span class="qc-tag ${x.named ? 'y' : 'n'}">${x.named ? 'вас назвали' : 'вас не назвали'}</span><div class="qc-ans" id="qa${i}">${hl(x.answer)}</div><button class="qc-more" data-more="${i}">Читать ответ целиком</button>${x.sources.length ? `<p class="qc-src">источники: ${escH(x.sources.join(', '))}</p>` : ''}</div>`).join('')}
-      <div class="qc-next"><a class="btn btn-w" href="#start" id="qcLead">Получить полный замер</a><a class="btn" href="${cab}">Открыть кабинет</a></div>
-      <p class="qc-note">Это настоящие ответы модели ${escH(d.results[0].model)}, получены сейчас. Нейросеть собирает ответ заново при каждом вопросе, поэтому в другой раз он может отличаться. Три вопроса — это проба, а не полный замер.</p>`;
-    qcBody.querySelectorAll('[data-more]').forEach(b => b.onclick = () => { $('#qa' + b.dataset.more).classList.add('all'); b.remove() });
-    $('#qcLead').onclick = qcClose;
-  } catch (e) {
-    qcTitle.textContent = 'Не получилось спросить нейросеть';
-    qcBody.innerHTML = `<p class="qc-err" style="margin:0 0 16px">${escH(e.message === 'Failed to fetch' ? 'Сервер не ответил. Он просыпается около минуты, попробуйте ещё раз.' : e.message)}</p><div class="qc-next"><button class="btn btn-w" id="qcAgain">Попробовать ещё раз</button><a class="btn" href="${cab}">Открыть пример кабинета</a></div>`;
-    $('#qcAgain').onclick = () => qcRun(company, niche, city);
-  }
+  const hl = t => escH(t).split(escH(company)).join('<mark>' + escH(company) + '</mark>');
+  const again = msg => { qcTitle.textContent = 'Не получилось спросить нейросеть'; qcBody.innerHTML = `<p class="qc-err" style="margin:0 0 16px">${escH(msg === 'Failed to fetch' ? 'Сервер не ответил. Он просыпается около минуты, попробуйте ещё раз.' : msg)}</p><div class="qc-next"><button class="btn btn-w" id="qcAgain">Попробовать ещё раз</button><a class="btn" href="${cab}">Открыть пример кабинета</a></div>`; $('#qcAgain').onclick = () => qcRun(company, niche, city) };
+  const got = [], errs = []; let shown = false;
+  const paint = () => {
+    if (!shown) { shown = true; qcTitle.textContent = 'Ответы нейросети'; qcBody.innerHTML = `<p class="qc-sum" id="qcSum"></p><div id="qcCards"></div><div id="qcTail"></div>` }
+    const left = 3 - got.length - errs.length, named = got.filter(x => x.named).length;
+    $('#qcSum').textContent = left ? `Пришло ответов: ${got.length} из 3…` : named ? `Вас назвали в ${named} из ${got.length} ответов` : `Вас не назвали ни в одном из ${got.length} ответов`;
+    if (!left) { $('#qcTail').innerHTML = `<div class="qc-next"><a class="btn btn-w" href="#start" id="qcLead">Получить полный замер</a><a class="btn" href="${cab}">Открыть кабинет</a></div><p class="qc-note">Это настоящие ответы модели ${escH(got[0].model)}. Нейросеть собирает ответ заново при каждом вопросе, поэтому в другой раз он может отличаться. Ответы на частые вопросы мы храним до трёх дней. Три вопроса — это проба, а не полный замер.</p>`; $('#qcLead').onclick = qcClose }
+  };
+  await Promise.all([0, 1, 2].map(async i => {
+    try {
+      const r = await fetch(API + '/api/quick', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ company, niche, city, i }) });
+      const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Ошибка сервера');
+      const x = d.result; got.push(x); paint();
+      const card = document.createElement('div'); card.className = 'qc-card';
+      card.innerHTML = `<h4>${escH(x.question)}</h4><span class="qc-tag ${x.named ? 'y' : 'n'}">${x.named ? 'вас назвали' : 'вас не назвали'}</span><div class="qc-ans">${hl(x.answer)}</div><button class="qc-more">Читать ответ целиком</button>${x.sources.length ? `<p class="qc-src">источники: ${escH(x.sources.join(', '))}</p>` : ''}`;
+      card.querySelector('.qc-more').onclick = e => { card.querySelector('.qc-ans').classList.add('all'); e.target.remove() };
+      $('#qcCards').appendChild(card);
+    } catch (e) { errs.push(e.message); if (shown) paint() }
+  }));
+  if (!got.length) again(errs[0]);
 }
 $('#checkForm').addEventListener('submit', e => { e.preventDefault(); const v = $('#company').value.trim(); if (v) qcAsk(v) });
 $('#leadForm').addEventListener('submit', async e => {

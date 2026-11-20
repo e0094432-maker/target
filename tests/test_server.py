@@ -138,6 +138,7 @@ class ApiTest(unittest.TestCase):
 
     def test_quick_check_returns_answers_word_for_word(self):
         real, app.ask = app.ask, lambda prompt, system=None: ("Советую школу Alfa и Hello Kids.", [], "test-model")
+        app._qcache.clear()
         try:
             code, data, _ = post(self.api.server_port, "/api/quick", {"company": "Hello Kids", "niche": "курсы английского", "city": "Алматы"})
         finally:
@@ -145,6 +146,25 @@ class ApiTest(unittest.TestCase):
         self.assertEqual((code, data["asked"], data["named"]), (200, 3, 3))
         self.assertIn("Alfa", data["results"][0]["answer"])
         self.assertEqual(post(self.api.server_port, "/api/quick", {"company": "A"})[0], 400)
+
+    def test_quick_check_pays_once_per_question_not_per_company(self):
+        calls = []
+
+        def fake(prompt, system=None):
+            calls.append(prompt)
+            return "Советую Alfa.", [], "test-model"
+
+        real, app.ask = app.ask, fake
+        app._qcache.clear()
+        try:
+            body = {"niche": "мебель на заказ", "city": "Астана", "i": 0}
+            _, first, _ = post(self.api.server_port, "/api/quick", {**body, "company": "Alfa"})
+            _, second, _ = post(self.api.server_port, "/api/quick", {**body, "company": "Beta"})
+        finally:
+            app.ask = real
+        self.assertEqual(len(calls), 1)
+        self.assertEqual((first["result"]["named"], first["result"]["cached"]), (True, False))
+        self.assertEqual((second["result"]["named"], second["result"]["cached"]), (False, True))
 
     def test_rate_limit(self):
         app._hits.clear()

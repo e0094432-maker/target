@@ -199,34 +199,70 @@ def run_check(body):
 
 
 # ---------- free check on the landing page ----------
+# The model's answer depends on the question and the city, not on who asks.
+# So one paid call serves every company in the same niche for three days.
+QUICK_TTL = 72 * 3600
+QUICK_PER_DAY = int(os.environ.get("KORIN_QUICK_PER_DAY", "200"))  # real model calls a day, cache hits are free
 _quick = {"day": "", "n": 0}
-QUICK_PER_DAY = int(os.environ.get("KORIN_QUICK_PER_DAY", "300"))
+_qcache, _qlocks, _qguard = {}, {}, threading.Lock()
+
+
+def quick_questions(niche, city):
+    return [f"{niche} в городе {city}: кого посоветуешь?", f"{niche} с хорошими отзывами, {city} — назови конкретные компании", f"{city} қаласында {niche}: қай компанияны ұсынасың?"]
+
+
+def cached_answer(question, city):
+    """(text, urls, model, from_cache). Two visitors asking the same thing at once share one call."""
+    key = (question.lower(), city.lower())
+    with _qguard:
+        lock = _qlocks.setdefault(key, threading.Lock())
+    with lock:
+        hit = _qcache.get(key)
+        if hit and hit[0] > time.time():
+            return (*hit[1:], True)
+        today = time.strftime("%Y-%m-%d")
+        with _qguard:
+            if _quick["day"] != today:
+                _quick.update(day=today, n=0)
+            if _quick["n"] >= QUICK_PER_DAY:
+                raise BadRequest("На сегодня бесплатные проверки закончились. Оставьте заявку, и мы сделаем замер вручную.")
+            _quick["n"] += 1
+        text, urls, model = ask(question, f"Пользователь находится в городе {city}, Казахстан. Называй конкретные компании.")
+        with _qguard:
+            if len(_qcache) > 3000:
+                now = time.time()
+                for k in [k for k, v in _qcache.items() if v[0] <= now] or list(_qcache)[:500]:
+                    _qcache.pop(k, None)
+                    _qlocks.pop(k, None)
+            _qcache[key] = (time.time() + QUICK_TTL, text, urls, model)
+        return text, urls, model, False
 
 
 def quick_check(body):
-    """Three real questions about the visitor's niche. Answers come back word for word."""
-    company, niche, city = (str(body.get(k, "")).strip()[:60] for k in ("company", "niche", "city"))
+    """Real questions about the visitor's niche, answers word for word. With "i" — one question, so the page can show cards as they come."""
+    company, niche, city = (re.sub(r"\s+", " ", str(body.get(k, ""))).strip()[:60] for k in ("company", "niche", "city"))
     if not company or not niche or not city:
         raise BadRequest("Нужны компания, ниша и город.")
-    today = time.strftime("%Y-%m-%d")
-    if _quick["day"] != today:
-        _quick.update(day=today, n=0)
-    if _quick["n"] >= QUICK_PER_DAY:
-        raise BadRequest("На сегодня бесплатные проверки закончились. Оставьте заявку, и мы сделаем замер вручную.")
-    _quick["n"] += 1
-    questions = [f"{niche} в городе {city}: кого посоветуешь?", f"{niche} с хорошими отзывами, {city} — назови конкретные компании", f"{city} қаласында {niche}: қай компанияны ұсынасың?"]
-    system = f"Пользователь находится в городе {city}, Казахстан. Называй конкретные компании."
+    questions = quick_questions(niche, city)
     me = [{"id": 0, "name": company, "aliases": []}]
+
+    def one(q):
+        text, urls, model, cached = cached_answer(q, city)
+        return {"question": q, "answer": text[:3000], "named": bool(detect.find_mentions(text, me)), "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)})[:6], "model": model, "cached": cached}
+
+    if body.get("i") is not None:
+        if body["i"] not in (0, 1, 2):
+            raise BadRequest("Нет такого вопроса.")
+        return {"company": company, "result": one(questions[body["i"]])}
     out, fails = [None] * len(questions), []
 
-    def one(i, q):
+    def run(i, q):
         try:
-            text, urls, model = ask(q, system)
-            out[i] = {"question": q, "answer": text[:3000], "named": bool(detect.find_mentions(text, me)), "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)})[:6], "model": model}
-        except providers.ProviderError as e:
+            out[i] = one(q)
+        except (providers.ProviderError, BadRequest) as e:
             fails.append(e)
 
-    threads = [threading.Thread(target=one, args=(i, q)) for i, q in enumerate(questions)]
+    threads = [threading.Thread(target=run, args=(i, q)) for i, q in enumerate(questions)]
     for t in threads:
         t.start()
     for t in threads:
