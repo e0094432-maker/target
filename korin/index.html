@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Körin — кого ChatGPT советует вместо вас</title>
 <meta name="description" content="Körin проверяет, называют ли ChatGPT, Gemini и Perplexity вашу компанию, кого советуют вместо вас и что сделать, чтобы называли вас. Для бизнеса в Казахстане, на русском и казахском.">
-<meta name="theme-color" content="#08090a">
+<meta name="theme-color" content="#05060f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#08090a;--panel:#0f1011;--panel2:#151618;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);--text:#f7f8f8;--muted:#8a8f98;--dim:#62666d;--acc:#5b8cff;--acc2:#8fb0ff;--lime:#c9f560;--lime-ink:#141a00;--bad:#ff6b5e;
   --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--max:1180px}
@@ -142,6 +142,37 @@ footer{border-top:1px solid var(--line);padding:32px 0 48px;font-size:13.5px;col
 }
 @media (min-width:900px){nav{display:flex}section{padding:128px 0}.hero{padding:104px 0 0}.wrap{padding:0 32px}.win-body{padding:24px}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01s!important;animation-delay:0s!important;transition:none!important}.rv{opacity:1;transform:none}}
+
+/* ---------- galactic layer ---------- */
+:root{--bg:#05060f;--panel:rgba(255,255,255,.03);--panel2:rgba(255,255,255,.055);--line:rgba(150,160,255,.13);--line2:rgba(150,160,255,.24);--text:#f5f6ff;--muted:#9197bd;--dim:#666c94;--acc:#8b7bff;--acc2:#b9adff;--lime:rgba(76,201,255,.18);--lime-ink:#a8ecff;--g:linear-gradient(120deg,#9d8cff,#5c9bff 50%,#34d6f5);--head:"Unbounded","Inter",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.75;background-image:radial-gradient(1px 1px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 34% 62%,#cfd6ff,transparent),radial-gradient(1.2px 1.2px at 58% 28%,#fff,transparent),radial-gradient(1px 1px at 76% 74%,#bfe9ff,transparent),radial-gradient(1px 1px at 90% 40%,#fff,transparent),radial-gradient(1.2px 1.2px at 22% 86%,#d9d2ff,transparent),radial-gradient(1px 1px at 66% 92%,#fff,transparent),radial-gradient(1px 1px at 46% 8%,#fff,transparent);background-size:520px 520px}
+h1,h2,.logo,.num,.huge{font-family:var(--head)}
+h1{font-weight:500;font-size:clamp(30px,6vw,62px);line-height:1.12;letter-spacing:-.03em}
+h2{font-weight:500;font-size:clamp(23px,3.8vw,38px);line-height:1.2;letter-spacing:-.02em}
+.grad{background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero::before{background:radial-gradient(46% 46% at 50% 0,rgba(124,92,255,.42),transparent 70%),radial-gradient(30% 30% at 78% 22%,rgba(34,199,238,.22),transparent 70%),radial-gradient(28% 28% at 18% 26%,rgba(76,141,255,.2),transparent 70%)}
+.hero::after{background:none;inset:auto;left:50%;top:120px;width:900px;height:900px;transform:translateX(-50%);border-radius:50%;border:1px solid var(--line);box-shadow:0 0 0 120px transparent,0 0 0 121px var(--line),0 0 0 260px transparent,0 0 0 261px rgba(150,160,255,.07);-webkit-mask:linear-gradient(#000,transparent 70%);mask:linear-gradient(#000,transparent 70%);opacity:1}
+.btn-w{background:var(--g);color:#fff;border-color:transparent;box-shadow:0 10px 30px -10px rgba(124,92,255,.8)}
+.btn-w:hover{background:var(--g);filter:brightness(1.12)}
+.badge b{background:var(--g);color:#fff}
+.logo i{border:0;background:var(--g);box-shadow:0 0 18px rgba(124,92,255,.7)}.logo i::before{background:#fff;box-shadow:none}
+.check{background:rgba(255,255,255,.05);backdrop-filter:blur(14px);box-shadow:0 0 0 1px rgba(150,160,255,.1),0 20px 60px -20px rgba(124,92,255,.5)}
+.check:focus-within{border-color:rgba(157,140,255,.8);box-shadow:0 0 0 4px rgba(124,92,255,.22),0 20px 60px -20px rgba(124,92,255,.6)}
+.win{background:linear-gradient(180deg,rgba(20,22,44,.9),rgba(8,9,20,.95));backdrop-filter:blur(10px)}
+.stage::before{background:radial-gradient(closest-side,rgba(124,92,255,.5),transparent)}
+.v{background:linear-gradient(135deg,rgba(124,92,255,.24),rgba(34,199,238,.07))}
+.num{font-weight:500;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+.num span{-webkit-text-fill-color:var(--muted);font-family:var(--sans)}
+.huge{font-weight:500;background:var(--g);-webkit-background-clip:text;background-clip:text}
+.cell,.pane,.cta{backdrop-filter:blur(14px)}
+.cell{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02))}
+.r.me i{background:var(--g)}
+.t.on i{background:var(--g);border-color:transparent}
+.ok{background:rgba(76,201,255,.16);color:#9fe9ff}
+.mark{border-radius:6px;padding:1px 7px}
+.ask{background:var(--g);color:#fff}
+.cta::before{background:radial-gradient(50% 50% at 50% 100%,rgba(124,92,255,.5),transparent 70%)}
+.strip div{color:#c8cdee;font-family:var(--head);font-weight:400;font-size:17px}
 </style>
 </head>
 <body>
