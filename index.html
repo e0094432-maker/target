@@ -580,8 +580,11 @@ $('#leadForm').addEventListener('submit', async e => {
   };
   if(CONFIG.sheet){
     // text/plain без своих заголовков: иначе браузер шлёт предварительный запрос, который Apps Script не принимает
+    if(f.dataset.busy) return;  // повторные нажатия, пока заявка уходит, создавали дубли в таблице
+    f.dataset.busy = '1'; const btn = f.querySelector('button'); btn.disabled = true; show('…');
     try{ await fetch(CONFIG.sheet, {method:'POST', mode:'no-cors', body:JSON.stringify(data)}); f.reset(); show(t.sent); }
     catch(err){ show(t.fail) }
+    finally{ delete f.dataset.busy; btn.disabled = false }
   } else if(CONFIG.endpoint){
     try{
       const r = await fetch(CONFIG.endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
