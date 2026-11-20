@@ -275,6 +275,14 @@ h2{font-weight:500;letter-spacing:-.03em}
   section>.wrap::before,section>.wrap::after{content:"";position:absolute;top:-96px;bottom:-96px;width:0;border-left:1px dashed var(--line);pointer-events:none}
   section>.wrap::before{left:-24px}section>.wrap::after{right:-24px}
 }
+
+/* ---------- web of sources ---------- */
+.web{position:relative;height:min(92vh,720px);min-height:480px;padding:0!important;overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.web canvas{position:absolute;inset:0;width:100%;height:100%}
+.web .say{position:absolute;inset:0;display:grid;place-items:center;padding:0 22px;pointer-events:none}
+.web h2{max-width:920px;text-align:center;font-size:clamp(26px,4.6vw,54px);line-height:1.12;letter-spacing:-.035em;font-weight:500;margin:0}
+.web h2 span{opacity:.14;filter:blur(5px);transition:opacity .5s,filter .5s}
+.web h2 span.on{opacity:1;filter:none}
 </style>
 </head>
 <body>
@@ -323,6 +331,8 @@ h2{font-weight:500;letter-spacing:-.03em}
 </section>
 
 <div class="strip"><div class="wrap rv"><p>Проверяем ответы трёх нейросетей, на русском и казахском</p><div><span>ChatGPT</span><span>Gemini</span><span>Perplexity</span></div></div></div>
+
+<section class="web" id="web" aria-label="Откуда нейросеть берёт ответы"><canvas id="net" aria-hidden="true"></canvas><div class="say"><h2 id="webText">Нейросеть собирает ответ из десятков сайтов. Körin показывает, из каких — и есть ли там вы</h2></div></section>
 
 <section id="product"><div class="wrap">
   <span class="eyebrow rv">Продукт</span>
@@ -396,6 +406,34 @@ h2{font-weight:500;letter-spacing:-.03em}
 <script>
 const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9kvzA8WbfzVFvVA4UfU5bKlHRZ3G1pCIDZ2kY0nP1CG/exec';
 const $ = s => document.querySelector(s);
+/* Сеть источников: точки, линии между соседями, часть точек — логотипы площадок */
+(() => {
+  const sec = document.getElementById('web'), cv = document.getElementById('net'), h2 = document.getElementById('webText'); if (!sec || !cv) return;
+  h2.innerHTML = h2.textContent.split(' ').map(w => `<span>${w}</span>`).join(' ');
+  const words = [...h2.children], still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reveal = () => { const r = sec.getBoundingClientRect(), k = Math.min(1, Math.max(0, (innerHeight * .85 - r.top) / (innerHeight * .6))); words.forEach((w, i) => w.classList.toggle('on', still || i < Math.round(k * words.length))) };
+  addEventListener('scroll', reveal, { passive: true }); reveal();
+  // логотипы берём из блока коннекторов на этой же странице
+  const icons = [...document.querySelectorAll('.tile .lgo')].map(l => { const path = l.querySelector('path'); if (!path) return null; const bg = getComputedStyle(l).backgroundColor, fill = path.getAttribute('fill'); return { p: new Path2D(path.getAttribute('d')), c: /255, 255, 255/.test(bg) || /gradient/.test(l.getAttribute('style') || '') ? (fill === '#fff' ? '#e1306c' : fill) : bg } }).filter(Boolean);
+  const ctx = cv.getContext('2d'); let W = 0, H = 0, pts = [], run = false, raf = 0;
+  const size = () => { const d = Math.min(2, devicePixelRatio || 1); W = sec.clientWidth; H = sec.clientHeight; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+    const n = Math.round(Math.min(110, W * H / 9000)); pts = Array.from({ length: n }, (_, i) => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .22, ic: icons.length && i % 4 === 0 ? icons[(i / 4) % icons.length | 0] : null, s: 13 + Math.random() * 9 })) };
+  const draw = () => {
+    ctx.clearRect(0, 0, W, H); const R = Math.min(170, W / 4.5);
+    for (const a of pts) { a.x += a.vx; a.y += a.vy; if (a.x < -20) a.x = W + 20; if (a.x > W + 20) a.x = -20; if (a.y < -20) a.y = H + 20; if (a.y > H + 20) a.y = -20 }
+    // ближе к центру сеть бледнее, чтобы текст читался
+    const dim = (x, y) => { const dx = (x - W / 2) / (W * .34), dy = (y - H / 2) / (H * .3); return Math.min(1, .16 + (dx * dx + dy * dy) * .8) };
+    ctx.lineWidth = 1;
+    for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const a = pts[i], b = pts[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy); if (d < R) { ctx.strokeStyle = `rgba(255,255,255,${(1 - d / R) * .16 * Math.min(dim(a.x, a.y), dim(b.x, b.y))})`; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke() } }
+    for (const a of pts) { const k = dim(a.x, a.y); ctx.globalAlpha = k;
+      if (a.ic) { ctx.save(); ctx.translate(a.x - a.s / 2, a.y - a.s / 2); ctx.scale(a.s / 24, a.s / 24); ctx.fillStyle = a.ic.c; ctx.fill(a.ic.p); ctx.restore() }
+      else { ctx.fillStyle = 'rgba(237,242,245,.5)'; ctx.beginPath(); ctx.arc(a.x, a.y, 1.4, 0, 6.3); ctx.fill() } }
+    ctx.globalAlpha = 1; if (run && !still) raf = requestAnimationFrame(draw);
+  };
+  size(); draw(); addEventListener('resize', () => { size(); if (!run) draw() });
+  new IntersectionObserver(e => { run = e[0].isIntersecting; cancelAnimationFrame(raf); if (run) draw() }).observe(sec);
+})();
+
 /* Название нейросети в заголовке сменяется */
 (() => { const el = document.getElementById('eng'), names = ['ChatGPT', 'Gemini', 'Perplexity', 'Claude']; let i = 0; if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   setInterval(() => { el.classList.add('out'); setTimeout(() => { i = (i + 1) % names.length; el.textContent = names[i]; el.classList.remove('out') }, 380) }, 2600) })();
