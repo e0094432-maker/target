@@ -506,6 +506,45 @@ main{max-width:1040px;padding:22px 16px 100px}
   .desk{grid-template-columns:230px minmax(0,1fr);gap:28px}
   .roster{top:76px}
 }
+
+/* ---------- black panel with a left rail ---------- */
+:root{--g:linear-gradient(#111113,#111113);--acc:#33343a;--acc-bg:rgba(0,0,0,.06);--lime:rgba(0,0,0,.08);--lime-ink:#111113}
+[data-theme=dark]{--bg:#000;--side:#000;--card:#0a0a0a;--sub:#161616;--line:rgba(255,255,255,.1);--line2:rgba(255,255,255,.18);--ink:#edf2f5;--text:rgba(237,242,245,.86);--muted:rgba(237,242,245,.6);--dim:rgba(237,242,245,.4);--acc:#d5dce1;--acc-bg:rgba(255,255,255,.08);--lime:rgba(255,255,255,.13);--lime-ink:#fff;--warn:#ff9d6c;--warn-bg:rgba(255,106,43,.15);--btn:#fff;--btn-ink:#000;--hero:#0a0a0a;--g:linear-gradient(#edf2f5,#edf2f5)}
+h1,.head h1,.ch h1{font-weight:500;letter-spacing:-.03em}
+.big,.big b{font-weight:500!important}
+.msg.u p{background:var(--sub);color:var(--ink);border:1px solid var(--line)}
+.steps li::before{color:var(--muted)}
+.dots3 i{background:var(--muted)}
+.lnk,.kpi a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line2);text-underline-offset:3px}
+.composer:focus-within{border-color:var(--line2);box-shadow:none}
+.inp:focus{border-color:var(--line2);box-shadow:none}
+.tag.acc{color:var(--ink)}
+.app{display:block}
+.sb{display:none}
+@media (min-width:1000px){
+  .app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+  .app .bar{display:none}
+  .sb{display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;padding:12px;border-right:1px solid var(--line);background:var(--bg);overflow-y:auto}
+  .wsw{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;min-width:0}
+  .wsw:hover{background:var(--sub)}
+  .wsw i{width:22px;height:22px;border-radius:6px;background:var(--warn-bg);display:grid;place-items:center;font:600 11px var(--sans);font-style:normal;color:var(--warn);flex:none}
+  .wsw b{font-weight:500;font-size:14px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+  .sbm{margin:8px 0 12px;display:grid;grid-template-columns:1fr 1fr;overflow:visible}
+  .sbm a{text-align:center}
+  .sl{display:flex;align-items:center;gap:10px;height:32px;padding:0 8px;border-radius:7px;font-size:13.5px;color:var(--muted);white-space:nowrap;min-width:0}
+  .sl:hover{color:var(--ink)}
+  .sl.on{background:var(--sub);color:var(--ink)}
+  .sl svg{flex:none;width:16px;height:16px}
+  .sl span{overflow:hidden;text-overflow:ellipsis}
+  .sl em{margin-left:auto;font:500 11px var(--mono);font-style:normal;color:var(--dim)}
+  .sb h6{margin:18px 8px 6px;font:500 12px var(--sans);color:var(--dim)}
+  .sbf{margin-top:auto;display:flex;align-items:center;gap:8px;padding:10px 4px 0}
+  .sbf .logo{flex:1;font-size:14px}
+  .desk{grid-template-columns:minmax(0,1fr)!important}
+  .roster{display:none!important}
+  main{max-width:940px;margin:0 auto;padding:32px 32px 60px}
+  .chat{min-height:calc(100dvh - 92px)}
+}
 </style>
 </head>
 <body>
@@ -832,10 +871,17 @@ function render(){
   const top = [['overview', 'Обзор', cur === 'overview'], ['serp/questions', 'Вопросы', tab === 'questions'], ['serp/sources', 'Источники', tab === 'sources'], ['tasks', 'План', cur === 'tasks'], ['serp/rivals', 'Конкуренты', tab === 'rivals']];
   const mob = [['overview', 'home', 'Обзор', cur === 'overview'], ['serp/questions', 'list', 'Вопросы', tab === 'questions'], ['serp/sources', 'globe', 'Источники', tab === 'sources'], ['tasks', 'check', 'План', cur === 'tasks'], ['settings', 'more', 'Ещё', !['overview', 'tasks'].includes(cur) && !['questions', 'sources'].includes(tab)]];
   const enter = lastRoute !== cur; lastRoute = cur;
-  $('#root').innerHTML = `<div class="shell"><header class="bar"><a class="logo" href="../"><i></i>Körin</a>
-  <nav class="pill" aria-label="Разделы">${top.map(n => `<a href="#/${n[0]}" class="${n[2] ? 'on' : ''}" ${n[2] ? 'aria-current="page"' : ''}>${n[1]}${n[0] === 'tasks' && badge.tasks ? `<em>${badge.tasks}</em>` : ''}</a>`).join('')}</nav>
-  <span class="sp"></span><span class="whoami"><b>${esc(st.company || 'Körin')}</b></span>${data.sample ? '<span class="tag warn">пример</span>' : ''}<a class="btn" href="#/agents" aria-label="Помощник">${ic('bot')}<span class="hm">Помощник</span></a><a class="btn ib" href="#/settings" aria-label="Настройки">${ic('more')}</a>${themeBtn()}</header>
-  <main class="${enter ? 'fx' : ''}" aria-label="${title}">${view}</main></div>
+  const asst = cur === 'agents', selA = asst ? (TEAM.find(x => x[0] === sub) || CHAT)[0] : '';
+  const an = [['overview', 'home', 'Обзор', cur === 'overview'], ['serp/questions', 'list', 'Вопросы', tab === 'questions'], ['serp/sources', 'globe', 'Источники', tab === 'sources'], ['serp/rivals', 'chart', 'Конкуренты', tab === 'rivals'], ['tasks', 'check', 'План', cur === 'tasks']];
+  const more = [['connectors', 'plug', 'Подключения'], ['site', 'globe', 'Проверка сайта'], ['settings', 'gear', 'Настройки']];
+  const recent = Object.keys(st.threads || {}).filter(k => (st.threads[k] || []).some(m => m.r === 'u')).slice(0, 5);
+  const side = `<aside class="sb"><a class="wsw" href="#/settings"><i>${esc((st.company || 'K')[0].toUpperCase())}</i><b>${esc(st.company || 'Körin')}</b>${data.sample ? '<span class="tag warn">пример</span>' : ''}</a>
+  <div class="seg sbm"><a href="#/overview" class="${asst ? '' : 'on'}">Аналитика</a><a href="#/agents" class="${asst ? 'on' : ''}">Помощник</a></div>
+  <nav aria-label="Разделы">${asst ? TEAM.map(x => `<a class="sl${x[0] === selA ? ' on' : ''}" href="#/agents/${x[0]}">${ic(x[2])}<span>${x[1]}</span></a>`).join('') : an.map(n => `<a class="sl${n[3] ? ' on' : ''}" href="#/${n[0]}" ${n[3] ? 'aria-current="page"' : ''}>${ic(n[1])}<span>${n[2]}</span>${n[0] === 'tasks' && badge.tasks ? `<em>${badge.tasks}</em>` : ''}</a>`).join('') + '<h6>Данные</h6>' + more.map(n => `<a class="sl${cur === n[0] ? ' on' : ''}" href="#/${n[0]}">${ic(n[1])}<span>${n[2]}</span></a>`).join('')}
+  ${recent.length ? `<h6>Последние</h6>${recent.map(k => { const x = TEAM.find(t => t[0] === k); return x ? `<a class="sl" href="#/agents/${k}">${ic(x[2])}<span>${esc(st.threads[k].find(m => m.r === 'u').text.slice(0, 40))}</span></a>` : '' }).join('')}` : ''}</nav>
+  <div class="sbf"><a class="logo" href="../"><i></i>Körin</a>${themeBtn()}</div></aside>`;
+  $('#root').innerHTML = `<div class="shell app">${side}<div style="min-width:0"><header class="bar"><a class="logo" href="../"><i></i>Körin</a><span class="sp"></span>${data.sample ? '<span class="tag warn">пример</span>' : ''}<a class="btn ib" href="#/agents" aria-label="Помощник">${ic('bot')}</a><a class="btn ib" href="#/settings" aria-label="Настройки">${ic('more')}</a>${themeBtn()}</header>
+  <main class="${enter ? 'fx' : ''}" aria-label="${title}">${view}</main></div></div>
   <nav class="tabs" aria-label="Разделы">${mob.map(n => `<a href="#/${n[0]}" class="${n[3] ? 'on' : ''}">${ic(n[1])}<span>${n[2]}</span></a>`).join('')}</nav>`;
   if (enter && FX) $$('[data-count]').forEach(el => { const n = +el.dataset.count, t0 = performance.now(); const f = t => { const k = Math.min(1, (t - t0) / 800); el.textContent = Math.round(n * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f) }; requestAnimationFrame(f) });
   bindTheme();

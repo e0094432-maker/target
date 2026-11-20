@@ -233,6 +233,48 @@ h2{font-weight:500;font-size:clamp(23px,3.8vw,38px);line-height:1.2;letter-spaci
 .qc-next{display:grid;gap:10px;margin-top:20px}
 .qc-note{font-size:13px;color:var(--dim);margin-top:14px;line-height:1.5}
 @media (min-width:720px){.qc{align-items:center}.qc-box{border-radius:24px;padding:30px}.qc-next{grid-template-columns:1fr 1fr}}
+
+/* ---------- black, quiet, Inter ---------- */
+:root{--bg:#000;--panel:#0a0a0a;--panel2:#111;--line:rgba(255,255,255,.1);--line2:rgba(255,255,255,.18);--text:#edf2f5;--muted:rgba(237,242,245,.6);--dim:rgba(237,242,245,.4);--acc:#edf2f5;--acc2:#edf2f5;--lime:rgba(255,255,255,.13);--lime-ink:#fff;--g:linear-gradient(#edf2f5,#edf2f5);--head:"Inter",system-ui,sans-serif}
+body{background:#000}
+body::before{display:none}
+h1{font-weight:500;font-size:clamp(32px,5.6vw,58px);line-height:1.06;letter-spacing:-.04em}
+h2{font-weight:500;letter-spacing:-.03em}
+.grad,.num,.huge,.step span,.qc-sum{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--text);-webkit-text-fill-color:currentColor}
+.step span{color:var(--muted)}
+.num span{-webkit-text-fill-color:var(--muted)}
+.hero::before{background:radial-gradient(70% 55% at 22% 0,rgba(255,255,255,.1),transparent 70%)}
+.hero::after{display:none}
+.btn{border-radius:8px}
+.btn-w,.btn-w:hover{background:#fff;color:#000;border-color:#fff;box-shadow:none;filter:none}
+.btn-w:hover{background:#dde2e6}
+.badge{border-radius:8px}
+.badge b{background:rgba(255,106,43,.16);color:#ff9d6c;border-radius:6px}
+.logo i{background:#fff;box-shadow:none}.logo i::before{background:#000}
+.check{background:#0a0a0a;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;border-radius:12px}
+.check:focus-within{border-color:var(--line2);box-shadow:none}
+.win{background:#0a0a0a;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:14px}
+.stage::before,.orbit::before{display:none}
+.v{background:#111}
+.cell,.pane,.cta,.tile,.step{backdrop-filter:none;-webkit-backdrop-filter:none;background:#0a0a0a;border-radius:14px}
+.r.me i,.t.on i{background:#edf2f5}
+.core{box-shadow:none;background:#0a0a0a;backdrop-filter:none}
+.core i,.pts li::before{background:#edf2f5;box-shadow:none}
+.node{background:#0a0a0a;backdrop-filter:none}
+.node i{background:#161616;border:1px solid var(--line2);box-shadow:none}
+.r3{border-color:var(--line2)}
+.lgo{box-shadow:none}
+.pts{color:var(--muted)}
+.qc-box{background:#0a0a0a;box-shadow:none}
+.qc-orb{background:#edf2f5;box-shadow:none;width:14px;height:14px}
+.qc-ans{color:var(--muted)}
+#eng{display:inline-block;transition:opacity .35s,transform .35s,filter .35s}
+#eng.out{opacity:0;transform:translateY(8px);filter:blur(6px)}
+@media (min-width:1000px){
+  section>.wrap{position:relative}
+  section>.wrap::before,section>.wrap::after{content:"";position:absolute;top:-96px;bottom:-96px;width:0;border-left:1px dashed var(--line);pointer-events:none}
+  section>.wrap::before{left:-24px}section>.wrap::after{right:-24px}
+}
 </style>
 </head>
 <body>
@@ -246,7 +288,7 @@ h2{font-weight:500;font-size:clamp(23px,3.8vw,38px);line-height:1.2;letter-spaci
 <section class="hero">
   <div class="wrap">
     <span class="badge rv"><b>Казахстан</b>Аналитика ответов нейросетей</span>
-    <h1 class="grad rv" style="--d:.06s">Узнайте, кого ChatGPT<br>советует вместо вас</h1>
+    <h1 class="grad rv" style="--d:.06s">Узнайте, кого <span id="eng">ChatGPT</span><br>советует вместо вас</h1>
     <p class="lead rv" style="--d:.12s">Клиенты спрашивают совета у нейросетей. Körin показывает, называют ли они вашу компанию, и даёт три шага, как попасть в ответы.</p>
     <form class="check rv" style="--d:.18s" id="checkForm">
       <input id="company" type="text" maxlength="40" required placeholder="Название вашей компании" aria-label="Название вашей компании">
@@ -354,6 +396,9 @@ h2{font-weight:500;font-size:clamp(23px,3.8vw,38px);line-height:1.2;letter-spaci
 <script>
 const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9kvzA8WbfzVFvVA4UfU5bKlHRZ3G1pCIDZ2kY0nP1CG/exec';
 const $ = s => document.querySelector(s);
+/* Название нейросети в заголовке сменяется */
+(() => { const el = document.getElementById('eng'), names = ['ChatGPT', 'Gemini', 'Perplexity', 'Claude']; let i = 0; if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  setInterval(() => { el.classList.add('out'); setTimeout(() => { i = (i + 1) % names.length; el.textContent = names[i]; el.classList.remove('out') }, 380) }, 2600) })();
 /* Бесплатная проверка: три настоящих вопроса нейросети про нишу посетителя */
 const API = 'https://korin-api.onrender.com';
 fetch(API + '/api/health').catch(() => {});  // будим сервер заранее
