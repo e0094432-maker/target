@@ -360,6 +360,77 @@ def check_one(body):
     return {"row": [i in mentioned for i in range(len(names))], "answer": text[:4000], "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)}), "model": model, "cached": cached}
 
 
+# ---------- breakdown: why them and not you ----------
+NOT_COMPANY_SITES = ("2gis", "google", "yandex", "instagram", "facebook", "youtube", "wikipedia", "tiktok", "t.me", "vk.com", "linkedin", "zoon", "flamp", "krisha", "kolesa", "kaspi", "gov.kz", "egov", "adilet", "zakon.kz", "tengrinews", "forbes", "kapital", "inform.kz", "nur.kz")
+
+
+def parse_json(text):
+    """The model is asked for JSON but may wrap it in prose or a code fence."""
+    a, b = text.find("{"), text.rfind("}")
+    if a < 0 or b <= a:
+        return None
+    try:
+        obj = json.loads(text[a:b + 1])
+    except json.JSONDecodeError:
+        return None
+    return obj if isinstance(obj, dict) else None
+
+
+def analyze(body):
+    company, niche, city = (re.sub(r"\s+", " ", str(body.get(k, ""))).strip()[:80] for k in ("company", "niche", "city"))
+    rivals = [str(r).strip()[:60] for r in body.get("rivals", []) if str(r).strip()][:6]
+    answers = [(str(x.get("q", ""))[:200], str(x.get("a", ""))[:1400]) for x in body.get("answers", []) if isinstance(x, dict) and x.get("a")][:10]
+    if not company or not answers:
+        raise BadRequest("Сначала нужна проверка: без ответов нейросети разбирать нечего.")
+    steps, pages = [{"text": f"Перечитал ответы нейросети: {len(answers)}", "ok": True}], []
+    site = str(body.get("site", "")).strip()[:300]
+    if site:
+        try:
+            page = read_page(site)
+            got = page["status"] == 200 and len(page["text"]) >= 200
+            steps.append({"text": f"Прочитал ваш сайт: {len(page['text'])} знаков" if got else f"Ваш сайт не отдал текст (код {page['status'] or 'нет ответа'})", "ok": got})
+            if got:
+                pages.append(f"САЙТ КЛИЕНТА ({page['url']}), заголовок: {page['title']}\n{page['text'][:3000]}")
+        except BadRequest as e:
+            steps.append({"text": f"Ваш сайт: {e}", "ok": False})
+    else:
+        steps.append({"text": "Ваш сайт не подключён: сравню только по ответам нейросети", "ok": False})
+    theirs = [d for d in (str(x).strip().lower()[:80] for x in body.get("sources", [])) if d and not any(n in d for n in NOT_COMPANY_SITES)][:2]
+    for d in theirs:
+        try:
+            page = read_page(d)
+        except BadRequest:
+            continue
+        if page["status"] == 200 and len(page["text"]) >= 200:
+            steps.append({"text": f"Прочитал сайт, на который ссылается нейросеть: {d}", "ok": True})
+            pages.append(f"САЙТ, НА КОТОРЫЙ ССЫЛАЕТСЯ НЕЙРОСЕТЬ ({d}), заголовок: {page['title']}\n{page['text'][:2200]}")
+    qa = "\n\n".join(f"ВОПРОС: {q}\nОТВЕТ НЕЙРОСЕТИ: {a}" for q, a in answers)
+    prompt = f"""Компания клиента: «{company}». Ниша: {niche}. Город: {city}, Казахстан.
+Конкуренты: {", ".join(rivals) or "не указаны"}.
+
+Ниже настоящие ответы нейросети на вопросы покупателей и тексты сайтов.
+
+{qa[:11000]}
+
+{chr(10).join(pages)[:8000]}
+
+Разбери, почему нейросеть называет конкурентов и не называет (или редко называет) компанию клиента.
+Правила: опирайся только на тексты выше, ничего не выдумывай; пиши очень простыми словами, короткими предложениями, без терминов; цитаты бери дословно из ответов нейросети.
+Верни ТОЛЬКО JSON такого вида, без пояснений:
+{{"verdict": "главная причина одним предложением",
+ "reasons": [{{"rival": "название конкурента", "why": "за что его называет нейросеть", "quote": "короткая дословная цитата из ответа"}}],
+ "gaps": [{{"title": "что сделать, начиная с глагола", "why": "что есть у конкурентов и чего нет у клиента", "how": "первый шаг на сегодня", "effort": "час" }}]}}
+В reasons от 2 до 4 пунктов, в gaps от 3 до 5, самые сильные первыми. effort — одно из: "час", "день", "неделя"."""
+    text, _, model = ask(prompt, "Ты опытный маркетолог. Отвечаешь только валидным JSON на русском языке.")
+    obj = parse_json(text)
+    if obj:
+        obj = {"verdict": str(obj.get("verdict", ""))[:300],
+               "reasons": [{k: str(r.get(k, ""))[:300] for k in ("rival", "why", "quote")} for r in obj.get("reasons", []) if isinstance(r, dict)][:4],
+               "gaps": [{k: str(g.get(k, ""))[:300] for k in ("title", "why", "how", "effort")} for g in obj.get("gaps", []) if isinstance(g, dict)][:5]}
+    steps.append({"text": f"Разбор написала нейросеть {model}", "ok": True})
+    return {"analysis": obj, "text": "" if obj else text[:4000], "steps": steps, "model": model}
+
+
 # ---------- agents ----------
 AGENTS = {
     "why": "Ты аналитик видимости в нейросетях. По данным кабинета объясни простым языком, почему компанию называют реже конкурентов, и дай три первых шага. Не выдумывай фактов о компании.",
@@ -417,7 +488,7 @@ def allowed(ip, limit=30, window=3600):
     return True
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one}
+ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze}
 
 
 class Handler(BaseHTTPRequestHandler):

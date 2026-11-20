@@ -575,6 +575,18 @@ h1,.head h1,.ch h1{font-weight:600}
 [data-theme=dark] .btn-p,[data-theme=dark] .btn-p:hover{background:#fff;color:#111;border-color:#fff}
 .logo i{background:#fff}.logo i::before{background:#000}
 .sl.on svg{color:var(--ink)}
+
+/* ---------- breakdown ---------- */
+.why{display:grid;gap:14px}
+.why .verdict{font-size:17px;line-height:1.45;color:var(--ink);font-weight:500}
+.rs{display:grid;gap:4px;padding:12px 0;border-top:1px solid var(--line)}
+.rs b{color:var(--ink);font-weight:600}
+.rs q{font-size:13px;color:var(--muted);quotes:"«" "»";font-style:italic}
+.gp{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.gp h4{font-size:14.5px}
+.gp p{font-size:13px;color:var(--muted)}
+.gp p b{color:var(--text);font-weight:500}
+.sub2{font-size:12.5px;font-weight:600;color:var(--muted);margin-top:6px}
 </style>
 </head>
 <body>
@@ -728,7 +740,7 @@ function onboarding(){
 
 /* ---------- Экраны ---------- */
 const dotsHtml = qi => data.engines.map(e => `<span class="tag ${data.eng[e].grid[qi][0] ? 'ok' : 'no'}">${ENG[e]} ${data.eng[e].grid[qi][0] ? '✓' : '✕'}</span>`).join('');
-const todos = () => { const g = gaps()[0], src = sources(), lead = ranked().find(x => !x[2]); return [
+const todos = () => { const g = gaps()[0], src = sources(), lead = ranked().find(x => !x[2]); return [...(st.custom || []).map(c => ({ id: c.id, icon: 'check', t: c.t, d: c.d })),
   { id: 'site', icon: 'globe', t: 'Проверить, видит ли нейросеть ваш сайт', d: 'Если сайт закрыт, нейросеть о вас ничего не узнает.', agent: 'audit' },
   { id: 'reviews', icon: 'star', t: (rv => rv ? `Собрать отзывы на ${rv[0]}` : 'Собрать отзывы на 2ГИС и Google Картах')(src.find(x => /2gis|google|yandex|zoon|flamp/i.test(x[0]))), d: 'Отсюда нейросети чаще всего берут ответы про местный бизнес.', agent: 'reviews' },
   { id: 'faq', icon: 'file', t: 'Сделать страницу с ответами на вопросы клиентов', d: g ? `На вопрос «${g.q}» нейросети нечего взять с вашего сайта.` : 'Вопрос в заголовке, ответ в первом предложении.', agent: 'faq' },
@@ -753,9 +765,33 @@ function viewOverview(){
   <div class="box sum in"><div><small>Вас назвали</small><div class="big"><b data-count="${mine}" style="font-weight:600">${mine}</b><span>из ${total()} ответов</span></div><p class="diag">${diag}</p>
     <dl class="facts"><div><dt>Место</dt><dd>${place} из ${r.length}</dd></div><div><dt>Доля упоминаний</dt><dd>${share}%</dd></div><div><dt>Вопросы без вас</dt><dd>${g.length} из ${data.qs.length}</dd></div></dl></div>
     <div><h2 style="margin-bottom:14px">Кого называют</h2>${r.map(x => `<div class="rank${x[2] ? ' me' : ''}"><span>${esc(x[0])}${x[2] ? ' · вы' : ''}</span><u><i style="width:${x[1] / max * 100}%"></i></u><em>${x[1]}/${total()}</em></div>`).join('')}</div></div>
+  ${whyBox()}
   <div class="box"><h2>Что сделать сейчас <a href="#/tasks">Весь план</a></h2>${open.slice(0, 3).map(t => `<div class="rowi"><span class="av">${ic(t.icon)}</span><div><h4>${esc(t.t)}</h4><p>${esc(t.d)}</p></div>${t.agent ? `<button class="btn" data-run="${t.agent}">Сделать</button>` : `<a class="btn" href="#/tasks">В план</a>`}</div>`).join('') || '<p class="muted">Все дела из плана сделаны.</p>'}</div>
   <div class="box"><h2>Где вас не назвали <a href="#/serp/questions">Все вопросы</a></h2>${g.length ? g.slice(0, 3).map(x => `<div class="qrow"><b>${esc(x.q)}</b><div class="who">вместо вас: <b>${esc(x.who.join(', '))}</b></div><div class="dots">${dotsHtml(x.qi)}<button class="lnk" data-ans="${x.qi}">Читать ответ</button></div></div>`).join('') : '<p class="muted">Таких вопросов в этой проверке нет.</p>'}</div>
   ${h.length > 1 ? `<div class="box"><h2>Динамика по проверкам</h2><div class="trend">${h.map(x => `<div class="rank me"><span>${day(x.t)}</span><u><i style="width:${x.m / x.n * 100}%"></i></u><em>${x.m}/${x.n}</em></div>`).join('')}</div><p class="mono" style="margin-top:10px">Разница в один ответ между проверками — норма.</p></div>` : ''}`;
+}
+/* Разбор: почему советуют не вас. Нейросеть перечитывает свои же ответы, ваш сайт и сайты-источники */
+function whyBox(){
+  if (data.sample) return '';
+  const a = st.analysis, busyNow = whyBox.busy;
+  if (busyNow) return `<div class="box why"><h2>Разбор: почему советуют не вас</h2><ul class="steps" id="whySteps" style="border:0;padding:0">${whyBox.steps.map(x => `<li class="${x.ok === false ? 'no' : ''}">${esc(x.text)}</li>`).join('')}</ul><div class="dots3"><i></i><i></i><i></i></div></div>`;
+  if (!a) return `<div class="box rep"><div><h2 style="margin-bottom:8px">Разбор: почему советуют не вас</h2><p>Нейросеть перечитает свои ответы, ваш сайт и сайты, на которые она ссылается. Скажет простыми словами, чего вам не хватает, и что сделать.${st.conn.site ? '' : ' Подключите сайт — разбор будет точнее.'}</p>${whyBox.err ? `<p style="color:var(--bad);margin-top:8px">${esc(whyBox.err)}</p>` : ''}</div><div style="display:flex;gap:8px;flex-wrap:wrap">${st.conn.site ? '' : '<button class="btn" data-conn="site">Подключить сайт</button>'}<button class="btn btn-p" id="whyRun">Сделать разбор</button></div></div>`;
+  if (!a.data) return `<div class="box why"><h2>Разбор: почему советуют не вас <a href="#" id="whyRun">Обновить</a></h2><div class="ans">${md(a.text)}</div></div>`;
+  const d = a.data, added = id => (st.custom || []).some(c => c.id === id);
+  return `<div class="box why"><h2>Разбор: почему советуют не вас <a href="#" id="whyRun">Обновить</a></h2><p class="verdict">${esc(d.verdict)}</p>
+    <div><p class="sub2">За что называют конкурентов</p>${d.reasons.map(r => `<div class="rs"><span><b>${esc(r.rival)}</b> — ${esc(r.why)}</span>${r.quote ? `<q>${esc(r.quote)}</q>` : ''}</div>`).join('')}</div>
+    <div><p class="sub2">Что сделать вам</p>${d.gaps.map((g, i) => `<div class="gp"><div><h4>${esc(g.title)}</h4><p>${esc(g.why)}</p><p><b>Первый шаг:</b> ${esc(g.how)}</p></div><div style="display:grid;gap:6px;justify-items:end"><span class="tag">${esc(g.effort)}</span><button class="btn" data-gap="${i}" ${added('gap' + a.at + i) ? 'disabled' : ''}>${added('gap' + a.at + i) ? 'В плане' : 'В план'}</button></div></div>`).join('')}</div>
+    <p class="mono">${when(a.at)} · ${esc(a.model || '')} · по ответам нейросети и прочитанным сайтам; проверьте перед тем, как делать</p></div>`;
+}
+whyBox.steps = [];
+async function runWhy(){
+  if (whyBox.busy) return; whyBox.busy = true; whyBox.err = ''; whyBox.steps = [{ text: 'Собираю ответы нейросети из проверки', ok: true }]; render();
+  try {
+    const e = data.eng[data.engines[0]];
+    const d = await call('/api/analyze', { company: st.company, niche: st.niche, city: st.city, rivals: st.rivals, site: st.conn.site || '', sources: sources().map(x => x[0]), answers: data.qs.map((q, i) => ({ q, a: e.answers[i] })).filter(x => x.a) });
+    st.analysis = { at: Date.now(), data: d.analysis, text: d.text, model: d.model, steps: d.steps }; store.save(st);
+  } catch (err) { whyBox.err = err.message === 'Failed to fetch' ? 'Сервер не ответил. Попробуйте ещё раз через минуту.' : err.message }
+  whyBox.busy = false; render();
 }
 function openReport(){
   if (data.sample) return drawer('Отчёт руководителю', `<p>Сейчас в кабинете пример на вымышленной школе, отправлять его руководителю нельзя.</p><p class="muted">Запустите настоящую проверку у помощника «Проверка ответов», и отчёт соберётся по вашей компании.</p>`, `<button class="btn btn-p" data-run="watch">Запустить проверку</button>`);
@@ -945,6 +981,8 @@ function render(){
   $$('[data-ans]').forEach(b => b.onclick = () => openAnswer(+b.dataset.ans));
   $$('[data-move]').forEach(b => b.onclick = () => { const [id, k] = b.dataset.move.split(':'); st.stat = st.stat || {}; st.doneAt = st.doneAt || {}; st.stat[id] = k; st.done[id] = k === 'done'; if (k === 'done') st.doneAt[id] = Date.now(); store.save(st); render() });
   const rp = $('#report'); if (rp) rp.onclick = openReport;
+  const wr = $('#whyRun'); if (wr) wr.onclick = e => { e.preventDefault(); runWhy() };
+  $$('[data-gap]').forEach(b => b.onclick = () => { const g = st.analysis.data.gaps[+b.dataset.gap]; st.custom = [{ id: 'gap' + st.analysis.at + b.dataset.gap, t: g.title, d: g.why + ' Первый шаг: ' + g.how }, ...(st.custom || [])].slice(0, 12); store.save(st); render() });
   const rs = $('#reset'); if (rs) rs.onclick = () => { store.clear(); location.href = location.pathname };
   const au = $('#audit'); if (au) au.onsubmit = async e => { e.preventDefault(); const v = au.querySelector('input').value.trim(); st.conn.site = v; store.save(st); const out = $('#auditOut');
     if (!API) { out.innerHTML = `<div class="empty">Сайт ${esc(v)} не проверялся: сервер Körin ещё не запущен. Адрес сохранён в подключениях.</div>`; return }

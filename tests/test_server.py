@@ -216,6 +216,24 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(app.named_ids("Советую Vega Legal и GK and Partners.", cs), {0, 1})
         self.assertEqual(app.named_ids("Советую REVERA.", cs), set())
 
+    def test_breakdown_reads_the_site_and_returns_structured_steps(self):
+        seen = {}
+
+        def fake(prompt, system=None):
+            seen["p"] = prompt
+            return 'Вот разбор:\n```json\n{"verdict": "Мало отзывов", "reasons": [{"rival": "Beta", "why": "отзывы", "quote": "у Beta много отзывов"}], "gaps": [{"title": "Собрать отзывы", "why": "у Beta 100", "how": "написать 5 клиентам", "effort": "день"}]}\n```', [], "test-model"
+
+        real, app.ask = app.ask, fake
+        try:
+            code, data, _ = post(self.api.server_port, "/api/analyze", {"company": "Alfa", "niche": "курсы", "city": "Алматы", "rivals": ["Beta"], "site": f"http://127.0.0.1:{self.site.server_port}/", "sources": ["2gis.kz"], "answers": [{"q": "кого посоветуешь?", "a": "у Beta много отзывов"}]})
+        finally:
+            app.ask = real
+        self.assertEqual((code, data["analysis"]["gaps"][0]["effort"], data["analysis"]["reasons"][0]["rival"]), (200, "день", "Beta"))
+        self.assertIn("САЙТ КЛИЕНТА", seen["p"])
+        self.assertTrue(data["steps"][1]["ok"])
+        self.assertEqual(post(self.api.server_port, "/api/analyze", {"company": "Alfa"})[0], 400)
+        self.assertIsNone(app.parse_json("нет данных"))
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))
