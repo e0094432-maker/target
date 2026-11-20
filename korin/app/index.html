@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#fff;--side:#fafafa;--card:#fff;--sub:#f6f6f7;--line:#ebebee;--line2:#dcdce0;--ink:#0f1114;--text:#2a2d33;--muted:#6f737b;--dim:#9a9ea6;--acc:#2f5bff;--acc-bg:#eef2ff;--lime:#c9f560;--lime-ink:#1c2600;--ok:#0f7b4f;--ok-bg:#e6f6ee;--bad:#c2331f;--bad-bg:#fdecea;--warn:#8a5a00;--warn-bg:#fff5db;--btn:#0f1114;--btn-ink:#fff;--hero:linear-gradient(135deg,#f3f6ff,#fff 60%);--shadow:0 1px 2px rgba(15,17,20,.04),0 8px 24px -12px rgba(15,17,20,.12);
+:root{--bg:#fff;--side:#fafafa;--card:#fff;--sub:#f6f6f7;--line:#ebebee;--line2:#dcdce0;--ink:#0f1114;--text:#2a2d33;--muted:#6f737b;--dim:#9a9ea6;--acc:#2f5bff;--acc-bg:#eef2ff;--lime:#8b9cff;--lime-ink:#1c2600;--ok:#0f7b4f;--ok-bg:#e6f6ee;--bad:#c2331f;--bad-bg:#fdecea;--warn:#8a5a00;--warn-bg:#fff5db;--btn:#0f1114;--btn-ink:#fff;--hero:linear-gradient(135deg,#f3f6ff,#fff 60%);--shadow:0 1px 2px rgba(15,17,20,.04),0 8px 24px -12px rgba(15,17,20,.12);
   --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
 [data-theme=dark]{--bg:#0b0c0e;--side:#0f1012;--card:#121316;--sub:#17181b;--line:#222428;--line2:#2f3237;--ink:#f7f8f8;--text:#d5d7db;--muted:#8a8f98;--dim:#62666d;--acc:#7aa2ff;--acc-bg:rgba(91,140,255,.14);--ok:#7ee0a8;--ok-bg:rgba(60,200,130,.14);--bad:#ff9d93;--bad-bg:rgba(255,107,94,.14);--warn:#f5c56b;--warn-bg:rgba(245,197,107,.13);--btn:#fff;--btn-ink:#0b0c0e;--hero:radial-gradient(120% 160% at 0 0,rgba(91,140,255,.2),transparent 60%),#15161a;--shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px -12px rgba(0,0,0,.7);color-scheme:dark}
 *{box-sizing:border-box}
@@ -552,22 +552,29 @@ h1,.head h1,.ch h1{font-weight:500;letter-spacing:-.03em}
 [data-theme=dark] .btn-p,[data-theme=dark] .btn-p:hover{background:#fff;color:#222}
 
 /* ---------- own accent ---------- */
-[data-theme=dark]{--lime:rgba(201,245,96,.15);--lime-ink:#d9f99d;--warn:#e7b65a;--warn-bg:rgba(231,182,90,.13)}
-[data-theme=dark] .rank.me i{background:#c9f560}
-[data-theme=dark] .wsw i{background:rgba(201,245,96,.15);color:#d9f99d}
+[data-theme=dark]{--lime:rgba(139,156,255,.15);--lime-ink:#c9d1ff;--warn:#e7b65a;--warn-bg:rgba(231,182,90,.13)}
+[data-theme=dark] .rank.me i{background:#8b9cff}
+[data-theme=dark] .wsw i{background:rgba(139,156,255,.15);color:#c9d1ff}
 
 /* ---------- Körin's own face ---------- */
 :root{--sans:"Onest",system-ui,sans-serif;--head:"Onest",system-ui,sans-serif}
-[data-theme=dark]{--bg:#070a08;--side:#070a08;--card:#0d110e;--sub:#151a16;--line:#1c221d;--line2:#2a322b;--ink:#eef3ea;--text:#cfd6cc;--muted:#9aa398;--dim:#6f786d;--btn:#c9f560;--btn-ink:#10140a}
+[data-theme=dark]{--bg:#070a08;--side:#070a08;--card:#0d110e;--sub:#151a16;--line:#1c221d;--line2:#2a322b;--ink:#eef3ea;--text:#cfd6cc;--muted:#9aa398;--dim:#6f786d;--btn:#8b9cff;--btn-ink:#111}
 [data-theme=dark] .btn{background:#111612}
-[data-theme=dark] .btn-p,[data-theme=dark] .btn-p:hover{background:#c9f560;color:#10140a;border-color:#c9f560}
+[data-theme=dark] .btn-p,[data-theme=dark] .btn-p:hover{background:#8b9cff;color:#111;border-color:#8b9cff}
 h1,.head h1,.ch h1{font-weight:600}
 .btn{border-radius:999px;padding:0 13px}
 .ib{padding:0}
 .box,.kcol,.kcard,.kpi,.agent,.conn,.onb,.bub,.composer{border-radius:16px}
-.logo i{background:#c9f560}.logo i::before{background:var(--bg)}
-.sl.on svg{color:#c9f560}
+.logo i{background:#8b9cff}.logo i::before{background:var(--bg)}
+.sl.on svg{color:#8b9cff}
 [data-theme=light] .logo i{background:#111613}
+
+/* ---------- neutral black, white button, soft blue accent ---------- */
+[data-theme=dark]{--bg:#000;--side:#000;--card:#0b0b0c;--sub:#151517;--line:#1f1f22;--line2:#2c2c30;--ink:#edf2f5;--text:#cfd3d8;--muted:#9a9ca3;--dim:#6c6e75;--btn:#fff;--btn-ink:#111}
+[data-theme=dark] .btn{background:#111113}
+[data-theme=dark] .btn-p,[data-theme=dark] .btn-p:hover{background:#fff;color:#111;border-color:#fff}
+.logo i{background:#fff}.logo i::before{background:#000}
+.sl.on svg{color:var(--ink)}
 </style>
 </head>
 <body>

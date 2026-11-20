@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#08090a;--panel:#0f1011;--panel2:#151618;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);--text:#f7f8f8;--muted:#8a8f98;--dim:#62666d;--acc:#5b8cff;--acc2:#8fb0ff;--lime:#c9f560;--lime-ink:#141a00;--bad:#ff6b5e;
+:root{--bg:#08090a;--panel:#0f1011;--panel2:#151618;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);--text:#f7f8f8;--muted:#8a8f98;--dim:#62666d;--acc:#5b8cff;--acc2:#8fb0ff;--lime:#8b9cff;--lime-ink:#141a00;--bad:#ff6b5e;
   --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--max:1180px}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-text-size-adjust:100%}
@@ -49,7 +49,7 @@ nav a:hover{color:var(--text);background:rgba(255,255,255,.05)}
 /* hero */
 .hero{padding:72px 0 0;text-align:center;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:-200px 0 auto 0;height:900px;pointer-events:none;
-  background:radial-gradient(50% 50% at 50% 0,rgba(91,140,255,.28),transparent 70%),radial-gradient(30% 30% at 72% 18%,rgba(201,245,96,.10),transparent 70%)}
+  background:radial-gradient(50% 50% at 50% 0,rgba(91,140,255,.28),transparent 70%),radial-gradient(30% 30% at 72% 18%,rgba(139,156,255,.10),transparent 70%)}
 .hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(var(--line) 1px,transparent 1px) 0 0/100% 72px,linear-gradient(90deg,var(--line) 1px,transparent 1px) 50% 0/72px 100%;-webkit-mask:radial-gradient(60% 50% at 50% 20%,#000,transparent);mask:radial-gradient(60% 50% at 50% 20%,#000,transparent);opacity:.6}
 .hero>.wrap{position:relative;z-index:1}
 .badge{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);border:1px solid var(--line2);background:rgba(255,255,255,.04);border-radius:999px;padding:6px 14px 6px 8px;margin-bottom:28px}
@@ -109,7 +109,7 @@ nav a:hover{color:var(--text);background:rgba(255,255,255,.05)}
 .bot{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid var(--line);font:400 13.5px var(--mono);color:#c9ccd1}
 .bot:first-child{border-top:0}
 .ok,.no{font-family:var(--sans);font-size:12.5px;font-weight:500;border-radius:999px;padding:2px 10px}
-.ok{background:rgba(201,245,96,.14);color:var(--lime)}.no{background:rgba(255,107,94,.14);color:#ff9d93}
+.ok{background:rgba(139,156,255,.14);color:var(--lime)}.no{background:rgba(255,107,94,.14);color:#ff9d93}
 .lang{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14.5px;background:rgba(255,255,255,.03)}
 .lang+.lang{margin-top:8px}
 .lang small{display:block;font:400 11.5px var(--mono);color:var(--dim);margin-bottom:4px}
@@ -301,7 +301,7 @@ section{padding-bottom:120px}
 @media (max-width:719px){section{padding-bottom:72px}}
 
 /* ---------- own identity: lime accent, live scene, solid guides ---------- */
-:root{--lime:rgba(201,245,96,.15);--lime-ink:#d9f99d;--ac:#c9f560}
+:root{--lime:rgba(139,156,255,.15);--lime-ink:#c9d1ff;--ac:#8b9cff}
 .badge b{background:var(--lime);color:var(--lime-ink)}
 .mark,.qc-ans mark{background:var(--lime);color:var(--lime-ink)}
 .r.me i,.t.on i{background:var(--ac)}
@@ -336,18 +336,18 @@ section{padding-bottom:120px}
 @media (min-width:900px){.live{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);min-height:400px}.lv-side{border-top:0;border-left:1px solid #232323}.lv-chat,.lv-side{padding:28px}}
 
 /* ---------- Körin's own face ---------- */
-:root{--bg:#070a08;--panel:#0d110e;--panel2:#121713;--line:#1c221d;--line2:#2a322b;--text:#eef3ea;--muted:#9aa398;--dim:#6f786d;--ac:#c9f560;--sans:"Onest",system-ui,sans-serif;--head:"Onest",system-ui,sans-serif}
+:root{--bg:#070a08;--panel:#0d110e;--panel2:#121713;--line:#1c221d;--line2:#2a322b;--text:#eef3ea;--muted:#9aa398;--dim:#6f786d;--ac:#8b9cff;--sans:"Onest",system-ui,sans-serif;--head:"Onest",system-ui,sans-serif}
 body{background:var(--bg);font-family:var(--sans)}
 h1,h2,.logo,.num,.huge{font-family:var(--head)}
 h1{font-weight:600;letter-spacing:-.035em;line-height:1.05;font-size:clamp(34px,5vw,60px)}
 h2{font-weight:600;letter-spacing:-.03em;color:var(--text)}
 header{background:rgba(7,10,8,.85)}
-.hero::before{background:radial-gradient(50% 60% at 85% 10%,rgba(201,245,96,.1),transparent 70%)}
+.hero::before{background:radial-gradient(50% 60% at 85% 10%,rgba(139,156,255,.1),transparent 70%)}
 section>.wrap::before,section>.wrap::after{display:none}
 .btn{border-radius:999px}
 header .btn{height:34px;padding:0 14px}
-.btn-w,.btn-w:hover{background:var(--ac);color:#10140a;border-color:var(--ac);font-weight:600}
-.btn-w:hover{background:#d8fb7e}
+.btn-w,.btn-w:hover{background:var(--ac);color:#111;border-color:var(--ac);font-weight:600}
+.btn-w:hover{background:#e4e7ea}
 .logo i{background:var(--ac)}.logo i::before{background:var(--bg)}
 .badge{border-radius:999px;background:var(--panel)}.badge b{border-radius:999px}
 #eng{color:var(--ac)}
@@ -382,6 +382,17 @@ header .btn{height:34px;padding:0 14px}
   .hero .fine{text-align:left;max-width:520px}
   .web-g{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}
 }
+
+/* ---------- neutral black, white button, soft blue accent ---------- */
+:root{--bg:#000;--panel:#0b0b0c;--panel2:#111113;--line:#1f1f22;--line2:#2c2c30;--text:#edf2f5;--muted:#9a9ca3;--dim:#6c6e75;--ac:#8b9cff}
+body{background:#000}
+header{background:rgba(0,0,0,.85)}
+.hero::before{background:radial-gradient(50% 60% at 85% 10%,rgba(139,156,255,.12),transparent 70%)}
+.btn-w,.btn-w:hover{background:#fff;color:#111;border-color:#fff}
+.btn-w:hover{background:#e4e7ea}
+.logo i{background:#fff}.logo i::before{background:#000}
+.lv-q{background:#1d1d20}.lv-b u{background:#1d1d20}.lv-b i{background:#3a3a40}
+.check:focus-within{border-color:var(--line2)}
 </style>
 </head>
 <body>
@@ -561,16 +572,16 @@ const $ = s => document.querySelector(s);
     ctx.clearRect(0, 0, W, W); ctx.lineWidth = 1;
     for (let k = 1; k <= 4; k++) { ctx.strokeStyle = `rgba(238,243,234,${k === 4 ? .16 : .08})`; ctx.setLineDash(k === 4 ? [] : [3, 5]); ctx.beginPath(); ctx.arc(c, c, R * k / 4, 0, 6.283); ctx.stroke() }
     ctx.setLineDash([]);
-    for (let j = 0; j < 46; j++) { ctx.fillStyle = `rgba(201,245,96,${.11 * (1 - j / 46)})`; ctx.beginPath(); ctx.moveTo(c, c); ctx.arc(c, c, R, sw - j * .025 - .025, sw - j * .025 + .004); ctx.fill() }
-    ctx.strokeStyle = 'rgba(201,245,96,.55)'; ctx.beginPath(); ctx.moveTo(c, c); ctx.lineTo(c + Math.cos(sw) * R, c + Math.sin(sw) * R); ctx.stroke();
+    for (let j = 0; j < 46; j++) { ctx.fillStyle = `rgba(139,156,255,${.11 * (1 - j / 46)})`; ctx.beginPath(); ctx.moveTo(c, c); ctx.arc(c, c, R, sw - j * .025 - .025, sw - j * .025 + .004); ctx.fill() }
+    ctx.strokeStyle = 'rgba(139,156,255,.55)'; ctx.beginPath(); ctx.moveTo(c, c); ctx.lineTo(c + Math.cos(sw) * R, c + Math.sin(sw) * R); ctx.stroke();
     const glow = a => { let d = (sw - a) % 6.283; if (d < 0) d += 6.283; return Math.max(0, 1 - d / 1.6) };
     for (const s of src) { const x = c + Math.cos(s.a) * R * s.r, y = c + Math.sin(s.a) * R * s.r, z = 17; ctx.globalAlpha = .3 + .7 * glow(s.a); ctx.save(); ctx.translate(x - z / 2, y - z / 2); ctx.scale(z / 24, z / 24); ctx.fillStyle = s.ic.c; ctx.fill(s.ic.p); ctx.restore() }
     ctx.globalAlpha = 1; ctx.font = '500 12px Onest, sans-serif'; ctx.textBaseline = 'middle';
     for (const [n, r, a] of rivals) { const x = c + Math.cos(a) * R * r, y = c + Math.sin(a) * R * r; ctx.fillStyle = 'rgba(238,243,234,.85)'; ctx.beginPath(); ctx.arc(x, y, 4, 0, 6.283); ctx.fill(); ctx.fillStyle = 'rgba(238,243,234,.6)'; ctx.fillText(n, x + 9, y) }
     // «Вы»: снаружи внутрь за девять секунд, потом пауза и заново
     const ph = t % 13000 / 9000, k = Math.min(1, ph), e = 1 - Math.pow(1 - k, 3), ry = .93 - .57 * e, ay = 5.35 - e * .5, x = c + Math.cos(ay) * R * ry, y = c + Math.sin(ay) * R * ry;
-    ctx.fillStyle = 'rgba(201,245,96,.18)'; ctx.beginPath(); ctx.arc(x, y, 11 + Math.sin(t / 300) * 2, 0, 6.283); ctx.fill();
-    ctx.fillStyle = '#c9f560'; ctx.beginPath(); ctx.arc(x, y, 5, 0, 6.283); ctx.fill(); ctx.font = '600 12.5px Onest, sans-serif'; ctx.fillText(lang === 'en' ? 'You' : 'Вы', x + 12, y);
+    ctx.fillStyle = 'rgba(139,156,255,.18)'; ctx.beginPath(); ctx.arc(x, y, 11 + Math.sin(t / 300) * 2, 0, 6.283); ctx.fill();
+    ctx.fillStyle = '#8b9cff'; ctx.beginPath(); ctx.arc(x, y, 5, 0, 6.283); ctx.fill(); ctx.font = '600 12.5px Onest, sans-serif'; ctx.fillText(lang === 'en' ? 'You' : 'Вы', x + 12, y);
     ctx.fillStyle = '#0d110e'; ctx.strokeStyle = 'rgba(238,243,234,.25)'; ctx.beginPath(); ctx.arc(c, c, 20, 0, 6.283); ctx.fill(); ctx.stroke();
     ctx.fillStyle = '#eef3ea'; ctx.font = '600 12px Onest, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(lang === 'en' ? 'AI' : 'ИИ', c, c + 1); ctx.textAlign = 'left';
     if (run && !still) raf = requestAnimationFrame(draw);
