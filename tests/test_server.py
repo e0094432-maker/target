@@ -199,7 +199,7 @@ class ApiTest(unittest.TestCase):
 
         real, app.providers.gemini = app.providers.gemini, fake
         os.environ["GEMINI_API_KEY"] = "k"
-        app._ai.update(model=None, no_search_until=0)
+        app._ai.update(model=None, no_search_until=0, listed_at=app.time.time(), listed=["gemini-b", "gemini-c"])
         try:
             first = app.ask("q")
             second = app.ask("q")

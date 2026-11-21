@@ -159,10 +159,30 @@ def provider_name():
 _ai = {"model": None, "no_search_until": 0}
 
 
+def _listed_models():
+    """Text models this key can really call, asked from Google once an hour: old names disappear without warning."""
+    if time.time() - _ai.get("listed_at", 0) > 3600:
+        _ai["listed_at"] = time.time()
+        try:
+            key = "".join(os.environ.get("GEMINI_API_KEY", "").split())
+            req = urllib.request.Request("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", headers={"x-goog-api-key": key})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                found = [m["name"].split("/")[-1] for m in json.loads(r.read()).get("models", []) if "generateContent" in m.get("supportedGenerationMethods", [])]
+            skip = ("tts", "image", "live", "embedding", "audio", "vision", "robotics", "computer", "exp")
+            _ai["listed"] = sorted([m for m in found if "flash" in m and not any(x in m for x in skip)], reverse=True)[:6]
+        except (urllib.error.URLError, TimeoutError, ValueError, KeyError) as e:
+            print(f"could not list gemini models: {e}", flush=True)
+    return _ai.get("listed", [])
+
+
 def gemini_models():
     first = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-    rest = [m.strip() for m in os.environ.get("GEMINI_FALLBACKS", "gemini-2.5-flash-lite,gemini-2.0-flash").split(",") if m.strip()]
-    order = [first, *[m for m in rest if m != first]]
+    rest = [m.strip() for m in os.environ.get("GEMINI_FALLBACKS", "").split(",") if m.strip()] + _listed_models()
+    order = []
+    for m in [first, *rest]:
+        if m not in order:
+            order.append(m)
+    order = order[:5]
     if _ai["model"] in order:  # the one that answered last time goes first
         order.remove(_ai["model"])
         order.insert(0, _ai["model"])
@@ -182,7 +202,8 @@ def ask(prompt, system=None):
     for search in ([True, False] if with_search else [False]):
         for model in gemini_models():
             try:
-                out = providers.gemini(prompt, system, search=search, model=model, retries=0, timeout=60)
+                # one quick second try covers a busy moment at Google
+                out = providers.gemini(prompt, system, search=search, model=model, retries=1, timeout=60)
             except providers.ProviderError as e:
                 if "не задан" in str(e):
                     raise
