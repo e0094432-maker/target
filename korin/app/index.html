@@ -587,6 +587,12 @@ h1,.head h1,.ch h1{font-weight:600}
 .gp p{font-size:13px;color:var(--muted)}
 .gp p b{color:var(--text);font-weight:500}
 .sub2{font-size:12.5px;font-weight:600;color:var(--muted);margin-top:6px}
+
+/* ---------- registration ---------- */
+.rg{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.6)}
+.rg-box{width:100%;max-width:440px;background:var(--card);border:1px solid var(--line2);border-radius:18px;padding:26px 22px;box-shadow:var(--shadow)}
+.rg-box h2{font-size:20px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px}
+.rg-box .acts{display:flex;justify-content:space-between;gap:10px}
 </style>
 </head>
 <body>
@@ -674,7 +680,7 @@ function sample(){
 function fromReal(r){ const e = /gemini/i.test(r.model || '') ? 'gemini' : /sonar|perplexity/i.test(r.model || '') ? 'perplexity' : 'chatgpt'; return { names: r.names, qs: r.questions, engines: [e], sample: false, label: r.names[0], at: r.at, eng: { [e]: { grid: r.grid.map(g => g || r.names.map(() => false)), answers: r.answers || [], src: r.sources || [], model: r.model || 'ChatGPT' } } } }
 
 let st = store.load(), engine = 'all', data;
-fetch(API + '/api/health').then(r => r.json()).then(d => { SRV = true; AI = !!d.ai; if (st && st.ready) render() }).catch(() => {});
+fetch(API + '/api/health').then(r => r.json()).then(d => { SRV = true; AI = !!d.ai; if (st && st.ready && !window.onWelcome) render() }).catch(() => {});
 const param = new URLSearchParams(location.search).get('company');
 if (!st) st = { company: param ? param.slice(0, 40) : '', niche: '', city: 'Алматы', rivals: [], conn: {}, notify: {}, agents: {}, runs: [], done: {}, ready: false, step: 1 };
 const load = () => { data = st.real ? fromReal(st.real) : sample(); if (engine !== 'all' && !data.engines.includes(engine)) engine = 'all'; if (data.engines.length < 2) engine = data.engines[0] };
@@ -793,7 +799,42 @@ async function runWhy(){
   } catch (err) { whyBox.err = err.message === 'Failed to fetch' ? 'Сервер не ответил. Попробуйте ещё раз через минуту.' : err.message }
   whyBox.busy = false; render();
 }
+/* Регистрация: сначала человек пробует, потом оставляет имя и WhatsApp, чтобы идти дальше */
+const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9kvzA8WbfzVFvVA4UfU5bKlHRZ3G1pCIDZ2kY0nP1CG/exec';
+const FREE = ['overview', 'serp'];
+const needReg = () => !st.user && !data.sample;
+function regModal(next){
+  if ($('#rg')) return;
+  const m = document.createElement('div'); m.className = 'rg'; m.id = 'rg';
+  m.innerHTML = `<form class="rg-box" id="rgForm" novalidate><h2>Сохраним ваш кабинет</h2><p class="muted">Проверка готова. Оставьте имя и WhatsApp — откроются план, помощники и отчёт. В следующий раз вы войдёте в свой кабинет.</p>
+    <div class="field"><label for="rgN">Имя</label><input class="inp" id="rgN" maxlength="40" autocomplete="name"></div>
+    <div class="field"><label for="rgW">WhatsApp</label><input class="inp" id="rgW" maxlength="20" inputmode="tel" autocomplete="tel" placeholder="+7 7__ ___ __ __"></div>
+    <p id="rgErr" style="color:var(--bad);font-size:13px;min-height:18px;margin-top:8px"></p>
+    <div class="acts"><button type="button" class="btn btn-lg" id="rgX">Позже</button><button class="btn btn-p btn-lg">Открыть кабинет</button></div>
+    <p class="mono" style="margin-top:12px">Данные кабинета пока хранятся в этом браузере.</p></form>`;
+  document.body.appendChild(m); $('#rgN').focus();
+  const close = () => m.remove();
+  $('#rgX').onclick = close; m.onclick = e => { if (e.target === m) close() };
+  $('#rgForm').onsubmit = e => { e.preventDefault(); const name = $('#rgN').value.trim(), phone = $('#rgW').value.trim();
+    if (!name) return $('#rgErr').textContent = 'Напишите имя.';
+    if (phone.replace(/\D/g, '').length < 10) return $('#rgErr').textContent = 'Напишите номер WhatsApp полностью.';
+    st.user = { name, phone, at: Date.now() }; store.save(st); try { sessionStorage.setItem('korin-in', '1') } catch (err) {}
+    fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name, business: [st.company, st.niche, st.city].filter(Boolean).join(' · '), whatsapp: phone, lang: 'korin · регистрация' }) }).catch(() => {});
+    close(); if (next) location.hash = next; render() };
+}
+/* Повторный визит: войти в кабинет с прошлыми данными или сделать новую проверку */
+function welcome(){
+  window.onWelcome = true; const r = ranked(), mine = hits(0);
+  $('#root').innerHTML = `<div class="top"><a class="logo" href="../"><i></i>Körin</a><span class="sp"></span>${themeBtn()}</div><div style="padding:0 14px 40px"><div class="onb"><h1>С возвращением, ${esc(st.user.name)}</h1>
+    <p class="muted" style="margin-top:10px">«${esc(st.company)}» · проверка ${when(data.at)}.</p><p style="margin-top:6px">Вас назвали в ${mine} из ${total()} ответов. Место ${r.findIndex(x => x[2]) + 1} из ${r.length}.</p>
+    <div class="acts"><button class="btn btn-lg" id="wNew">Новая проверка</button><button class="btn btn-p btn-lg" id="wIn">Войти в кабинет</button></div></div></div>`;
+  bindTheme();
+  const enter = () => { window.onWelcome = false; try { sessionStorage.setItem('korin-in', '1') } catch (e) {} };
+  $('#wIn').onclick = () => { enter(); render() };
+  $('#wNew').onclick = () => { enter(); st = { company: '', niche: '', city: st.city || 'Алматы', rivals: [], conn: {}, notify: {}, agents: {}, runs: [], done: {}, ready: false, step: 1, user: st.user }; store.save(st); location.hash = ''; onboarding() };
+}
 function openReport(){
+  if (needReg()) return regModal();
   if (data.sample) return drawer('Отчёт руководителю', `<p>Сейчас в кабинете пример на вымышленной школе, отправлять его руководителю нельзя.</p><p class="muted">Запустите настоящую проверку у помощника «Проверка ответов», и отчёт соберётся по вашей компании.</p>`, `<button class="btn btn-p" data-run="watch">Запустить проверку</button>`);
   const r = ranked(), g = gaps(), t = todos(), names = k => t.filter(x => statOf(x.id) === k).map(x => x.t);
   const text = [`Видимость «${me()}» в нейросетях · ${day(data.at)}`, '', `Нас назвали в ${hits(0)} из ${total()} ответов. Место ${r.findIndex(x => x[2]) + 1} из ${r.length}.`, `Чаще называют: ${r.filter(x => !x[2]).slice(0, 3).map(x => `${x[0]} (${x[1]})`).join(', ')}.`,
@@ -868,7 +909,7 @@ const OUT = {
 let runSeq = 0;
 const FX = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 const logRun = (a, what) => { st.runs = [{ a: a[0], n: a[1], what, t: Date.now() }, ...st.runs].slice(0, 40); store.save(st) };
-function runAgent(id){ location.hash = '#/agents/' + id; send(id, ASK[id][0]) }
+function runAgent(id){ if (needReg()) return regModal('#/agents/' + id); location.hash = '#/agents/' + id; send(id, ASK[id][0]) }
 async function send(id, q){
   q = (q || '').trim(); if (!q || busy) return;
   st.threads = st.threads || {};
@@ -944,6 +985,7 @@ const VIEWS = { overview: viewOverview, agents: viewAgents, tasks: viewTasks, co
 let lastRoute = '';
 function render(){
   const [route = 'overview', sub] = location.hash.replace('#/', '').split('/');
+  if (needReg() && NAV.some(n => n[1] === route) && !FREE.includes(route)) { const want = location.hash; history.replaceState(null, '', '#/overview'); regModal(want); return render() }
   const cur = NAV.some(n => n[1] === route) ? route : 'overview', title = NAV.find(n => n[1] === cur)[3];
   const view = cur === 'serp' ? viewSerp(['questions', 'rivals', 'sources'].includes(sub) ? sub : 'questions') : VIEWS[cur](sub);
   const badge = { agents: AGENTS.filter(a => agentOn(a[0])).length, connectors: CONNECTORS.filter(c => connected(c[1])).length || '', tasks: todos().filter(t => statOf(t.id) !== 'done').length };
@@ -982,7 +1024,7 @@ function render(){
   $$('[data-move]').forEach(b => b.onclick = () => { const [id, k] = b.dataset.move.split(':'); st.stat = st.stat || {}; st.doneAt = st.doneAt || {}; st.stat[id] = k; st.done[id] = k === 'done'; if (k === 'done') st.doneAt[id] = Date.now(); store.save(st); render() });
   const rp = $('#report'); if (rp) rp.onclick = openReport;
   const wr = $('#whyRun'); if (wr) wr.onclick = e => { e.preventDefault(); runWhy() };
-  $$('[data-gap]').forEach(b => b.onclick = () => { const g = st.analysis.data.gaps[+b.dataset.gap]; st.custom = [{ id: 'gap' + st.analysis.at + b.dataset.gap, t: g.title, d: g.why + ' Первый шаг: ' + g.how }, ...(st.custom || [])].slice(0, 12); store.save(st); render() });
+  $$('[data-gap]').forEach(b => b.onclick = () => { if (needReg()) return regModal(); const g = st.analysis.data.gaps[+b.dataset.gap]; st.custom = [{ id: 'gap' + st.analysis.at + b.dataset.gap, t: g.title, d: g.why + ' Первый шаг: ' + g.how }, ...(st.custom || [])].slice(0, 12); store.save(st); render() });
   const rs = $('#reset'); if (rs) rs.onclick = () => { store.clear(); location.href = location.pathname };
   const au = $('#audit'); if (au) au.onsubmit = async e => { e.preventDefault(); const v = au.querySelector('input').value.trim(); st.conn.site = v; store.save(st); const out = $('#auditOut');
     if (!API) { out.innerHTML = `<div class="empty">Сайт ${esc(v)} не проверялся: сервер Körin ещё не запущен. Адрес сохранён в подключениях.</div>`; return }
@@ -993,8 +1035,9 @@ function render(){
 const app = render;
 $('#dclose').onclick = closeDrawer; $('#scrim').onclick = closeDrawer;
 addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer() });
-addEventListener('hashchange', () => { closeDrawer(); if (st.ready) render() });
-if (st.ready) { load(); render() } else onboarding();
+addEventListener('hashchange', () => { closeDrawer(); if (st.ready && !window.onWelcome) render() });
+let inSession = false; try { inSession = !!sessionStorage.getItem('korin-in') } catch (e) {}
+if (st.ready) { load(); if (st.user && !data.sample && !inSession) welcome(); else render() } else onboarding();
 </script>
 </body>
 </html>
