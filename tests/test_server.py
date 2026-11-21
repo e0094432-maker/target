@@ -288,7 +288,13 @@ class ApiTest(unittest.TestCase):
             code, pl, _ = post(p, "/api/marketer-plan", {"key": "secret"})
             imgs = [f"https://kenesai.asia/korin/media/2026-11-21-ab12-{i}.png" for i in (1, 2, 3)]
             code2, pub, _ = post(p, "/api/marketer-publish", {"key": "secret", "text": pl["text"], "images": imgs + ["https://evil.example/x.png"]})
-            bad = post(p, "/api/marketer-publish", {"key": "secret", "text": "t", "images": ["https://evil.example/x.png"]})[0]
+            bad = post(p, "/api/marketer-publish", {"key": "secret", "text": "", "images": []})[0]
+            # midday: a short text post, no pictures, nothing foreign gets through as a picture
+            app.ask = lambda prompt, system=None: ('{"text": "Мало кто замечает, но клиент уже спросил нейросеть.", "tags": ["малыйбизнес"]}', [], "test-model")
+            _, noon, _ = post(p, "/api/marketer-plan", {"key": "secret", "slot": 1})
+            before = len(calls)
+            _, pub_t, _ = post(p, "/api/marketer-publish", {"key": "secret", "text": noon["text"], "images": ["https://evil.example/x.png"]})
+            text_calls = [c[2] for c in calls[before:]]
         finally:
             app._threads, app.ask, app.time.sleep = real_t, real_a, real_s
             del os.environ["KORIN_ADMIN_KEY"], os.environ["THREADS_TOKEN"]
@@ -303,6 +309,8 @@ class ApiTest(unittest.TestCase):
         self.assertEqual((code2, pub["link"], bad), (200, "https://threads.net/p/9", 400))
         self.assertEqual([c[2] for c in calls[:4]], ["IMAGE", "IMAGE", "IMAGE", "CAROUSEL"])
         self.assertEqual(calls[3][3], "1,2,3")
+        self.assertEqual((noon["format"], noon["slides"], text_calls[0]), ("text", [], "TEXT"))
+        self.assertIn("#малыйбизнес", noon["text"])
 
     def test_github_token_is_checked_with_a_real_rsa_signature(self):
         import subprocess, tempfile, base64 as b64

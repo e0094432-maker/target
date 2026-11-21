@@ -631,36 +631,56 @@ BRANDS = {
 FORMS = ["вопрос к читателю", "простой совет", "наблюдение", "разбор мифа", "три шага", "маленький опыт для читателя"]
 
 
+HOOKS = [
+    "начни с короткой истории из жизни владельца бизнеса: три предложения и вывод",
+    "начни с неожиданного наблюдения, с которым хочется поспорить",
+    "начни фразой «Мало кто замечает, но…» и объясни одну простую вещь",
+    "задай один прямой вопрос читателю и дай свой короткий ответ",
+    "дай список из трёх коротких пунктов, каждый с новой строки",
+    "сравни «раньше» и «теперь» в двух коротких строках",
+    "начни с ошибки, которую делают почти все, и скажи, как проще",
+]
+
+
 def marketer_plan(body):
-    """Today's post and the text for two pictures. The third picture (where to check) is always the same."""
+    """Today's post for a brand and a time slot. Morning: a carousel. Midday: short text. Evening: a question or one picture."""
     _admin(body)
     key = str(body.get("brand", "korin")) if str(body.get("brand", "korin")) in BRANDS else "korin"
     brand = BRANDS[key]
     day = int(time.time() // 86400)
-    topic, form = brand["topics"][day % len(brand["topics"])], FORMS[day % len(FORMS)]
-    prompt = f"""Ты ведёшь Threads «{brand['name']}». {brand['about']} Сайт: {brand['site']}. Работает в Казахстане.
+    slot = int(body.get("slot", 0)) % 3 if str(body.get("slot", 0)).isdigit() else 0
+    n = day * 3 + slot
+    topic = brand["topics"][n % len(brand["topics"])]
+    fmt = "carousel" if slot == 0 else "text" if slot == 1 else ("image" if day % 2 else "text")
+    who = f"Ты ведёшь Threads «{brand['name']}». {brand['about']} Сайт: {brand['site']}. Работает в Казахстане.\n\nЧитатели: владельцы малого бизнеса в Казахстане. Тема: {topic}."
+    rules = "Правила: очень простые слова и короткие предложения, как будто пишешь другу; первая строка такая, чтобы захотелось читать дальше; без слов «уникальный», «инновационный», «под ключ», «эффективный»; не обещай результат; не выдумывай клиентов, цифры, проценты и отзывы; пиши как человек, а не как реклама."
+    tags_rule = '"tags": ["от 2 до 4 хэштегов без решётки, одним словом, по теме"]'
+    if fmt == "text":
+        prompt = f"""{who} Подача: {HOOKS[n % len(HOOKS)]}.
 
-Читатели: владельцы малого бизнеса в Казахстане. Тема на сегодня: {topic}. Подача: {form}.
+Напиши короткий текстовый пост без картинки. Такой, чтобы на него хотелось ответить или переслать. {rules} Бренд и сайт не упоминай вообще, если это не просится само: такие посты читают охотнее.
+Верни ТОЛЬКО JSON: {{"text": "пост до 280 знаков, можно с переносами строк, в конце вопрос к читателю", {tags_rule}}}"""
+    else:
+        form = FORMS[n % len(FORMS)]
+        prompt = f"""{who} Подача: {form}.
 
-Сделай пост-карусель, который хочется долистать и сохранить.
-Правила для всего текста: очень простые слова и короткие предложения, как будто объясняешь другу; без слов «уникальный», «инновационный», «под ключ», «эффективный»; не обещай результат; не выдумывай клиентов, цифры, проценты и отзывы; без хэштегов.
+Сделай пост {'-карусель из двух картинок, который хочется долистать и сохранить' if fmt == 'carousel' else 'с одной картинкой: на ней одна крупная фраза'}. {rules}
 Верни ТОЛЬКО JSON:
-{{"text": "подпись к посту, до 330 знаков: первая строка цепляет; потом интересный факт или наблюдение о том, как люди пользуются нейросетями (без выдуманных цифр и процентов: если точного числа не знаешь, пиши без числа); потом одна строка с пользой; в конце вопрос к читателю или строка «{brand['last']}»",
- "tags": ["от 3 до 5 хэштегов без решётки, одним словом, по теме: например малыйбизнес, Казахстан, нейросети, маркетинг, Алматы"],
+{{"text": "подпись до 330 знаков: цепляющая первая строка; интересный факт или наблюдение (без выдуманных чисел); одна строка с пользой; в конце вопрос к читателю или строка «{brand['last']}»",
+ {tags_rule},
  "slides": [
-  {{"tag": "одно слово-рубрика", "title": "крупная фраза для первой картинки, до 45 знаков, без точки"}},
-  {{"tag": "одно слово", "title": "заголовок второй картинки, до 30 знаков", "points": ["пункт до 55 знаков", "пункт до 55 знаков", "пункт до 55 знаков"]}}
+  {{"tag": "одно слово-рубрика", "title": "крупная фраза для картинки, до 45 знаков, без точки"}}{', {"tag": "одно слово", "title": "заголовок второй картинки, до 30 знаков", "points": ["пункт до 55 знаков", "пункт до 55 знаков", "пункт до 55 знаков"]}' if fmt == 'carousel' else ''}
  ]}}"""
     text, _, model = ask(prompt, "Ты маркетолог, пишешь по-русски живо и просто. Отвечаешь только валидным JSON.")
     obj = parse_json(text) or {}
-    slides = [{"tag": str(x.get("tag", ""))[:18], "title": str(x.get("title", ""))[:70], "points": [str(q)[:80] for q in x.get("points", []) if str(q).strip()][:3]} for x in obj.get("slides", []) if isinstance(x, dict) and x.get("title")][:2]
+    slides = [{"tag": str(x.get("tag", ""))[:18], "title": str(x.get("title", ""))[:70], "points": [str(q)[:80] for q in x.get("points", []) if str(q).strip()][:3]} for x in obj.get("slides", []) if isinstance(x, dict) and x.get("title")][:2 if fmt == "carousel" else 1]
     post = str(obj.get("text", "")).strip()[:400]
-    tags = [re.sub(r"[^\wа-яёА-ЯЁ]", "", str(t)) for t in obj.get("tags", []) if str(t).strip()][:5]
-    tags = [t for t in tags if 2 < len(t) < 30] or ["малыйбизнес", "Казахстан", "нейросети"]
-    post = (post + "\n\n" + " ".join("#" + t for t in tags))[:500]
-    if not post or not slides:
+    tags = [re.sub(r"[^\wа-яёА-ЯЁ]", "", str(t)) for t in obj.get("tags", []) if str(t).strip()][:4]
+    tags = [t for t in tags if 2 < len(t) < 30] or ["малыйбизнес", "Казахстан"]
+    if not post or (fmt != "text" and not slides):
         raise providers.ProviderError("нейросеть вернула пост в неверном виде")
-    return {"ok": True, "brand": key, "topic": topic, "text": post, "slides": slides, "theme": day % 3, "model": model}
+    post = (post + "\n\n" + " ".join("#" + t for t in tags))[:500]
+    return {"ok": True, "brand": key, "format": fmt, "single": fmt == "image", "topic": topic, "text": post, "slides": slides if fmt != "text" else [], "theme": n % 3, "model": model}
 
 
 def marketer_publish(body):
@@ -668,15 +688,17 @@ def marketer_publish(body):
     token = _admin(body)
     text = str(body.get("text", "")).strip()[:500]
     images = [str(u).strip() for u in body.get("images", []) if re.match(r"https://kenesai\.asia/korin/media/[\w.-]+\.png$", str(u).strip())][:6]
-    if not text or not images:
-        raise BadRequest("Нужны текст и картинки с нашего сайта.")
-    if len(images) == 1:
+    if not text:
+        raise BadRequest("Нужен текст поста.")
+    if not images:
+        made = _threads("POST", "/me/threads", {"media_type": "TEXT", "text": text, "access_token": token})
+    elif len(images) == 1:
         made = _threads("POST", "/me/threads", {"media_type": "IMAGE", "image_url": images[0], "text": text, "access_token": token})
     else:
         kids = [_threads("POST", "/me/threads", {"media_type": "IMAGE", "image_url": u, "is_carousel_item": "true", "access_token": token}).get("id", "") for u in images]
         time.sleep(4)
         made = _threads("POST", "/me/threads", {"media_type": "CAROUSEL", "children": ",".join(kids), "text": text, "access_token": token})
-    time.sleep(6)  # Threads asks to wait before publishing so it can fetch the pictures
+    time.sleep(6 if images else 1)  # Threads asks to wait before publishing so it can fetch the pictures
     done = _threads("POST", "/me/threads_publish", {"creation_id": made.get("id", ""), "access_token": token})
     link = _threads("GET", f"/{done.get('id', '')}", {"fields": "permalink", "access_token": token}).get("permalink", "") if done.get("id") else ""
     print(f"marketer published: {link} ({len(images)} pictures)", flush=True)

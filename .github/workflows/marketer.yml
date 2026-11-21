@@ -3,12 +3,17 @@ name: Marketer
 # Every day, for each brand: the model writes a post and the text for the pictures, the pictures are drawn in the brand's style, the post goes to its Threads account.
 on:
   schedule:
-    - cron: "40 5 * * *"   # 10:40 in Almaty
+    - cron: "40 5 * * *"    # 10:40 in Almaty: a carousel
+    - cron: "10 9 * * *"    # 14:10: short text
+    - cron: "30 14 * * *"   # 19:30: a question or one picture
   workflow_dispatch:
     inputs:
       brand:
         description: "korin, kenes or both"
         default: both
+      slot:
+        description: "0 morning carousel, 1 midday text, 2 evening"
+        default: ""
 
 permissions:
   contents: write
@@ -44,23 +49,29 @@ jobs:
           git config user.name "marketer"
           git config user.email "marketer@users.noreply.github.com"
           curl -s -m 120 "$API/api/health" || true
+          SLOT="${{ github.event.inputs.slot }}"
+          if [ -z "$SLOT" ]; then H=$(date -u +%H); if [ "$H" -lt 8 ]; then SLOT=0; elif [ "$H" -lt 12 ]; then SLOT=1; else SLOT=2; fi; fi
+          echo "slot $SLOT"
           FAILED=0
           for BRAND in korin kenes; do
             [ "$ONLY" = "both" ] || [ "$ONLY" = "$BRAND" ] || continue
             echo "::group::$BRAND"
             OIDC=$(token); echo "::add-mask::$OIDC"
-            OIDC="$OIDC" BRAND="$BRAND" node -e 'console.log(JSON.stringify({oidc:process.env.OIDC, brand:process.env.BRAND}))' > /tmp/ask.json
+            OIDC="$OIDC" BRAND="$BRAND" SLOT="$SLOT" node -e 'console.log(JSON.stringify({oidc:process.env.OIDC, brand:process.env.BRAND, slot:process.env.SLOT}))' > /tmp/ask.json
             ask /api/marketer-plan /tmp/ask.json /tmp/plan.json || { echo "no answer from the server"; FAILED=1; echo "::endgroup::"; continue; }
-            if ! node -e 'const p=JSON.parse(require("fs").readFileSync("/tmp/plan.json")); if(!p.slides){console.log("skipped: "+(p.error||"no plan")); process.exit(1)} console.log(p.topic+"\n\n"+p.text)'; then
+            if ! node -e 'const p=JSON.parse(require("fs").readFileSync("/tmp/plan.json")); if(!p.ok){console.log("skipped: "+(p.error||"no plan")); process.exit(1)} console.log(p.format+": "+p.topic+"\n\n"+p.text)'; then
               # an account that is not connected yet is not a failure
               grep -q "ещё не подключён" /tmp/plan.json || FAILED=1
               echo "::endgroup::"; continue
             fi
-            FILES=$(node social/cards.js /tmp/plan.json korin/media); echo "$FILES"
-            ls -t korin/media/*.png | tail -n +61 | xargs -r git rm -q --ignore-unmatch
-            git add korin/media && git commit -q -m "Marketer pictures: $BRAND" && git pull -q --rebase && git push -q
-            LAST=$(node -pe 'JSON.parse(process.argv[1]).pop()' "$FILES")
-            for i in $(seq 1 40); do [ "$(curl -s -o /dev/null -w '%{http_code}' "https://kenesai.asia/korin/media/$LAST")" = "200" ] && break; sleep 15; done
+            FILES="[]"
+            if [ "$(node -pe 'JSON.parse(require("fs").readFileSync("/tmp/plan.json")).format')" != "text" ]; then
+              FILES=$(node social/cards.js /tmp/plan.json korin/media); echo "$FILES"
+              ls -t korin/media/*.png | tail -n +61 | xargs -r git rm -q --ignore-unmatch
+              git add korin/media && git commit -q -m "Marketer pictures: $BRAND" && git pull -q --rebase && git push -q
+              LAST=$(node -pe 'JSON.parse(process.argv[1]).pop()' "$FILES")
+              for i in $(seq 1 40); do [ "$(curl -s -o /dev/null -w '%{http_code}' "https://kenesai.asia/korin/media/$LAST")" = "200" ] && break; sleep 15; done
+            fi
             OIDC=$(token); echo "::add-mask::$OIDC"
             OIDC="$OIDC" BRAND="$BRAND" node -e 'const p=JSON.parse(require("fs").readFileSync("/tmp/plan.json")); console.log(JSON.stringify({oidc:process.env.OIDC, brand:process.env.BRAND, text:p.text, images:JSON.parse(process.argv[1]).map(f=>"https://kenesai.asia/korin/media/"+f)}))' "$FILES" > /tmp/pub.json
             ask /api/marketer-publish /tmp/pub.json /tmp/result.json && cat /tmp/result.json

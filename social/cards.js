@@ -23,7 +23,7 @@ const BRAND = plan.brand === 'kenes'
   : { name: 'Körin', site: 'kenesai.asia/korin', handle: '@korin.kz', head: '"Onest",system-ui,sans-serif', weight: 600, track: '-.035em', scale: 1, themes: THEMES, tag: 'бесплатно', cta: 'Проверьте, советует ли вас нейросеть', sub: 'Одна минута. Без регистрации.' };
 const t = BRAND.themes[(plan.theme ?? Math.floor(Date.now() / 864e5)) % BRAND.themes.length];
 const slides = plan.slides.slice(0, 2).map((s, i) => ({ ...s, n: i + 1 }));
-slides.push({ cta: true, n: slides.length + 1 });
+if (!plan.single) slides.push({ cta: true, n: slides.length + 1 });  // one picture: just the phrase
 const total = slides.length;
 
 const page = s => `<!doctype html><html lang="ru"><head><meta charset="utf-8">
@@ -50,7 +50,7 @@ li b{width:76px;height:76px;border-radius:50%;background:${t.chip};color:${t.ac}
 .foot{position:absolute;left:80px;right:80px;bottom:80px;display:flex;justify-content:space-between;align-items:center;font-size:32px;color:${t.mute}}
 .foot i{display:block;width:120px;height:6px;background:${t.ac};border-radius:3px}
 </style></head><body><div class="glow"></div><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
-<div class="top"><div class="logo"><i></i>${BRAND.name}</div><div class="num">${s.n} / ${total}</div></div>
+<div class="top"><div class="logo"><i></i>${BRAND.name}</div><div class="num">${total > 1 ? s.n + ' / ' + total : ''}</div></div>
 <div class="mid">${s.cta
   ? `<span class="tag">${BRAND.tag}</span><h1 id="h">${BRAND.cta}</h1><div class="cta">${BRAND.sub}<br><span class="site">${BRAND.site}</span></div>`
   : `${s.tag ? `<span class="tag">${esc(s.tag)}</span>` : ''}<h1 id="h">${esc(s.title)}</h1>${(s.points || []).length ? `<ol>${s.points.slice(0, 3).map((p, i) => `<li><b>${i + 1}</b><span>${esc(p)}</span></li>`).join('')}</ol>` : ''}`}</div>
