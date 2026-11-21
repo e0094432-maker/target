@@ -269,31 +269,32 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(calls[:2], [("POST", "/me/threads", "123"), ("POST", "/me/threads_publish", None)])
         self.assertEqual((code2, found["found"][0]["id"]), (200, "5"))
 
-    def test_marketer_writes_and_publishes_with_the_picture(self):
+    def test_marketer_plans_a_post_and_publishes_a_carousel(self):
         p = self.api.server_port
         os.environ.update(KORIN_ADMIN_KEY="secret", THREADS_TOKEN="tok")
         calls = []
 
         def fake(method, path, params):
-            calls.append((method, path, params.get("media_type"), params.get("image_url")))
-            return {"id": "9", "permalink": "https://threads.net/p/9", "status": "FINISHED"}
+            calls.append((method, path, params.get("media_type"), params.get("children")))
+            return {"id": str(len(calls)), "permalink": "https://threads.net/p/9"}
 
+        plan = '{"text": "Спросите нейросеть про свою нишу.", "slides": [{"tag": "вопрос", "title": "Вас советует нейросеть?"}, {"tag": "шаги", "title": "Что проверить", "points": ["Цены на сайте", "Отзывы", "Адрес"]}, {"title": "лишний"}]}'
         real_t, app._threads = app._threads, fake
-        real_a, app.ask = app.ask, lambda prompt, system=None: ("«Спросите нейросеть про свою нишу. kenesai.asia/korin»", [], "test-model")
+        real_a, app.ask = app.ask, lambda prompt, system=None: (plan, [], "test-model")
         real_s, app.time.sleep = app.time.sleep, lambda s: None
         try:
-            body = {"key": "secret", "media": "https://kenesai.asia/korin/media/2026-11-21-cards.png", "kind": "image", "shows": "карточки возможностей"}
-            code, data, _ = post(p, "/api/marketer-run", body)
-            bad = post(p, "/api/marketer-run", {**body, "media": "https://evil.example/x.png"})[0]
-            code_dry, dry, _ = post(p, "/api/marketer-run", {**body, "dry": True})
+            self.assertEqual(post(p, "/api/marketer-plan", {"key": "no"})[0], 400)
+            code, pl, _ = post(p, "/api/marketer-plan", {"key": "secret"})
+            imgs = [f"https://kenesai.asia/korin/media/2026-11-21-ab12-{i}.png" for i in (1, 2, 3)]
+            code2, pub, _ = post(p, "/api/marketer-publish", {"key": "secret", "text": pl["text"], "images": imgs + ["https://evil.example/x.png"]})
+            bad = post(p, "/api/marketer-publish", {"key": "secret", "text": "t", "images": ["https://evil.example/x.png"]})[0]
         finally:
             app._threads, app.ask, app.time.sleep = real_t, real_a, real_s
             del os.environ["KORIN_ADMIN_KEY"], os.environ["THREADS_TOKEN"]
-        self.assertEqual((code, data["link"], bad), (200, "https://threads.net/p/9", 400))
-        self.assertFalse(data["text"].startswith("«"))
-        self.assertEqual(calls[0], ("POST", "/me/threads", "IMAGE", "https://kenesai.asia/korin/media/2026-11-21-cards.png"))
-        self.assertEqual((code_dry, dry.get("dry")), (200, True))
-        self.assertEqual(len(calls), 3)  # the dry run published nothing
+        self.assertEqual((code, len(pl["slides"]), len(pl["slides"][1]["points"])), (200, 2, 3))
+        self.assertEqual((code2, pub["link"], bad), (200, "https://threads.net/p/9", 400))
+        self.assertEqual([c[2] for c in calls[:4]], ["IMAGE", "IMAGE", "IMAGE", "CAROUSEL"])
+        self.assertEqual(calls[3][3], "1,2,3")
 
     def test_rate_limit(self):
         app._hits.clear()

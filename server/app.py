@@ -531,58 +531,71 @@ def threads_post(body):
     return {"ok": True, "id": done.get("id", ""), "link": link}
 
 
-ANGLES = [
-    "задай читателю вопрос, на который хочется ответить в комментариях",
-    "дай один простой совет, который можно сделать сегодня",
-    "расскажи наблюдение о том, как люди теперь выбирают, куда пойти",
-    "объясни одну вещь про нейросети совсем простыми словами",
-    "предложи читателю маленький опыт: спросить нейросеть про свою нишу",
-    "развей один распространённый миф",
+TOPICS = [
+    "люди теперь спрашивают нейросеть, куда пойти, а не листают поиск",
+    "как за минуту проверить, называет ли нейросеть ваш бизнес",
+    "почему нейросеть называет конкурента: у него на сайте написаны цены",
+    "отзывы в 2ГИС и на картах: нейросеть их читает",
+    "сайт может быть закрыт для нейросети, а хозяин об этом не знает",
+    "нейросеть называет два-три места, остальных для клиента нет",
+    "страница с ответами на частые вопросы клиентов помогает попасть в ответ",
+    "длинные точные запросы: клиент пишет нейросети целую фразу",
+    "почему только Instagram без сайта мешает нейросети вас найти",
+    "название, адрес и телефон должны совпадать на всех площадках",
+    "вопрос к читателям: вы сами уже спрашивали совета у нейросети?",
+    "три дела на эту неделю, чтобы нейросеть узнала о вашем бизнесе",
+    "казахский язык: на нём нейросеть тоже отвечает, а конкурентов меньше",
+    "миф: в нейросети нельзя попасть без больших денег",
+    "что написать в описании профиля, чтобы нейросеть поняла, чем вы заняты",
+    "нейросеть берёт ответы с сайтов: с каких именно",
 ]
+FORMS = ["вопрос к читателю", "простой совет", "наблюдение", "разбор мифа", "три шага", "маленький опыт для читателя"]
 
 
-def marketer_post(shows, kind, angle):
-    """The text of today's post: what is on the screen, why a business owner should care."""
-    prompt = f"""Ты ведёшь Threads сервиса Körin. Körin проверяет, называет ли нейросеть (ChatGPT, Gemini, Perplexity) компанию, когда клиент спрашивает совета, и говорит, что сделать, чтобы называла. Сайт: kenesai.asia/korin. Проверка бесплатная. Работает в Казахстане, на русском и казахском.
+def marketer_plan(body):
+    """Today's post and the text for two pictures. The third picture (where to check) is always the same."""
+    _admin(body)
+    day = int(time.time() // 86400)
+    topic, form = TOPICS[day % len(TOPICS)], FORMS[day % len(FORMS)]
+    prompt = f"""Ты ведёшь Threads сервиса Körin. Körin проверяет, называет ли нейросеть (ChatGPT, Gemini, Perplexity) компанию, когда клиент спрашивает совета, и говорит, что сделать, чтобы называла. Проверка бесплатная: kenesai.asia/korin. Работает в Казахстане.
 
-К посту приложен{' ролик' if kind == 'video' else ' снимок экрана'}. На нём: {shows}.
+Читатели: владельцы малого бизнеса в Казахстане. Тема на сегодня: {topic}. Подача: {form}.
 
-Напиши пост для владельцев малого бизнеса в Казахстане. Задача: {angle}.
-Правила: до 420 знаков; очень простые слова, короткие предложения; первая строка цепляет и понятна без картинки; не начинай с названия сервиса; не обещай результат; не выдумывай клиентов, цифры и отзывы; если на экране пример — не выдавай его за настоящего клиента; в конце одна спокойная строка, где проверить: kenesai.asia/korin; без хэштегов; не больше одного эмодзи.
-Верни только текст поста."""
-    text, _, model = ask(prompt, "Ты маркетолог, пишешь по-русски живо и просто, как человек.")
-    text = re.sub(r"^[\"«]|[\"»]$", "", text.strip()).strip()
-    return text[:480], model
+Сделай пост-карусель, который хочется долистать и сохранить.
+Правила для всего текста: очень простые слова и короткие предложения, как будто объясняешь другу; без слов «уникальный», «инновационный», «под ключ», «эффективный»; не обещай результат; не выдумывай клиентов, цифры, проценты и отзывы; без хэштегов.
+Верни ТОЛЬКО JSON:
+{{"text": "подпись к посту, до 380 знаков: первая строка цепляет, потом 2–3 коротких предложения с пользой, в конце вопрос к читателю или строка «Проверить бесплатно: kenesai.asia/korin»",
+ "slides": [
+  {{"tag": "одно слово-рубрика", "title": "крупная фраза для первой картинки, до 45 знаков, без точки"}},
+  {{"tag": "одно слово", "title": "заголовок второй картинки, до 30 знаков", "points": ["пункт до 55 знаков", "пункт до 55 знаков", "пункт до 55 знаков"]}}
+ ]}}"""
+    text, _, model = ask(prompt, "Ты маркетолог, пишешь по-русски живо и просто. Отвечаешь только валидным JSON.")
+    obj = parse_json(text) or {}
+    slides = [{"tag": str(x.get("tag", ""))[:18], "title": str(x.get("title", ""))[:70], "points": [str(q)[:80] for q in x.get("points", []) if str(q).strip()][:3]} for x in obj.get("slides", []) if isinstance(x, dict) and x.get("title")][:2]
+    post = str(obj.get("text", "")).strip()[:480]
+    if not post or not slides:
+        raise providers.ProviderError("нейросеть вернула пост в неверном виде")
+    return {"ok": True, "topic": topic, "text": post, "slides": slides, "theme": day % 3, "model": model}
 
 
-def marketer_run(body):
-    """One daily post. Called by the scheduled job with the address of a fresh screenshot or video."""
+def marketer_publish(body):
+    """Publish the post with its pictures: one picture as a photo, several as a carousel."""
     token = _admin(body)
-    media = str(body.get("media", "")).strip()[:300]
-    kind = "video" if body.get("kind") == "video" else "image"
-    shows = re.sub(r"\s+", " ", str(body.get("shows", ""))).strip()[:600]
-    if not re.match(r"https://kenesai\.asia/[\w./-]+\.(png|jpg|mp4)$", media) or not shows:
-        raise BadRequest("Нужны адрес картинки или ролика на нашем сайте и описание экрана.")
-    angle = ANGLES[int(time.time() // 86400) % len(ANGLES)]
-    text, model = marketer_post(shows, kind, angle)
-    if body.get("dry"):
-        return {"ok": True, "text": text, "model": model, "dry": True}
-    params = {"media_type": "VIDEO" if kind == "video" else "IMAGE", ("video_url" if kind == "video" else "image_url"): media, "text": text, "access_token": token}
-    made = _threads("POST", "/me/threads", params)
-    if kind == "video":  # Threads needs time to process a video before it can be published
-        for _ in range(24):
-            state = _threads("GET", f"/{made.get('id', '')}", {"fields": "status", "access_token": token}).get("status", "")
-            if state in ("FINISHED", "PUBLISHED"):
-                break
-            if state in ("ERROR", "EXPIRED"):
-                raise BadRequest("Threads не смог обработать ролик.")
-            time.sleep(5)
+    text = str(body.get("text", "")).strip()[:500]
+    images = [str(u).strip() for u in body.get("images", []) if re.match(r"https://kenesai\.asia/korin/media/[\w.-]+\.png$", str(u).strip())][:6]
+    if not text or not images:
+        raise BadRequest("Нужны текст и картинки с нашего сайта.")
+    if len(images) == 1:
+        made = _threads("POST", "/me/threads", {"media_type": "IMAGE", "image_url": images[0], "text": text, "access_token": token})
     else:
+        kids = [_threads("POST", "/me/threads", {"media_type": "IMAGE", "image_url": u, "is_carousel_item": "true", "access_token": token}).get("id", "") for u in images]
         time.sleep(4)
+        made = _threads("POST", "/me/threads", {"media_type": "CAROUSEL", "children": ",".join(kids), "text": text, "access_token": token})
+    time.sleep(6)  # Threads asks to wait before publishing so it can fetch the pictures
     done = _threads("POST", "/me/threads_publish", {"creation_id": made.get("id", ""), "access_token": token})
     link = _threads("GET", f"/{done.get('id', '')}", {"fields": "permalink", "access_token": token}).get("permalink", "") if done.get("id") else ""
-    print(f"marketer published: {link} ({kind}, {model})", flush=True)
-    return {"ok": True, "text": text, "link": link, "model": model}
+    print(f"marketer published: {link} ({len(images)} pictures)", flush=True)
+    return {"ok": True, "link": link}
 
 
 def threads_search(body):
@@ -659,7 +672,7 @@ def allowed(ip, limit=30, window=3600):
     return True
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply, "/api/threads-post": threads_post, "/api/threads-search": threads_search, "/api/threads-me": threads_me, "/api/marketer-run": marketer_run}
+ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply, "/api/threads-post": threads_post, "/api/threads-search": threads_search, "/api/threads-me": threads_me, "/api/marketer-plan": marketer_plan, "/api/marketer-publish": marketer_publish}
 
 
 class Handler(BaseHTTPRequestHandler):
