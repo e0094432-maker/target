@@ -1,0 +1,68 @@
+name: Körin marketer
+
+# Every day the marketer films the live site, the server writes a post about what is on the screen and publishes it to Threads.
+on:
+  schedule:
+    - cron: "40 5 * * *"   # 10:40 in Almaty
+  workflow_dispatch:
+    inputs:
+      scene:
+        description: "Scene number 0-5 (empty = by day)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency: marketer
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Browser
+        run: |
+          npm install --no-save playwright@1.48.0
+          npx playwright install --with-deps chromium
+      - name: Film the site
+        id: shoot
+        run: |
+          OUT=$(node social/shoot.js https://kenesai.asia/korin/ korin/media "${{ github.event.inputs.scene }}")
+          echo "$OUT"
+          FILE=$(echo "$OUT" | node -pe 'JSON.parse(require("fs").readFileSync(0)).file')
+          if [ "${FILE##*.}" = "webm" ]; then
+            sudo apt-get install -y -qq ffmpeg >/dev/null
+            ffmpeg -loglevel error -y -ss 1 -i "korin/media/$FILE" -t 9 -an -c:v libx264 -pix_fmt yuv420p -movflags +faststart -r 30 "korin/media/${FILE%.webm}.mp4"
+            rm "korin/media/$FILE"; FILE="${FILE%.webm}.mp4"
+          fi
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+          echo "$OUT" | node -pe 'const o=JSON.parse(require("fs").readFileSync(0)); JSON.stringify({kind:o.kind, shows:o.shows})' > /tmp/scene.json
+      - name: Publish the media file on the site
+        run: |
+          ls -t korin/media/* | tail -n +31 | xargs -r git rm -q --ignore-unmatch
+          git config user.name "korin-marketer"
+          git config user.email "marketer@users.noreply.github.com"
+          git add korin/media
+          git commit -q -m "Marketer media ${{ steps.shoot.outputs.file }}" || echo "nothing new"
+          git push -q
+      - name: Wait until the file is live
+        run: |
+          for i in $(seq 1 40); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://kenesai.asia/korin/media/${{ steps.shoot.outputs.file }}")
+            [ "$code" = "200" ] && exit 0
+            sleep 15
+          done
+          echo "media did not appear on the site"; exit 1
+      - name: Write and publish the post
+        env:
+          KORIN_ADMIN_KEY: ${{ secrets.KORIN_ADMIN_KEY }}
+        run: |
+          BODY=$(node -e 'const s=JSON.parse(require("fs").readFileSync("/tmp/scene.json")); console.log(JSON.stringify({key:process.env.KORIN_ADMIN_KEY, media:"https://kenesai.asia/korin/media/"+process.argv[1], kind:s.kind, shows:s.shows}))' "${{ steps.shoot.outputs.file }}")
+          # the free server sleeps: wake it first, then give the model and Threads time
+          curl -s -m 120 https://korin-api.onrender.com/api/health || true
+          curl -sS -m 300 -X POST -H "Content-Type: application/json" -d "$BODY" https://korin-api.onrender.com/api/marketer-run | tee /tmp/result.json
+          node -e 'const r=JSON.parse(require("fs").readFileSync("/tmp/result.json")); if(!r.ok){console.error(r.error||"failed"); process.exit(1)}'

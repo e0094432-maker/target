@@ -269,6 +269,32 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(calls[:2], [("POST", "/me/threads", "123"), ("POST", "/me/threads_publish", None)])
         self.assertEqual((code2, found["found"][0]["id"]), (200, "5"))
 
+    def test_marketer_writes_and_publishes_with_the_picture(self):
+        p = self.api.server_port
+        os.environ.update(KORIN_ADMIN_KEY="secret", THREADS_TOKEN="tok")
+        calls = []
+
+        def fake(method, path, params):
+            calls.append((method, path, params.get("media_type"), params.get("image_url")))
+            return {"id": "9", "permalink": "https://threads.net/p/9", "status": "FINISHED"}
+
+        real_t, app._threads = app._threads, fake
+        real_a, app.ask = app.ask, lambda prompt, system=None: ("«Спросите нейросеть про свою нишу. kenesai.asia/korin»", [], "test-model")
+        real_s, app.time.sleep = app.time.sleep, lambda s: None
+        try:
+            body = {"key": "secret", "media": "https://kenesai.asia/korin/media/2026-11-21-cards.png", "kind": "image", "shows": "карточки возможностей"}
+            code, data, _ = post(p, "/api/marketer-run", body)
+            bad = post(p, "/api/marketer-run", {**body, "media": "https://evil.example/x.png"})[0]
+            code_dry, dry, _ = post(p, "/api/marketer-run", {**body, "dry": True})
+        finally:
+            app._threads, app.ask, app.time.sleep = real_t, real_a, real_s
+            del os.environ["KORIN_ADMIN_KEY"], os.environ["THREADS_TOKEN"]
+        self.assertEqual((code, data["link"], bad), (200, "https://threads.net/p/9", 400))
+        self.assertFalse(data["text"].startswith("«"))
+        self.assertEqual(calls[0], ("POST", "/me/threads", "IMAGE", "https://kenesai.asia/korin/media/2026-11-21-cards.png"))
+        self.assertEqual((code_dry, dry.get("dry")), (200, True))
+        self.assertEqual(len(calls), 3)  # the dry run published nothing
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))
