@@ -387,6 +387,7 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
       <div class="field"><label for="f_biz" data-i="l_biz">Название бизнеса или сайт</label><input type="text" id="f_biz" name="business" autocomplete="organization" required></div>
       <div class="field"><label for="f_wa">WhatsApp</label><input type="tel" id="f_wa" name="whatsapp" autocomplete="tel" inputmode="tel" placeholder="+7 7__ ___ __ __" required></div>
       <button class="btn btn-primary btn-block"><span data-i="l_btn">Отправить заявку</span><span class="arrow">→</span></button>
+      <a class="btn btn-block" id="waBtn" target="_blank" rel="noopener" href="https://wa.me/77076234637?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D1%80%D0%B5%D0%BA%D0%BB%D0%B0%D0%BC%D1%83%20%D0%B2%20ChatGPT."><span data-i="l_wa">Или сразу написать в WhatsApp</span></a>
       <div class="form-msg" id="leadMsg" role="status"></div>
       <p class="fine" style="margin:0" data-i="l_fine">Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности.</p>
     </form>
@@ -496,7 +497,7 @@ const KZ = {
   l_lead:'Байланыс деректерін қалдырыңыз — жұмыс күні ішінде WhatsApp-қа жазамыз.',
   l_name:'Атыңыз', l_biz:'Бизнес атауы немесе сайт', l_site:'Сайт немесе Instagram', l_srv:'Қандай қызметтер керек', l_s1:'ChatGPT-дегі жарнама',
   l_bud:'Айлық бюджет', b1:'200 000 ₸ дейін', b2:'200–500 мың ₸', b3:'500 мың – 1 млн ₸', b4:'1 млн ₸ артық', b5:'әзірге білмеймін',
-  l_btn:'Өтінім жіберу', l_fine:'Батырманы басу арқылы құпиялылық саясатымен келісесіз.',
+  l_btn:'Өтінім жіберу', l_wa:'Немесе бірден WhatsApp-қа жазу', l_fine:'Батырманы басу арқылы құпиялылық саясатымен келісесіз.',
   ft_city:'Алматы қ., Абай даңғылы, 60', ft_contract:'Шарт', ft_privacy:'Құпиялылық саясаты',
   ft_disc:'Біз тәуелсіз агенттікпіз және OpenAI-дың ресми серіктесі емеспіз. Сайттағы хат алмасу мысалдары — иллюстрация.',
   ch_name:'Kenes ЖИ-агенті', ch_sub:'Сізде де дәл осылай жұмыс істейді', ch_ph:'Сұрағыңызды жазыңыз…'
@@ -571,6 +572,7 @@ const savedTheme = store.get('theme'); if(savedTheme) document.documentElement.d
 
 /* откуда пришёл посетитель: метка из рекламной ссылки, иначе сайт-источник */
 const SOURCE = (new URLSearchParams(location.search).get('utm_source') || (document.referrer ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
+document.getElementById('waBtn').addEventListener('click', () => { if (CONFIG.sheet) fetch(CONFIG.sheet, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: 'нажал «WhatsApp»', business: '—', whatsapp: '—', lang: lang + ' · ' + SOURCE }) }).catch(() => {}) });
 
 /* заявка */
 const leadMsg = $('#leadMsg');
