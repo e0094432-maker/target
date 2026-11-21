@@ -705,6 +705,52 @@ def marketer_publish(body):
     return {"ok": True, "link": link}
 
 
+def marketer_replies(body):
+    """Answer new comments under our own recent posts. People who wrote to us get a reply; nobody else is touched."""
+    token = _admin(body)
+    key = str(body.get("brand", "korin")) if str(body.get("brand", "korin")) in BRANDS else "korin"
+    brand = BRANDS[key]
+    me = _threads("GET", "/me", {"fields": "username", "access_token": token}).get("username", "")
+    posts = _threads("GET", "/me/threads", {"fields": "id,text,timestamp", "limit": "8", "access_token": token}).get("data", [])
+    done, skipped, limit = [], 0, 4
+    for post in posts:
+        if len(done) >= limit:
+            break
+        talk = _threads("GET", f"/{post.get('id', '')}/conversation", {"fields": "id,text,username,timestamp,replied_to", "reverse": "false", "access_token": token}).get("data", [])
+        answered = {(x.get("replied_to") or {}).get("id") for x in talk if x.get("username") == me}
+        for c in talk:
+            if len(done) >= limit:
+                break
+            text = re.sub(r"\s+", " ", str(c.get("text", ""))).strip()
+            # only comments written to the post itself or to us, by someone else, not answered yet
+            if c.get("username") == me or c.get("id") in answered or len(text) < 4:
+                continue
+            parent = (c.get("replied_to") or {}).get("id")
+            if parent and parent != post.get("id") and parent not in {x.get("id") for x in talk if x.get("username") == me}:
+                continue
+            prompt = f"""Ты ведёшь Threads «{brand['name']}». {brand['about']}
+
+Наш пост: «{str(post.get('text', ''))[:500]}»
+Комментарий от @{c.get('username', '')}: «{text[:600]}»
+
+Реши, отвечать ли. Не отвечай, если комментарий — оскорбление, спам, реклама чужого, политика, религия, личная беда или просто набор символов.
+Если отвечать: сначала согласись с тем, в чём человек прав, потом одной фразой спокойно поверни к нашей мысли. Если он задал вопрос — ответь прямо. Пиши как живой человек: просто, коротко, с уважением, можно с лёгкой иронией, но без колкостей и без спора. Без ссылок, без хэштегов, без обещаний и выдуманных цифр. До 230 знаков.
+Верни ТОЛЬКО JSON: {{"answer": true, "reply": "текст ответа"}} или {{"answer": false, "reply": ""}}"""
+            obj = parse_json(ask(prompt, "Ты вежливый и остроумный представитель бренда. Отвечаешь только валидным JSON на русском языке.")[0]) or {}
+            reply = str(obj.get("reply", "")).strip()[:300]
+            if not obj.get("answer") or len(reply) < 3:
+                skipped += 1
+                answered.add(c.get("id"))
+                continue
+            made = _threads("POST", "/me/threads", {"media_type": "TEXT", "text": reply, "reply_to_id": c.get("id", ""), "access_token": token})
+            time.sleep(2)
+            _threads("POST", "/me/threads_publish", {"creation_id": made.get("id", ""), "access_token": token})
+            answered.add(c.get("id"))
+            done.append({"to": c.get("username", ""), "comment": text[:140], "reply": reply})
+            print(f"marketer replied to @{c.get('username', '')} ({key}): {reply[:120]}", flush=True)
+    return {"ok": True, "brand": key, "replied": done, "skipped": skipped}
+
+
 def threads_search(body):
     """Popular threads by a keyword, for a person to choose which to answer."""
     token = _admin(body)
@@ -780,7 +826,7 @@ def allowed(ip, limit=30, window=3600):
     return True
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply, "/api/threads-post": threads_post, "/api/threads-search": threads_search, "/api/threads-me": threads_me, "/api/marketer-plan": marketer_plan, "/api/marketer-publish": marketer_publish}
+ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply, "/api/threads-post": threads_post, "/api/threads-search": threads_search, "/api/threads-me": threads_me, "/api/marketer-plan": marketer_plan, "/api/marketer-publish": marketer_publish, "/api/marketer-replies": marketer_replies}
 
 
 class Handler(BaseHTTPRequestHandler):

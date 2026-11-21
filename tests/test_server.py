@@ -342,6 +342,43 @@ class ApiTest(unittest.TestCase):
             finally:
                 app._jwks.update(at=0, keys={})
 
+    def test_marketer_answers_new_comments_once_and_skips_the_rest(self):
+        p = self.api.server_port
+        os.environ.update(KORIN_ADMIN_KEY="secret", THREADS_TOKEN="tok")
+        sent = []
+        talk = [
+            {"id": "c1", "text": "Проблема не в нейросетях, а в запросах.", "username": "artur", "replied_to": {"id": "p1"}},
+            {"id": "c2", "text": "Уже отвечено раньше", "username": "dana", "replied_to": {"id": "p1"}},
+            {"id": "r2", "text": "Спасибо!", "username": "korin.kz", "replied_to": {"id": "c2"}},
+            {"id": "c3", "text": "ты дурак", "username": "troll", "replied_to": {"id": "p1"}},
+            {"id": "c4", "text": "разговор двух чужих людей", "username": "x", "replied_to": {"id": "c3"}},
+        ]
+
+        def fake(method, path, params):
+            if path == "/me":
+                return {"username": "korin.kz"}
+            if path == "/me/threads" and method == "GET":
+                return {"data": [{"id": "p1", "text": "Наш пост"}]}
+            if path.endswith("/conversation"):
+                return {"data": talk}
+            if path == "/me/threads":
+                sent.append((params.get("reply_to_id"), params.get("text")))
+            return {"id": "n1"}
+
+        def model(prompt, system=None):
+            return ('{"answer": false, "reply": ""}' if "ты дурак" in prompt else '{"answer": true, "reply": "Согласны. Но клиент спросит как умеет."}', [], "test-model")
+
+        real_t, app._threads = app._threads, fake
+        real_a, app.ask = app.ask, model
+        real_s, app.time.sleep = app.time.sleep, lambda s: None
+        try:
+            code, data, _ = post(p, "/api/marketer-replies", {"key": "secret"})
+        finally:
+            app._threads, app.ask, app.time.sleep = real_t, real_a, real_s
+            del os.environ["KORIN_ADMIN_KEY"], os.environ["THREADS_TOKEN"]
+        self.assertEqual((code, data["skipped"]), (200, 1))
+        self.assertEqual(sent, [("c1", "Согласны. Но клиент спросит как умеет.")])
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))
