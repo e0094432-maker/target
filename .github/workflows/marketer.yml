@@ -33,7 +33,12 @@ jobs:
           OIDC=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=korin-api" | node -pe 'JSON.parse(require("fs").readFileSync(0)).value')
           echo "::add-mask::$OIDC"
           OIDC="$OIDC" node -e 'console.log(JSON.stringify({oidc:process.env.OIDC}))' > /tmp/key.json
-          curl -sS -m 180 -X POST -H "Content-Type: application/json" -d @/tmp/key.json "$API/api/marketer-plan" > /tmp/plan.json
+          # the server may be restarting after an update: ask until it answers with a plan
+          for i in 1 2 3 4 5 6; do
+            curl -sS -m 180 -X POST -H "Content-Type: application/json" -d @/tmp/key.json "$API/api/marketer-plan" > /tmp/plan.json || true
+            node -e 'try{const p=JSON.parse(require("fs").readFileSync("/tmp/plan.json")); process.exit(p.slides||p.error?0:1)}catch(e){process.exit(1)}' && break
+            echo "server is not ready, waiting"; sleep 30
+          done
           node -e 'const p=JSON.parse(require("fs").readFileSync("/tmp/plan.json")); if(!p.slides){console.error(p.error||"no plan"); process.exit(1)} console.log(p.topic+"\n\n"+p.text)'
       - name: Draw the pictures
         id: draw
