@@ -1,4 +1,5 @@
 import json
+import json
 import os
 import threading
 import unittest
@@ -295,6 +296,36 @@ class ApiTest(unittest.TestCase):
         self.assertEqual((code2, pub["link"], bad), (200, "https://threads.net/p/9", 400))
         self.assertEqual([c[2] for c in calls[:4]], ["IMAGE", "IMAGE", "IMAGE", "CAROUSEL"])
         self.assertEqual(calls[3][3], "1,2,3")
+
+    def test_github_token_is_checked_with_a_real_rsa_signature(self):
+        import subprocess, tempfile, base64 as b64
+        enc = lambda raw: b64.urlsafe_b64encode(raw).rstrip(b"=").decode()
+        with tempfile.TemporaryDirectory() as d:
+            subprocess.run(["openssl", "genrsa", "-out", f"{d}/k.pem", "2048"], check=True, capture_output=True)
+            mod = subprocess.run(["openssl", "rsa", "-in", f"{d}/k.pem", "-noout", "-modulus"], check=True, capture_output=True, text=True).stdout.strip().split("=")[1]
+            keys = {"k1": {"kid": "k1", "kty": "RSA", "n": enc(bytes.fromhex(mod)), "e": enc(b"\x01\x00\x01")}}
+
+            def token(claims):
+                signed = enc(json.dumps({"alg": "RS256", "kid": "k1"}).encode()) + "." + enc(json.dumps(claims).encode())
+                open(f"{d}/m", "w").write(signed)
+                sig = subprocess.run(["openssl", "dgst", "-sha256", "-sign", f"{d}/k.pem", f"{d}/m"], check=True, capture_output=True).stdout
+                return signed + "." + enc(sig)
+
+            good = {"iss": app.GITHUB_ISSUER, "aud": "korin-api", "repository": "e0094432-maker/target", "exp": app.time.time() + 300}
+            t = token(good)
+            self.assertEqual(app.verify_rs256(t, keys)["repository"], "e0094432-maker/target")
+            head, body, sig = t.split(".")
+            forged = head + "." + enc(json.dumps({**good, "repository": "evil/repo"}).encode()) + "." + sig
+            self.assertIsNone(app.verify_rs256(forged, keys))
+            self.assertIsNone(app.verify_rs256("a.b.c", keys))
+            app._jwks.update(at=app.time.time(), keys=keys)
+            try:
+                self.assertTrue(app.from_our_workflow(t))
+                self.assertFalse(app.from_our_workflow(token({**good, "repository": "evil/repo"})))
+                self.assertFalse(app.from_our_workflow(token({**good, "exp": app.time.time() - 5})))
+                self.assertFalse(app.from_our_workflow(token({**good, "aud": "other"})))
+            finally:
+                app._jwks.update(at=0, keys={})
 
     def test_rate_limit(self):
         app._hits.clear()

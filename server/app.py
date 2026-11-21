@@ -6,6 +6,8 @@ import ipaddress
 import json
 import os
 import re
+import base64
+import hashlib
 import hmac
 import socket
 import threading
@@ -485,10 +487,57 @@ def social_reply(body):
 THREADS = "https://graph.threads.net/v1.0"
 
 
+GITHUB_ISSUER = "https://token.actions.githubusercontent.com"
+_jwks = {"at": 0, "keys": {}}
+_SHA256_PREFIX = bytes.fromhex("3031300d060960864801650304020105000420")
+
+
+def _b64(part):
+    return base64.urlsafe_b64decode(part + "=" * (-len(part) % 4))
+
+
+def _github_keys():
+    if time.time() - _jwks["at"] > 3600 or not _jwks["keys"]:
+        with urllib.request.urlopen(GITHUB_ISSUER + "/.well-known/jwks", timeout=15) as r:
+            _jwks["keys"] = {k["kid"]: k for k in json.loads(r.read()).get("keys", []) if k.get("kty") == "RSA"}
+        _jwks["at"] = time.time()
+    return _jwks["keys"]
+
+
+def verify_rs256(token, keys):
+    """Claims of a JWT signed with RS256 by one of the given keys, or None. Standard library only."""
+    try:
+        head_b, body_b, sig_b = token.split(".")
+        head = json.loads(_b64(head_b))
+        key = keys.get(head.get("kid"))
+        if head.get("alg") != "RS256" or not key:
+            return None
+        n, e = int.from_bytes(_b64(key["n"]), "big"), int.from_bytes(_b64(key["e"]), "big")
+        size = (n.bit_length() + 7) // 8
+        got = pow(int.from_bytes(_b64(sig_b), "big"), e, n).to_bytes(size, "big")
+        digest = hashlib.sha256(f"{head_b}.{body_b}".encode()).digest()
+        want = b"\x00\x01" + b"\xff" * (size - len(_SHA256_PREFIX) - len(digest) - 3) + b"\x00" + _SHA256_PREFIX + digest
+        return json.loads(_b64(body_b)) if hmac.compare_digest(got, want) else None
+    except (ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def from_our_workflow(token):
+    """True when the token was issued by GitHub to a workflow of our own repository."""
+    if not token:
+        return False
+    try:
+        claims = verify_rs256(str(token), _github_keys())
+    except (urllib.error.URLError, TimeoutError, ValueError):
+        return False
+    repo = os.environ.get("KORIN_REPO", "e0094432-maker/target")
+    return bool(claims) and claims.get("iss") == GITHUB_ISSUER and claims.get("aud") == "korin-api" and claims.get("repository") == repo and float(claims.get("exp", 0)) > time.time()
+
+
 def _admin(body):
-    """Posting goes to our own account, so the page must send the owner's code."""
+    """Posting goes to our own account: the page sends the owner's code, the daily job sends GitHub's signed token."""
     key = os.environ.get("KORIN_ADMIN_KEY", "")
-    if not key or not hmac.compare_digest(str(body.get("key", "")), key):
+    if not (key and hmac.compare_digest(str(body.get("key", "")), key)) and not from_our_workflow(body.get("oidc")):
         raise BadRequest("Неверный код владельца.")
     token = "".join(os.environ.get("THREADS_TOKEN", "").split())
     if not token:
@@ -564,7 +613,8 @@ def marketer_plan(body):
 Сделай пост-карусель, который хочется долистать и сохранить.
 Правила для всего текста: очень простые слова и короткие предложения, как будто объясняешь другу; без слов «уникальный», «инновационный», «под ключ», «эффективный»; не обещай результат; не выдумывай клиентов, цифры, проценты и отзывы; без хэштегов.
 Верни ТОЛЬКО JSON:
-{{"text": "подпись к посту, до 380 знаков: первая строка цепляет, потом 2–3 коротких предложения с пользой, в конце вопрос к читателю или строка «Проверить бесплатно: kenesai.asia/korin»",
+{{"text": "подпись к посту, до 330 знаков: первая строка цепляет; потом интересный факт или наблюдение о том, как люди пользуются нейросетями (без выдуманных цифр и процентов: если точного числа не знаешь, пиши без числа); потом одна строка с пользой; в конце вопрос к читателю или строка «Проверить бесплатно: kenesai.asia/korin»",
+ "tags": ["от 3 до 5 хэштегов без решётки, одним словом, по теме: например малыйбизнес, Казахстан, нейросети, маркетинг, Алматы"],
  "slides": [
   {{"tag": "одно слово-рубрика", "title": "крупная фраза для первой картинки, до 45 знаков, без точки"}},
   {{"tag": "одно слово", "title": "заголовок второй картинки, до 30 знаков", "points": ["пункт до 55 знаков", "пункт до 55 знаков", "пункт до 55 знаков"]}}
@@ -572,7 +622,10 @@ def marketer_plan(body):
     text, _, model = ask(prompt, "Ты маркетолог, пишешь по-русски живо и просто. Отвечаешь только валидным JSON.")
     obj = parse_json(text) or {}
     slides = [{"tag": str(x.get("tag", ""))[:18], "title": str(x.get("title", ""))[:70], "points": [str(q)[:80] for q in x.get("points", []) if str(q).strip()][:3]} for x in obj.get("slides", []) if isinstance(x, dict) and x.get("title")][:2]
-    post = str(obj.get("text", "")).strip()[:480]
+    post = str(obj.get("text", "")).strip()[:400]
+    tags = [re.sub(r"[^\wа-яёА-ЯЁ]", "", str(t)) for t in obj.get("tags", []) if str(t).strip()][:5]
+    tags = [t for t in tags if 2 < len(t) < 30] or ["малыйбизнес", "Казахстан", "нейросети"]
+    post = (post + "\n\n" + " ".join("#" + t for t in tags))[:500]
     if not post or not slides:
         raise providers.ProviderError("нейросеть вернула пост в неверном виде")
     return {"ok": True, "topic": topic, "text": post, "slides": slides, "theme": day % 3, "model": model}
@@ -625,6 +678,7 @@ AGENTS = {
     "pitch": "Ты специалист по связям с изданиями. Напиши короткое вежливое письмо автору подборки или каталога с предложением добавить компанию. Факты, которых нет в данных, отметь как [что вписать]. Без преувеличений.",
     "chat": "Ты ассистент Körin для владельца бизнеса и маркетолога в Казахстане. Помогаешь сделать так, чтобы нейросети чаще называли компанию: тексты, письма, планы, разбор сайта и отзывов. Опирайся на данные кабинета и прочитанные страницы. Не выдумывай фактов о компании: чего нет в данных, отметь как [что вписать].",
     "narrow": "Ты специалист по поисковому спросу в Казахстане. Люди задают нейросетям длинные точные вопросы. Придумай для компании 10 узких запросов из 5–9 слов: с размером, ценой, районом, сроком или случаем использования, на русском и два на казахском. Только то, что компания из данных реально может продавать. Затем для самого сильного запроса напиши план страницы: заголовок, первый абзац с прямым ответом, 5 подзаголовков. Факты, которых нет в данных, отметь как [что вписать].",
+    "post": "Ты маркетолог компании и ведёшь её Threads. Напиши один пост для владельцев малого бизнеса в Казахстане: цепляющая первая строка, интересное наблюдение или факт без выдуманных цифр, одна польза для читателя, в конце вопрос. До 400 знаков, очень простыми словами. Потом с новой строки 3–5 хэштегов по теме. Ничего не выдумывай о компании.",
     "plan": "Ты руководитель проекта. Составь план работ на 4 недели, чтобы нейросети начали чаще называть компанию: по неделям, с ответственным и результатом. Опирайся на данные кабинета.",
 }
 
@@ -696,7 +750,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/api/health":
-            return self._send(200, {"ok": True, "ai": bool(provider_name()), "provider": provider_name(), "threads": bool(os.environ.get("THREADS_TOKEN") and os.environ.get("KORIN_ADMIN_KEY"))})
+            return self._send(200, {"ok": True, "ai": bool(provider_name()), "provider": provider_name(), "threads": bool(os.environ.get("THREADS_TOKEN") and os.environ.get("KORIN_ADMIN_KEY")), "marketer": bool(os.environ.get("THREADS_TOKEN"))})
         self._send(404, {"error": "Не найдено."})
 
     def do_POST(self):
