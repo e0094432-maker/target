@@ -234,6 +234,18 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(post(self.api.server_port, "/api/analyze", {"company": "Alfa"})[0], 400)
         self.assertIsNone(app.parse_json("нет данных"))
 
+    def test_social_plan_and_reply(self):
+        plan = '{"posts": [{"kind": "вопрос", "hook": "Вас советует нейросеть?", "threads": "Спросите нейросеть про свою нишу.", "x": "Спросите нейросеть.", "day": "пн"}, {"kind": "совет", "hook": "", "threads": "", "x": ""}]}'
+        real, app.ask = app.ask, lambda prompt, system=None: (plan if "posts" in prompt else '{"fit": false, "why": "личная тема", "reply": "не важно"}', [], "test-model")
+        try:
+            code, data, _ = post(self.api.server_port, "/api/social-plan", {"brand": "Kenes AI", "about": "реклама в нейросетях"})
+            code2, rep, _ = post(self.api.server_port, "/api/social-reply", {"brand": "Kenes AI", "about": "реклама", "thread": "Сегодня у меня умер кот, очень грустно."})
+        finally:
+            app.ask = real
+        self.assertEqual((code, len(data["posts"]), data["posts"][0]["day"]), (200, 1, "пн"))
+        self.assertEqual((code2, rep["fit"], rep["reply"]), (200, False, ""))
+        self.assertEqual(post(self.api.server_port, "/api/social-plan", {"brand": "A"})[0], 400)
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))

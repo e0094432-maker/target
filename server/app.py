@@ -431,6 +431,55 @@ def analyze(body):
     return {"analysis": obj, "text": "" if obj else text[:4000], "steps": steps, "model": model}
 
 
+# ---------- social: posts and replies ----------
+def _brand(body):
+    brand, about, city = (re.sub(r"\s+", " ", str(body.get(k, ""))).strip()[:n] for k, n in (("brand", 60), ("about", 300), ("city", 40)))
+    if not brand or not about:
+        raise BadRequest("Напишите название и чем занимается компания.")
+    return brand, about, city or "Казахстан"
+
+
+def social_plan(body):
+    brand, about, city = _brand(body)
+    n = max(3, min(7, int(body.get("n", 7)) if str(body.get("n", 7)).isdigit() else 7))
+    prompt = f"""Бренд: «{brand}». Чем занимается: {about}. Где: {city}.
+Читатели: владельцы малого и среднего бизнеса в Казахстане, которые сидят в Threads и X.
+
+Составь {n} постов на неделю. Каждый пост должен быть полезен сам по себе: наблюдение, короткий совет, вопрос к читателю, цифра или маленькая история. Не реклама в лоб.
+Правила: очень простые слова и короткие предложения; без канцелярита и без слов «уникальный», «инновационный», «под ключ»; не обещай результат и не давай гарантий; не выдумывай цифры, клиентов и кейсы; бренд упоминай не чаще чем в каждом третьем посте и только в конце; не больше одного хэштега; без эмодзи в начале строки.
+Верни ТОЛЬКО JSON:
+{{"posts": [{{"kind": "вопрос", "hook": "фраза для картинки, до 55 знаков, без точки в конце", "threads": "текст для Threads, до 450 знаков", "x": "текст для X, до 260 знаков", "day": "пн"}}]}}
+kind — одно из: "вопрос", "совет", "наблюдение", "цифра", "история". day — пн, вт, ср, чт, пт, сб, вс по порядку."""
+    text, _, model = ask(prompt, "Ты редактор соцсетей для малого бизнеса. Пишешь живо и просто. Отвечаешь только валидным JSON на русском языке.")
+    obj = parse_json(text) or {}
+    posts = [{"kind": str(x.get("kind", "совет"))[:20], "hook": str(x.get("hook", ""))[:90], "threads": str(x.get("threads", ""))[:500], "x": str(x.get("x", ""))[:280], "day": str(x.get("day", ""))[:4]} for x in obj.get("posts", []) if isinstance(x, dict) and x.get("threads")][:7]
+    if not posts:
+        raise providers.ProviderError("нейросеть вернула план в неверном виде")
+    return {"posts": posts, "model": model}
+
+
+def social_reply(body):
+    """Is this thread ours to answer, and what to say. A person reads it and posts it."""
+    brand, about, city = _brand(body)
+    thread = re.sub(r"\s+", " ", str(body.get("thread", ""))).strip()[:1500]
+    if len(thread) < 20:
+        raise BadRequest("Вставьте текст ветки, на которую хотите ответить.")
+    prompt = f"""Бренд: «{brand}». Чем занимается: {about}. Где: {city}.
+
+Чужая ветка в соцсети:
+«{thread}»
+
+Реши, стоит ли бренду отвечать. Подходит, если ветка про малый бизнес, продвижение, клиентов, рекламу, нейросети или близкую тему, и можно сказать что-то полезное. Не подходит, если тема личная, политическая, трагическая, спорная или не связана с делом бренда.
+Если подходит — напиши ответ: по смыслу ветки, с пользой для автора, как человек, а не как реклама. Без ссылок. Бренд не называй, если это не отвечает прямо на вопрос автора. До 260 знаков, простыми словами.
+Верни ТОЛЬКО JSON: {{"fit": true, "why": "почему подходит или нет, одной фразой", "reply": "текст ответа или пустая строка"}}"""
+    text, _, model = ask(prompt, "Ты ведёшь соцсети бренда. Отвечаешь только валидным JSON на русском языке.")
+    obj = parse_json(text)
+    if not obj:
+        raise providers.ProviderError("нейросеть вернула ответ в неверном виде")
+    fit = bool(obj.get("fit"))
+    return {"fit": fit, "why": str(obj.get("why", ""))[:300], "reply": str(obj.get("reply", ""))[:280] if fit else "", "model": model}
+
+
 # ---------- agents ----------
 AGENTS = {
     "why": "Ты аналитик видимости в нейросетях. По данным кабинета объясни простым языком, почему компанию называют реже конкурентов, и дай три первых шага. Не выдумывай фактов о компании.",
@@ -488,7 +537,7 @@ def allowed(ip, limit=30, window=3600):
     return True
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze}
+ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply}
 
 
 class Handler(BaseHTTPRequestHandler):

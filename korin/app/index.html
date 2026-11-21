@@ -593,6 +593,16 @@ h1,.head h1,.ch h1{font-weight:600}
 .rg-box{width:100%;max-width:440px;background:var(--card);border:1px solid var(--line2);border-radius:18px;padding:26px 22px;box-shadow:var(--shadow)}
 .rg-box h2{font-size:20px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px}
 .rg-box .acts{display:flex;justify-content:space-between;gap:10px}
+
+/* ---------- social ---------- */
+.soc{display:grid;gap:14px}
+.post{display:grid;gap:16px;border:1px solid var(--line);border-radius:16px;background:var(--card);padding:16px;min-width:0}
+.post canvas{width:100%;max-width:260px;aspect-ratio:4/5;border-radius:12px;border:1px solid var(--line);display:block}
+.post textarea{width:100%;min-height:120px;resize:vertical;border:1px solid var(--line);border-radius:10px;background:var(--sub);color:var(--ink);padding:10px 12px;font:inherit;font-size:14px;line-height:1.5}
+.post .meta{margin-top:10px}
+.post.done{opacity:.6}
+.cnt{font:400 12px var(--mono);color:var(--muted)}
+@media (min-width:720px){.post{grid-template-columns:260px minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -833,13 +843,73 @@ function welcome(){
   $('#wIn').onclick = () => { enter(); render() };
   $('#wNew').onclick = () => { enter(); st = { company: '', niche: '', city: st.city || 'Алматы', rivals: [], conn: {}, notify: {}, agents: {}, runs: [], done: {}, ready: false, step: 1, user: st.user }; store.save(st); location.hash = ''; onboarding() };
 }
+/* Соцсети: посты на неделю с картинками, публикация в одно нажатие, ответы в ветки, журнал для отчёта */
+const SOC_KIND = { 'вопрос': 0, 'совет': 1, 'наблюдение': 2, 'цифра': 1, 'история': 2 };
+const socTemplates = () => { const n = st.niche || 'ваш бизнес', c = st.city || 'Алматы'; return [
+  ['вопрос', 'Вас советует нейросеть?', `Спросите у нейросети: «посоветуй ${n} в ${c}». Вас назвали? Напишите в ответах, что получилось.`],
+  ['совет', 'Напишите цены на сайте', `Нейросеть чаще называет тех, у кого на сайте есть цены. Нет цен — она не знает, что о вас сказать. Проверьте свой сайт сегодня.`],
+  ['наблюдение', 'Клиент спрашивает не Google', `Раньше искали в Google. Теперь спрашивают нейросеть: «куда пойти?». Она называет два-три места. Остальных для клиента нет.`],
+  ['совет', 'Попросите пять отзывов', `Самый простой шаг на этой неделе: попросите пять довольных клиентов написать отзыв в 2ГИС. Нейросети читают отзывы.`],
+  ['вопрос', 'Где вы ищете подрядчика?', `Вопрос к владельцам бизнеса: где вы сами ищете подрядчика — в поиске, у знакомых или уже спрашиваете нейросеть?`] ].map((x, i) => ({ id: 't' + i, kind: x[0], hook: x[1], threads: x[2], x: x[2].slice(0, 260), day: ['пн', 'вт', 'ср', 'чт', 'пт'][i], status: 'draft', tpl: true })) };
+function drawCard(cv, p, i){
+  const W = 1080, H = 1350, c = cv.getContext('2d'); cv.width = W; cv.height = H;
+  const style = [['#0b0b0c', '#edf2f5', '#8b9cff'], ['#f4f5f7', '#0c0d10', '#4f5bd5'], ['#11143a', '#ffffff', '#aab6ff']][(SOC_KIND[p.kind] ?? i) % 3], [bg, ink, ac] = style;
+  c.fillStyle = bg; c.fillRect(0, 0, W, H);
+  const g = c.createRadialGradient(W * .85, H * .1, 0, W * .85, H * .1, W * .9); g.addColorStop(0, ac + '55'); g.addColorStop(1, ac + '00'); c.fillStyle = g; c.fillRect(0, 0, W, H);
+  c.strokeStyle = ink + '22'; c.lineWidth = 2; for (let k = 1; k <= 3; k++) { c.beginPath(); c.arc(W * .85, H * .1, k * 190, 0, 6.3); c.stroke() }
+  c.fillStyle = ink; c.beginPath(); c.arc(98, 104, 22, 0, 6.3); c.fill(); c.fillStyle = bg; c.beginPath(); c.arc(98, 104, 8, 0, 6.3); c.fill();
+  c.fillStyle = ink; c.font = '600 40px Onest, sans-serif'; c.textBaseline = 'middle'; c.fillText(st.company || 'Körin', 138, 106);
+  c.font = '500 30px Onest, sans-serif'; const tag = p.kind.toUpperCase(), tw = c.measureText(tag).width; c.fillStyle = ac + '33'; c.beginPath(); c.roundRect(76, 330, tw + 44, 58, 29); c.fill(); c.fillStyle = ac; c.fillText(tag, 98, 360);
+  // заголовок: подбираем размер, чтобы влез в шесть строк
+  const words = (p.hook || p.threads).replace(/[.]$/, '').split(' '); let size = 118, lines;
+  do { c.font = `600 ${size}px Onest, sans-serif`; lines = ['']; for (const w of words) { const t = lines[lines.length - 1] ? lines[lines.length - 1] + ' ' + w : w; if (c.measureText(t).width > W - 152 && lines[lines.length - 1]) lines.push(w); else lines[lines.length - 1] = t } size -= 8 } while (lines.length > 6 && size > 54);
+  c.fillStyle = ink; c.textBaseline = 'top'; lines.forEach((l, k) => c.fillText(l, 76, 440 + k * (size + 8) * 1.1));
+  c.fillStyle = ink + '99'; c.font = '400 34px Onest, sans-serif'; c.textBaseline = 'alphabetic'; c.fillText((st.conn.site || '').replace(/^https?:\/\//, '').replace(/\/$/, '') || [st.niche, st.city].filter(Boolean).join(' · '), 76, H - 84);
+  c.fillStyle = ac; c.fillRect(76, H - 150, 120, 6);
+}
+function viewSocial(){
+  const so = st.social || {}, posts = so.posts || [], log = so.log || [], about = so.about ?? st.niche, r = so.reply;
+  return `<div class="head"><div><h1>Соцсети</h1><p>Посты для Threads и X на неделю. Вы проверяете — публикуется в одно нажатие.</p></div></div>
+  <div class="box"><h2>О чём писать</h2><div class="field" style="margin-top:0"><label for="socAbout">Чем занимается «${esc(st.company)}»</label><input class="inp" id="socAbout" maxlength="300" value="${esc(about || '')}" placeholder="Например: запускаем рекламу в нейросетях для малого бизнеса"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px"><button class="btn btn-p" id="socRun">${posts.length ? 'Составить новый план' : 'Составить план на неделю'}</button><span class="muted" id="socMsg" style="font-size:13px">${AI ? 'Посты пишет нейросеть. Перед публикацией их читаете вы.' : 'Нейросеть не отвечает: покажу готовые заготовки.'}</span></div></div>
+  ${posts.length ? `<div class="sect" style="margin-top:22px"><h2>План на неделю</h2><span class="mono">${posts.filter(p => p.status === 'done').length} из ${posts.length} опубликовано</span></div><div class="soc">${posts.map((p, i) => `<article class="post${p.status === 'done' ? ' done' : ''}"><div><canvas data-card="${i}"></canvas><div class="meta"><button class="btn" data-dl="${i}">Скачать картинку</button></div></div>
+    <div><div class="meta" style="margin:0 0 10px"><span class="tag acc">${esc(p.day || '')}</span><span class="tag">${esc(p.kind)}</span>${p.tpl ? '<span class="tag warn">заготовка</span>' : ''}${p.status === 'done' ? '<span class="tag ok">опубликовано</span>' : ''}</div>
+      <label class="cnt">Threads · <span data-n="t${i}">${p.threads.length}</span>/500</label><textarea data-edit="${i}:threads" maxlength="500">${esc(p.threads)}</textarea>
+      <label class="cnt" style="display:block;margin-top:10px">X · <span data-n="x${i}">${p.x.length}</span>/280</label><textarea data-edit="${i}:x" maxlength="280" style="min-height:84px">${esc(p.x)}</textarea>
+      <div class="meta"><a class="btn btn-p" target="_blank" rel="noopener" data-go="${i}:threads" href="https://www.threads.net/intent/post?text=${encodeURIComponent(p.threads)}">Опубликовать в Threads</a><a class="btn" target="_blank" rel="noopener" data-go="${i}:x" href="https://x.com/intent/post?text=${encodeURIComponent(p.x)}">Опубликовать в X</a><button class="btn" data-done="${i}">${p.status === 'done' ? 'Вернуть' : 'Отметить опубликованным'}</button></div></div></article>`).join('')}</div>` : ''}
+  <div class="box" style="margin-top:22px"><h2>Ответ в чужую ветку</h2><p class="muted" style="font-size:13.5px;margin-bottom:10px">Вставьте текст залетевшей ветки. Нейросеть решит, подходит ли она по теме, и напишет ответ по смыслу. Публикуете вы сами: автоматические ответы незнакомым людям соцсети считают спамом и блокируют аккаунт.</p>
+    <textarea class="ans" id="socThread" rows="4" style="width:100%;resize:vertical;font:inherit" placeholder="Текст ветки">${esc(so.thread || '')}</textarea>
+    <div class="meta" style="margin-top:10px"><button class="btn btn-p" id="socReply">Подобрать ответ</button><span class="muted" id="socRmsg" style="font-size:13px"></span></div>
+    ${r ? `<div style="margin-top:14px;display:grid;gap:10px"><div class="meta"><span class="tag ${r.fit ? 'ok' : 'no'}">${r.fit ? 'подходит' : 'не подходит'}</span><span class="muted" style="font-size:13.5px">${esc(r.why)}</span></div>${r.fit ? `<textarea class="ans" id="socRtext" rows="4" style="width:100%;resize:vertical;font:inherit">${esc(r.reply)}</textarea><div class="meta"><button class="btn" id="socRcopy">Скопировать ответ</button><button class="btn" id="socRlog">Отметить, что ответил</button></div>` : ''}</div>` : ''}</div>
+  <div class="box" style="margin-top:12px"><h2>Журнал для отчёта <span class="mono">${log.length}</span></h2>${log.length ? log.slice(0, 20).map(x => `<div class="log"><span class="tag">${esc(x.where)}</span><span>${esc(x.text.slice(0, 90))}</span><span class="mono">${when(x.t)}</span></div>`).join('') : '<p class="muted">Здесь появится всё, что вы опубликовали: посты и ответы. Журнал попадает в отчёт руководителю.</p>'}</div>`;
+}
+function bindSocial(){
+  if (!$('#socRun')) return; const so = st.social = st.social || {}, save = () => store.save(st);
+  const paint = () => $$('[data-card]').forEach(cv => drawCard(cv, so.posts[+cv.dataset.card], +cv.dataset.card));
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(paint); paint();
+  $('#socAbout').oninput = e => { so.about = e.target.value; save() };
+  $('#socRun').onclick = async () => { const about = $('#socAbout').value.trim(); if (!about) return $('#socAbout').focus(); so.about = about; const b = $('#socRun'); b.disabled = true; b.textContent = 'Пишу посты…';
+    try { const d = await call('/api/social-plan', { brand: st.company, about, city: st.city, n: 7 }); so.posts = d.posts.map((p, i) => ({ ...p, id: 'p' + Date.now() + i, status: 'draft' })) }
+    catch (e) { so.posts = socTemplates(); so.err = e.message }
+    save(); render() };
+  $$('[data-edit]').forEach(t => t.oninput = () => { const [i, k] = t.dataset.edit.split(':'), p = so.posts[+i]; p[k] = t.value; save(); $(`[data-n="${k[0]}${i}"]`).textContent = t.value.length; const a = $(`[data-go="${i}:${k}"]`); a.href = (k === 'x' ? 'https://x.com/intent/post?text=' : 'https://www.threads.net/intent/post?text=') + encodeURIComponent(t.value) });
+  $$('[data-dl]').forEach(b => b.onclick = () => { const cv = $(`[data-card="${b.dataset.dl}"]`), a = document.createElement('a'); a.download = 'post-' + (+b.dataset.dl + 1) + '.png'; a.href = cv.toDataURL('image/png'); a.click() });
+  const logIt = (where, text) => { so.log = [{ where, text, t: Date.now() }, ...(so.log || [])].slice(0, 60) };
+  $$('[data-done]').forEach(b => b.onclick = () => { const p = so.posts[+b.dataset.done]; p.status = p.status === 'done' ? 'draft' : 'done'; if (p.status === 'done') logIt('пост', p.threads); save(); render() });
+  $('#socThread').oninput = e => { so.thread = e.target.value; save() };
+  $('#socReply').onclick = async () => { const thread = $('#socThread').value.trim(), about = $('#socAbout').value.trim(), m = $('#socRmsg'); if (thread.length < 20) return m.textContent = 'Вставьте текст ветки.'; if (!about) return m.textContent = 'Сначала напишите, чем занимается компания.';
+    $('#socReply').disabled = true; m.textContent = 'Читаю ветку…';
+    try { so.reply = await call('/api/social-reply', { brand: st.company, about, city: st.city, thread }); save(); render() } catch (e) { $('#socReply').disabled = false; m.textContent = e.message === 'Failed to fetch' ? 'Сервер не ответил, попробуйте ещё раз.' : e.message } };
+  if ($('#socRcopy')) { $('#socRcopy').onclick = async () => { try { await navigator.clipboard.writeText($('#socRtext').value); $('#socRcopy').textContent = 'Скопировано' } catch (e) { $('#socRtext').select() } };
+    $('#socRlog').onclick = () => { logIt('ответ', $('#socRtext').value); so.reply = null; so.thread = ''; save(); render() } }
+}
 function openReport(){
   if (needReg()) return regModal();
   if (data.sample) return drawer('Отчёт руководителю', `<p>Сейчас в кабинете пример на вымышленной школе, отправлять его руководителю нельзя.</p><p class="muted">Запустите настоящую проверку у помощника «Проверка ответов», и отчёт соберётся по вашей компании.</p>`, `<button class="btn btn-p" data-run="watch">Запустить проверку</button>`);
   const r = ranked(), g = gaps(), t = todos(), names = k => t.filter(x => statOf(x.id) === k).map(x => x.t);
   const text = [`Видимость «${me()}» в нейросетях · ${day(data.at)}`, '', `Нас назвали в ${hits(0)} из ${total()} ответов. Место ${r.findIndex(x => x[2]) + 1} из ${r.length}.`, `Чаще называют: ${r.filter(x => !x[2]).slice(0, 3).map(x => `${x[0]} (${x[1]})`).join(', ')}.`,
     g.length ? `Не назвали в запросах: ${g.slice(0, 3).map(x => '«' + x.q + '»').join('; ')}.` : 'Нас называют везде, где называют конкурентов.', '',
-    names('done').length ? `Сделано: ${names('done').join('; ')}.` : 'Сделано: пока ничего.', names('doing').length ? `В работе: ${names('doing').join('; ')}.` : '', `Дальше: ${names('todo').slice(0, 2).join('; ') || 'план выполнен'}.`].filter((x, i, a) => x !== '' || a[i - 1] !== '').join('\n');
+    names('done').length ? `Сделано: ${names('done').join('; ')}.` : 'Сделано: пока ничего.', names('doing').length ? `В работе: ${names('doing').join('; ')}.` : '', `Дальше: ${names('todo').slice(0, 2).join('; ') || 'план выполнен'}.`, (st.social && st.social.log && st.social.log.length) ? `В соцсетях за всё время: постов ${st.social.log.filter(x => x.where === 'пост').length}, ответов в ветках ${st.social.log.filter(x => x.where === 'ответ').length}.` : ''].filter((x, i, a) => x !== '' || a[i - 1] !== '').join('\n');
   drawer('Отчёт руководителю', `<p class="mono">по проверке ${esc(meta())} · проверьте перед отправкой</p><textarea class="ans" id="rout" rows="13" style="width:100%;resize:vertical;font:inherit">${esc(text)}</textarea>`, `<button class="btn btn-p" id="rcopy">Скопировать</button><a class="btn" id="rwa" target="_blank" rel="noopener">WhatsApp</a><a class="btn" id="rtg" target="_blank" rel="noopener">Telegram</a>`);
   const set = () => { const v = encodeURIComponent($('#rout').value); $('#rwa').href = 'https://wa.me/?text=' + v; $('#rtg').href = 'https://t.me/share/url?url=' + encodeURIComponent('https://kenesai.asia/korin/') + '&text=' + v }; set(); $('#rout').oninput = set;
   $('#rcopy').onclick = async () => { try { await navigator.clipboard.writeText($('#rout').value); $('#rcopy').textContent = 'Скопировано' } catch (e) { $('#rout').select() } };
@@ -892,7 +962,7 @@ function viewSite(){
 }
 function viewSettings(){
   return `<div class="head"><div><h1>Настройки</h1><p>Компания и конкуренты</p></div></div>
-  <div class="cstrip" style="margin-bottom:14px"><a class="cchip" href="#/agents"><span class="av">${ic('bot')}</span><span>Помощник<br><small>чат и готовые тексты</small></span></a><a class="cchip" href="#/connectors"><span class="av">${ic('plug')}</span><span>Подключения<br><small>сайт, карты, соцсети</small></span></a><a class="cchip" href="#/site"><span class="av">${ic('globe')}</span><span>Проверка сайта<br><small>боты нейросетей и Bing</small></span></a><a class="cchip" href="#/serp/rivals"><span class="av">${ic('chart')}</span><span>Конкуренты<br><small>кого называют чаще</small></span></a></div>
+  <div class="cstrip" style="margin-bottom:14px"><a class="cchip" href="#/agents"><span class="av">${ic('bot')}</span><span>Помощник<br><small>чат и готовые тексты</small></span></a><a class="cchip" href="#/social"><span class="av">${ic('send')}</span><span>Соцсети<br><small>посты и ответы</small></span></a><a class="cchip" href="#/connectors"><span class="av">${ic('plug')}</span><span>Подключения<br><small>сайт, карты, соцсети</small></span></a><a class="cchip" href="#/site"><span class="av">${ic('globe')}</span><span>Проверка сайта<br><small>боты нейросетей и Bing</small></span></a><a class="cchip" href="#/serp/rivals"><span class="av">${ic('chart')}</span><span>Конкуренты<br><small>кого называют чаще</small></span></a></div>
   <div class="grid two" style="margin-top:0"><div class="box"><h2>Компания</h2><p style="color:var(--ink);font-weight:600">${esc(st.company)}</p><p class="muted">${esc(st.niche)} · ${esc(st.city)}</p><h2 style="margin-top:20px">Конкуренты</h2><div class="chips">${st.rivals.map(r => `<span style="padding-right:11px">${esc(r)}</span>`).join('')}</div></div>
   <div class="box"><h2>Оформление</h2><p class="muted" style="margin-bottom:10px">Светлая или тёмная тема. Переключается и кнопкой в шапке.</p>${themeBtn(true)}<h2 style="margin-top:22px">Начать заново</h2><p class="muted" style="margin-bottom:10px">Удалит компанию, подключения и переписку из этого браузера.</p><button class="btn" id="reset">Сбросить</button></div></div>`;
 }
@@ -980,8 +1050,8 @@ function closeDrawer(){ runSeq++; $('#drawer').classList.remove('open'); $('#scr
 /* ---------- Каркас ---------- */
 const themeBtn = wide => `<button class="btn${wide ? '' : ' ib'}" data-theme-toggle aria-label="Сменить тему">${ic(document.documentElement.dataset.theme === 'dark' ? 'sun' : 'moon')}${wide ? (document.documentElement.dataset.theme === 'dark' ? 'Светлая тема' : 'Тёмная тема') : ''}</button>`;
 function bindTheme(){ $$('[data-theme-toggle]').forEach(b => b.onclick = () => { const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = t; try { localStorage.setItem('korin-theme-v4', t) } catch (e) {} st.ready ? render() : onboarding() }) }
-const NAV = [['Мониторинг', 'overview', 'home', 'Обзор'], ['Мониторинг', 'serp', 'list', 'Ответы'], ['Автоматизация', 'agents', 'bot', 'Агенты'], ['Автоматизация', 'tasks', 'check', 'Задачи'], ['Данные', 'connectors', 'plug', 'Подключения'], ['Данные', 'site', 'globe', 'Сайт для ИИ'], ['Кабинет', 'settings', 'gear', 'Настройки']];
-const VIEWS = { overview: viewOverview, agents: viewAgents, tasks: viewTasks, connectors: viewConnectors, site: viewSite, settings: viewSettings };
+const NAV = [['Мониторинг', 'overview', 'home', 'Обзор'], ['Мониторинг', 'serp', 'list', 'Ответы'], ['Автоматизация', 'agents', 'bot', 'Агенты'], ['Автоматизация', 'tasks', 'check', 'Задачи'], ['Данные', 'connectors', 'plug', 'Подключения'], ['Данные', 'site', 'globe', 'Сайт для ИИ'], ['Данные', 'social', 'send', 'Соцсети'], ['Кабинет', 'settings', 'gear', 'Настройки']];
+const VIEWS = { social: viewSocial, overview: viewOverview, agents: viewAgents, tasks: viewTasks, connectors: viewConnectors, site: viewSite, settings: viewSettings };
 let lastRoute = '';
 function render(){
   const [route = 'overview', sub] = location.hash.replace('#/', '').split('/');
@@ -995,7 +1065,7 @@ function render(){
   const enter = lastRoute !== cur; lastRoute = cur;
   const asst = cur === 'agents', selA = asst ? (TEAM.find(x => x[0] === sub) || CHAT)[0] : '';
   const an = [['overview', 'home', 'Обзор', cur === 'overview'], ['serp/questions', 'list', 'Вопросы', tab === 'questions'], ['serp/sources', 'globe', 'Источники', tab === 'sources'], ['serp/rivals', 'chart', 'Конкуренты', tab === 'rivals'], ['tasks', 'check', 'План', cur === 'tasks']];
-  const more = [['connectors', 'plug', 'Подключения'], ['site', 'globe', 'Проверка сайта'], ['settings', 'gear', 'Настройки']];
+  const more = [['social', 'send', 'Соцсети'], ['connectors', 'plug', 'Подключения'], ['site', 'globe', 'Проверка сайта'], ['settings', 'gear', 'Настройки']];
   const recent = Object.keys(st.threads || {}).filter(k => (st.threads[k] || []).some(m => m.r === 'u')).slice(0, 5);
   const side = `<aside class="sb"><a class="wsw" href="#/settings"><i>${esc((st.company || 'K')[0].toUpperCase())}</i><b>${esc(st.company || 'Körin')}</b>${data.sample ? '<span class="tag warn">пример</span>' : ''}</a>
   <div class="seg sbm"><a href="#/overview" class="${asst ? '' : 'on'}">Аналитика</a><a href="#/agents" class="${asst ? 'on' : ''}">Помощник</a></div>
@@ -1022,6 +1092,7 @@ function render(){
   $$('[data-agent]').forEach(c => c.onchange = () => { st.agents[c.dataset.agent] = c.checked; store.save(st); render() });
   $$('[data-ans]').forEach(b => b.onclick = () => openAnswer(+b.dataset.ans));
   $$('[data-move]').forEach(b => b.onclick = () => { const [id, k] = b.dataset.move.split(':'); st.stat = st.stat || {}; st.doneAt = st.doneAt || {}; st.stat[id] = k; st.done[id] = k === 'done'; if (k === 'done') st.doneAt[id] = Date.now(); store.save(st); render() });
+  bindSocial();
   const rp = $('#report'); if (rp) rp.onclick = openReport;
   const wr = $('#whyRun'); if (wr) wr.onclick = e => { e.preventDefault(); runWhy() };
   $$('[data-gap]').forEach(b => b.onclick = () => { if (needReg()) return regModal(); const g = st.analysis.data.gaps[+b.dataset.gap]; st.custom = [{ id: 'gap' + st.analysis.at + b.dataset.gap, t: g.title, d: g.why + ' Первый шаг: ' + g.how }, ...(st.custom || [])].slice(0, 12); store.save(st); render() });
