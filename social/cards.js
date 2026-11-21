@@ -12,13 +12,22 @@ const THEMES = [
   { bg: '#f4f5f7', ink: '#0c0d10', mute: 'rgba(12,13,16,.6)', ac: '#4f5bd5', glow: 'rgba(79,91,213,.22)', line: 'rgba(12,13,16,.08)', chip: 'rgba(79,91,213,.12)' },
   { bg: '#10133a', ink: '#ffffff', mute: 'rgba(255,255,255,.66)', ac: '#aab6ff', glow: 'rgba(170,182,255,.3)', line: 'rgba(255,255,255,.1)', chip: 'rgba(170,182,255,.18)' },
 ];
-const t = THEMES[(plan.theme ?? Math.floor(Date.now() / 864e5)) % THEMES.length];
+// Kenes AI keeps its poster look: paper, ink and yellow, heavy Unbounded headlines
+const KENES = [
+  { bg: '#faf8f2', ink: '#0d0d0c', mute: 'rgba(13,13,12,.62)', ac: '#0d0d0c', glow: 'rgba(255,200,0,.5)', line: 'rgba(13,13,12,.08)', chip: '#ffc800' },
+  { bg: '#0d0d0c', ink: '#faf8f2', mute: 'rgba(250,248,242,.66)', ac: '#0d0d0c', glow: 'rgba(255,200,0,.26)', line: 'rgba(250,248,242,.09)', chip: '#ffc800' },
+  { bg: '#ffc800', ink: '#0d0d0c', mute: 'rgba(13,13,12,.7)', ac: '#ffc800', glow: 'rgba(255,255,255,.4)', line: 'rgba(13,13,12,.1)', chip: '#0d0d0c' },
+];
+const BRAND = plan.brand === 'kenes'
+  ? { name: 'Kenes AI', site: 'kenesai.asia', handle: plan.handle || 'kenesai.asia', head: '"Unbounded","Onest",sans-serif', weight: 700, track: '-.03em', scale: .84, themes: KENES, tag: 'под ключ', cta: 'Запустим для вас рекламу в ChatGPT', sub: 'Всё делаем сами. Вы получаете заявки.' }
+  : { name: 'Körin', site: 'kenesai.asia/korin', handle: '@korin.kz', head: '"Onest",system-ui,sans-serif', weight: 600, track: '-.035em', scale: 1, themes: THEMES, tag: 'бесплатно', cta: 'Проверьте, советует ли вас нейросеть', sub: 'Одна минута. Без регистрации.' };
+const t = BRAND.themes[(plan.theme ?? Math.floor(Date.now() / 864e5)) % BRAND.themes.length];
 const slides = plan.slides.slice(0, 2).map((s, i) => ({ ...s, n: i + 1 }));
 slides.push({ cta: true, n: slides.length + 1 });
 const total = slides.length;
 
 const page = s => `<!doctype html><html lang="ru"><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0}
 body{width:1080px;height:1350px;background:${t.bg};color:${t.ink};font-family:"Onest",system-ui,sans-serif;position:relative;overflow:hidden;padding:84px 80px}
@@ -32,7 +41,7 @@ body{width:1080px;height:1350px;background:${t.bg};color:${t.ink};font-family:"O
 .num{font-size:30px;color:${t.mute};font-variant-numeric:tabular-nums}
 .mid{position:absolute;left:80px;right:80px;top:300px;bottom:210px;display:flex;flex-direction:column;justify-content:center;gap:44px}
 .tag{align-self:flex-start;font-size:30px;font-weight:500;color:${t.ac};background:${t.chip};border-radius:999px;padding:12px 26px;letter-spacing:.04em;text-transform:uppercase}
-h1{font-weight:600;letter-spacing:-.035em;line-height:1.04}
+h1{font-family:${BRAND.head};font-weight:${BRAND.weight};letter-spacing:${BRAND.track};line-height:1.06}
 ol{list-style:none;padding:0;display:grid;gap:30px}
 li{display:grid;grid-template-columns:76px 1fr;gap:26px;align-items:start;font-size:46px;line-height:1.22;font-weight:500;letter-spacing:-.015em}
 li b{width:76px;height:76px;border-radius:50%;background:${t.chip};color:${t.ac};display:grid;place-items:center;font-size:36px;font-weight:600}
@@ -41,21 +50,21 @@ li b{width:76px;height:76px;border-radius:50%;background:${t.chip};color:${t.ac}
 .foot{position:absolute;left:80px;right:80px;bottom:80px;display:flex;justify-content:space-between;align-items:center;font-size:32px;color:${t.mute}}
 .foot i{display:block;width:120px;height:6px;background:${t.ac};border-radius:3px}
 </style></head><body><div class="glow"></div><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
-<div class="top"><div class="logo"><i></i>Körin</div><div class="num">${s.n} / ${total}</div></div>
+<div class="top"><div class="logo"><i></i>${BRAND.name}</div><div class="num">${s.n} / ${total}</div></div>
 <div class="mid">${s.cta
-  ? `<span class="tag">бесплатно</span><h1 id="h">Проверьте, советует ли вас нейросеть</h1><div class="cta">Одна минута. Без регистрации.<br><span class="site">kenesai.asia/korin</span></div>`
+  ? `<span class="tag">${BRAND.tag}</span><h1 id="h">${BRAND.cta}</h1><div class="cta">${BRAND.sub}<br><span class="site">${BRAND.site}</span></div>`
   : `${s.tag ? `<span class="tag">${esc(s.tag)}</span>` : ''}<h1 id="h">${esc(s.title)}</h1>${(s.points || []).length ? `<ol>${s.points.slice(0, 3).map((p, i) => `<li><b>${i + 1}</b><span>${esc(p)}</span></li>`).join('')}</ol>` : ''}`}</div>
-<div class="foot"><i></i><span>${s.n < total ? 'листайте →' : '@korin.kz'}</span></div>
+<div class="foot"><i></i><span>${s.n < total ? 'листайте →' : BRAND.handle}</span></div>
 <script>
 // the headline takes the largest size that still fits its space
-(() => { const h = document.getElementById('h'), mid = document.querySelector('.mid'); let size = ${s.cta ? 104 : (s.points || []).length ? 84 : 128};
+(() => { const h = document.getElementById('h'), mid = document.querySelector('.mid'); let size = Math.round(${s.cta ? 104 : (s.points || []).length ? 84 : 128} * ${BRAND.scale});
 const fits = () => mid.scrollHeight <= mid.clientHeight + 2 && h.scrollWidth <= h.clientWidth + 2;
 h.style.fontSize = size + 'px'; while (!fits() && size > 44) { size -= 4; h.style.fontSize = size + 'px' } })();
 </script></body></html>`;
 
 (async () => {
   fs.mkdirSync(out, { recursive: true });
-  const stamp = new Date().toISOString().slice(0, 10) + '-' + Date.now().toString(36).slice(-4);
+  const stamp = new Date().toISOString().slice(0, 10) + '-' + (plan.brand === 'kenes' ? 'k' : '') + Date.now().toString(36).slice(-4);
   const browser = await chromium.launch(), ctx = await browser.newContext({ viewport: { width: 1080, height: 1350 } }), p = await ctx.newPage(), files = [];
   for (const s of slides) {
     await p.setContent(page(s), { waitUntil: 'networkidle' }).catch(() => {});

@@ -293,6 +293,13 @@ class ApiTest(unittest.TestCase):
             app._threads, app.ask, app.time.sleep = real_t, real_a, real_s
             del os.environ["KORIN_ADMIN_KEY"], os.environ["THREADS_TOKEN"]
         self.assertEqual((code, len(pl["slides"]), len(pl["slides"][1]["points"])), (200, 2, 3))
+        self.assertEqual(pl["brand"], "korin")
+        # the second brand has its own account: without its token nothing can be planned or posted
+        os.environ.update(KORIN_ADMIN_KEY="secret", THREADS_TOKEN="tok")
+        code_k, no, _ = post(p, "/api/marketer-plan", {"key": "secret", "brand": "kenes"})
+        self.assertEqual(code_k, 400)
+        self.assertIn("Kenes AI", no["error"])
+        del os.environ["KORIN_ADMIN_KEY"], os.environ["THREADS_TOKEN"]
         self.assertEqual((code2, pub["link"], bad), (200, "https://threads.net/p/9", 400))
         self.assertEqual([c[2] for c in calls[:4]], ["IMAGE", "IMAGE", "IMAGE", "CAROUSEL"])
         self.assertEqual(calls[3][3], "1,2,3")
