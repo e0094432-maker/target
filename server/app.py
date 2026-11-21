@@ -6,6 +6,7 @@ import ipaddress
 import json
 import os
 import re
+import hmac
 import socket
 import threading
 import time
@@ -480,6 +481,73 @@ def social_reply(body):
     return {"fit": fit, "why": str(obj.get("why", ""))[:300], "reply": str(obj.get("reply", ""))[:280] if fit else "", "model": model}
 
 
+# ---------- Threads (the brand's own account) ----------
+THREADS = "https://graph.threads.net/v1.0"
+
+
+def _admin(body):
+    """Posting goes to our own account, so the page must send the owner's code."""
+    key = os.environ.get("KORIN_ADMIN_KEY", "")
+    if not key or not hmac.compare_digest(str(body.get("key", "")), key):
+        raise BadRequest("Неверный код владельца.")
+    token = "".join(os.environ.get("THREADS_TOKEN", "").split())
+    if not token:
+        raise BadRequest("Threads ещё не подключён: на сервере нет токена.")
+    return token
+
+
+def _threads(method, path, params):
+    data = urllib.parse.urlencode(params)
+    url = f"{THREADS}{path}" + ("?" + data if method == "GET" else "")
+    req = urllib.request.Request(url, data=data.encode() if method == "POST" else None, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode(errors="replace")[:600]
+        print(f"threads {method} {path} failed: HTTP {e.code}: {detail}", flush=True)
+        try:
+            msg = json.loads(detail).get("error", {}).get("message", "")
+        except json.JSONDecodeError:
+            msg = ""
+        raise BadRequest(f"Threads отказал: {msg or 'код ' + str(e.code)}") from None
+    except (urllib.error.URLError, TimeoutError) as e:
+        raise BadRequest(f"Threads не ответил: {e}") from None
+
+
+def threads_post(body):
+    """Publish a text post, or a reply when reply_to is given. One call — one post, started by a person."""
+    token = _admin(body)
+    text = str(body.get("text", "")).strip()[:500]
+    if len(text) < 3:
+        raise BadRequest("Пустой текст.")
+    params = {"media_type": "TEXT", "text": text, "access_token": token}
+    reply_to = re.sub(r"\D", "", str(body.get("reply_to", "")))[:30]
+    if reply_to:
+        params["reply_to_id"] = reply_to
+    made = _threads("POST", "/me/threads", params)
+    done = _threads("POST", "/me/threads_publish", {"creation_id": made.get("id", ""), "access_token": token})
+    link = _threads("GET", f"/{done.get('id', '')}", {"fields": "permalink", "access_token": token}).get("permalink", "") if done.get("id") else ""
+    return {"ok": True, "id": done.get("id", ""), "link": link}
+
+
+def threads_search(body):
+    """Popular threads by a keyword, for a person to choose which to answer."""
+    token = _admin(body)
+    q = re.sub(r"\s+", " ", str(body.get("q", ""))).strip()[:60]
+    if len(q) < 2:
+        raise BadRequest("Напишите слово для поиска.")
+    data = _threads("GET", "/keyword_search", {"q": q, "search_type": "TOP", "fields": "id,text,username,permalink,timestamp", "access_token": token})
+    found = [{"id": str(x.get("id", "")), "text": str(x.get("text", ""))[:600], "user": str(x.get("username", ""))[:40], "link": str(x.get("permalink", ""))[:200], "time": str(x.get("timestamp", ""))[:25]} for x in data.get("data", []) if x.get("text")][:15]
+    return {"found": found}
+
+
+def threads_me(body):
+    token = _admin(body)
+    me = _threads("GET", "/me", {"fields": "id,username", "access_token": token})
+    return {"username": me.get("username", "")}
+
+
 # ---------- agents ----------
 AGENTS = {
     "why": "Ты аналитик видимости в нейросетях. По данным кабинета объясни простым языком, почему компанию называют реже конкурентов, и дай три первых шага. Не выдумывай фактов о компании.",
@@ -537,7 +605,7 @@ def allowed(ip, limit=30, window=3600):
     return True
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply}
+ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply, "/api/threads-post": threads_post, "/api/threads-search": threads_search, "/api/threads-me": threads_me}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -561,7 +629,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/api/health":
-            return self._send(200, {"ok": True, "ai": bool(provider_name()), "provider": provider_name()})
+            return self._send(200, {"ok": True, "ai": bool(provider_name()), "provider": provider_name(), "threads": bool(os.environ.get("THREADS_TOKEN") and os.environ.get("KORIN_ADMIN_KEY"))})
         self._send(404, {"error": "Не найдено."})
 
     def do_POST(self):

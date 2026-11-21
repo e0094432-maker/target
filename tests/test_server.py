@@ -246,6 +246,29 @@ class ApiTest(unittest.TestCase):
         self.assertEqual((code2, rep["fit"], rep["reply"]), (200, False, ""))
         self.assertEqual(post(self.api.server_port, "/api/social-plan", {"brand": "A"})[0], 400)
 
+    def test_threads_needs_the_owner_code_and_publishes_in_two_steps(self):
+        p = self.api.server_port
+        os.environ.pop("KORIN_ADMIN_KEY", None)
+        self.assertEqual(post(p, "/api/threads-post", {"key": "", "text": "привет"})[0], 400)
+        os.environ.update(KORIN_ADMIN_KEY="secret", THREADS_TOKEN="tok")
+        calls = []
+
+        def fake(method, path, params):
+            calls.append((method, path, params.get("reply_to_id")))
+            return {"id": "777", "permalink": "https://threads.net/t/1", "data": [{"id": "5", "text": "ветка", "username": "u", "permalink": "l", "timestamp": "t"}]}
+
+        real, app._threads = app._threads, fake
+        try:
+            self.assertEqual(post(p, "/api/threads-post", {"key": "wrong", "text": "привет"})[0], 400)
+            code, data, _ = post(p, "/api/threads-post", {"key": "secret", "text": "привет", "reply_to": "123"})
+            code2, found, _ = post(p, "/api/threads-search", {"key": "secret", "q": "малый бизнес"})
+        finally:
+            app._threads = real
+            del os.environ["KORIN_ADMIN_KEY"], os.environ["THREADS_TOKEN"]
+        self.assertEqual((code, data["link"]), (200, "https://threads.net/t/1"))
+        self.assertEqual(calls[:2], [("POST", "/me/threads", "123"), ("POST", "/me/threads_publish", None)])
+        self.assertEqual((code2, found["found"][0]["id"]), (200, "5"))
+
     def test_rate_limit(self):
         app._hits.clear()
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))
