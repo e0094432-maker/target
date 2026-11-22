@@ -578,6 +578,22 @@ document.getElementById('langBtn').onclick = () => setLang(lang === 'en' ? 'ru' 
 addEventListener('DOMContentLoaded', () => setLang(lang)); if (document.readyState !== 'loading') setTimeout(() => setLang(lang));
 
 const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9kvzA8WbfzVFvVA4UfU5bKlHRZ3G1pCIDZ2kY0nP1CG/exec';
+/* каждый посетитель получает номер; в таблицу пишем, что он сделал */
+const TRK = (() => {
+  let vid = null; try { vid = localStorage.getItem('vid'); if (!vid) { vid = Math.random().toString(36).slice(2, 7).toUpperCase(); localStorage.setItem('vid', vid) } } catch (e) { vid = 'без номера' }
+  const src = (new URLSearchParams(location.search).get('utm_source') || (document.referrer && !document.referrer.includes(location.hostname) ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
+  const dev = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'телефон' : 'компьютер', t0 = Date.now();
+  let deep = 0, left = false; addEventListener('scroll', () => { deep = Math.max(deep, Math.round((scrollY + innerHeight) / document.documentElement.scrollHeight * 100)) }, { passive: true });
+  const track = (what, extra, beacon) => {
+    if (navigator.webdriver) return;
+    const body = JSON.stringify({ name: 'Körin: ' + what, business: extra || 'откуда: ' + src, whatsapp: 'посетитель ' + vid + ' · ' + dev, lang: 'korin' });
+    if (beacon && navigator.sendBeacon) navigator.sendBeacon(SHEET, body); else fetch(SHEET, { method: 'POST', mode: 'no-cors', body, keepalive: true }).catch(() => {});
+  };
+  let seen = false; try { seen = sessionStorage.getItem('seen-Körin'); sessionStorage.setItem('seen-Körin', 1) } catch (e) {}
+  if (!seen) track('зашёл');
+  addEventListener('pagehide', () => { if (!left) { left = true; track('ушёл: был ' + Math.round((Date.now() - t0) / 1000) + ' сек, пролистал ' + deep + '%', '', true) } });
+  return { track, vid };
+})();
 const $ = s => document.querySelector(s);
 /* Живая сцена: клиент спрашивает нейросеть, она отвечает, Körin показывает итог и шаги */
 (() => {
@@ -675,6 +691,7 @@ function qcAsk(company){
   $('#qcForm').onsubmit = e => { e.preventDefault(); qcRun(company, $('#qcNiche').value.trim(), $('#qcCity').value.trim()) };
 }
 async function qcRun(company, niche, city){
+  TRK.track('бесплатная проверка', [company, niche, city].filter(Boolean).join(' · ').slice(0, 120));
   if (!niche || !city) return;
   const cab = 'app/index.html?company=' + encodeURIComponent(company);
   qcTitle.textContent = L("Спрашиваем нейросеть", "Asking the AI");
@@ -707,7 +724,7 @@ $('#leadForm').addEventListener('submit', async e => {
   if (f.dataset.busy) return;
   if (!f.business.value.trim() || !f.whatsapp.value.trim()) { m.textContent = L("Заполните компанию и WhatsApp.", "Fill in the company and WhatsApp."); return }
   f.dataset.busy = '1'; m.textContent = '…';
-  try { await fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: 'Körin: заявка на замер', business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang: 'korin' }) }); f.reset(); m.textContent = L("Спасибо! Напишем в WhatsApp в течение рабочего дня.", "Thank you! We will message you on WhatsApp within one business day.") }
+  try { await fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: 'Körin: заявка на замер', business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang: 'korin · посетитель ' + TRK.vid }) }); f.reset(); m.textContent = L("Спасибо! Напишем в WhatsApp в течение рабочего дня.", "Thank you! We will message you on WhatsApp within one business day.") }
   catch (err) { m.textContent = L("Не получилось отправить. Попробуйте ещё раз.", "Could not send. Please try again.") }
   finally { delete f.dataset.busy }
 });
