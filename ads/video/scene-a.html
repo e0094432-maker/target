@@ -15,9 +15,22 @@ em{font-style:normal;color:#c3cbff;text-shadow:0 0 36px rgba(139,156,255,.9)}
 .w{display:inline-block}
 
 /* HOOK: headline + prompt box */
-#hook{left:90px;width:900px;top:318px;text-align:center;font-size:120px;font-weight:700;line-height:1.0;letter-spacing:-.045em;text-shadow:0 6px 40px rgba(10,8,40,.6)}
+/* opening: «Клиенты больше не гуглят.» slams in letter by letter, «гуглят» is struck through and shatters into «ИИ.» */
+.hl{left:0;width:1080px;text-align:center;font-weight:700;line-height:1;letter-spacing:-.045em;white-space:nowrap;color:#f6f7ff;text-shadow:0 8px 50px rgba(12,6,60,.55)}
+.hl .ch{display:inline-block;transform-origin:50% 62%}
+#hl0{top:520px;font-size:210px}
+#hl1{top:752px;font-size:178px}
+#hl2{top:944px;font-size:270px}
+#hl2 .ch{color:#cbd2ff;text-shadow:0 0 46px rgba(139,156,255,.95)}
+#strike{left:0;top:0;height:24px;border-radius:12px;background:#fff;box-shadow:0 0 22px #fff,0 0 60px rgba(139,156,255,.95),0 0 130px rgba(111,227,255,.6);transform-origin:0 50%}
+#ask1{left:0;width:1080px;top:566px;text-align:center;font-size:110px;font-weight:700;line-height:1;letter-spacing:-.04em;white-space:nowrap;text-shadow:0 6px 40px rgba(10,8,40,.6)}
+#ask2{left:0;width:1080px;top:690px;text-align:center;font-size:420px;font-weight:700;line-height:1;letter-spacing:-.04em;white-space:nowrap;transform-origin:540px 0;color:#fff;text-shadow:0 0 60px rgba(139,156,255,.95),0 0 150px rgba(91,60,255,.8)}
+#ask2 i{font-style:normal}
+#pdot{position:relative;display:inline-block}
+#pcol{position:absolute;left:0;top:0;opacity:0}
 .bx{left:60px;top:700px;width:960px;height:500px;border-radius:64px;background:linear-gradient(180deg,rgba(38,40,62,.97),rgba(14,15,27,.97));box-shadow:0 0 0 2px rgba(255,255,255,.10) inset,0 60px 160px rgba(40,20,160,.55),0 0 120px rgba(139,156,255,.40)}
 .bx .rim{position:absolute;inset:0;border-radius:64px;padding:4px;background:conic-gradient(from var(--a,0deg),rgba(139,156,255,0) 0deg,rgba(139,156,255,0) 170deg,rgba(139,156,255,.85) 270deg,#fff 312deg,#6fe3ff 334deg,rgba(139,156,255,0) 360deg);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.bx .zm{position:absolute;inset:0;border-radius:64px;background:radial-gradient(ellipse 70% 80% at 50% 50%,#b4abff 0%,#7f66ff 34%,#5b3cff 70%,#3d22d0 100%);opacity:0}
 .bx .hot{position:absolute;inset:0;border-radius:64px;box-shadow:inset 0 0 140px 40px rgba(210,222,255,.95),0 0 120px 30px rgba(190,205,255,.9);opacity:0}
 .qt{position:absolute;left:64px;top:54px;right:52px;font-size:104px;line-height:1.08;font-weight:500;letter-spacing:-.035em;white-space:pre-line}
 #caret{display:inline-block;width:8px;height:96px;margin-left:8px;vertical-align:-14px;background:#a9b7ff;border-radius:4px;box-shadow:0 0 22px #8b9cff,0 0 6px #fff}
@@ -53,29 +66,30 @@ em{font-style:normal;color:#c3cbff;text-shadow:0 0 36px rgba(139,156,255,.9)}
 #korL::before{content:"";width:60px;height:60px;border-radius:50%;background:#08090a}
 #korT{font-size:200px;font-weight:700;letter-spacing:-.04em;line-height:1.1;display:block;padding:0 8px;background:linear-gradient(110deg,#ccd3ff 0%,#ccd3ff 44%,#ffffff 47.5%,#ffffff 52.5%,#ccd3ff 56%,#ccd3ff 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
 
-/* WHEEL (flat scrolling list) + step content */
-#wl{left:0;top:0;width:1080px;height:1920px;transform-origin:540px 760px}
-.wi{position:absolute;left:0;top:0;height:120px;line-height:120px;font-size:116px;font-weight:700;letter-spacing:-.045em;white-space:nowrap;transform-origin:0 50%}
-.sub{left:90px;width:900px;text-align:left;font-weight:600;letter-spacing:-.03em;transform-origin:0 50%}
-#q1{top:1010px;font-size:90px;line-height:1.05}
-#r1{top:918px;line-height:1;font-size:64px}
-#r1 .l{font-size:64px;color:#cfd5ff;font-weight:600}
-#r1 .big{font-size:170px;font-weight:700;letter-spacing:-.05em;color:#fff;line-height:1.02}
-.slot{display:inline-block;height:1em;overflow:hidden;vertical-align:top;line-height:1}
-.slot b{display:block;font-weight:700}
+/* MIDDLE: centred beats. hero «ИИ назвал вас 4 раза из 30» (пример) on a full-colour field > «Покажем, кого советуют вместо вас» > «Подскажем, что исправить:» */
+#m1{left:0;top:0;width:1080px;height:1920px;transform-origin:540px 880px}
+#m1cap{left:0;width:1080px;top:470px;text-align:center;font-size:124px;font-weight:700;line-height:1;letter-spacing:-.04em;white-space:nowrap;text-shadow:0 8px 40px rgba(20,8,90,.55)}
+#m1cap em{color:#fff;text-shadow:0 0 40px rgba(190,240,255,.95),0 0 90px rgba(111,227,255,.7)}
+#m1num{left:0;width:1080px;top:650px;justify-content:center;align-items:flex-end;gap:34px;font-weight:700;line-height:1;color:#fff;text-shadow:0 12px 60px rgba(20,8,90,.5)}
+.slot{display:block;font-size:440px;height:1em;line-height:1;overflow:hidden;padding:0 6px;letter-spacing:-.05em}
+.slot b{display:block;height:1em;font-weight:700}
 #slotc{display:block}
-.tag{display:inline-block;font-size:48px;font-weight:600;letter-spacing:0;padding:10px 26px;border-radius:40px;border:3px solid rgba(170,185,255,.75);color:#d7dcff;background:rgba(20,16,70,.55);vertical-align:middle;margin-left:28px;position:relative;top:-14px}
-#h2{top:942px;font-size:66px;line-height:1.05}
-#mcs{left:0;top:0;width:1080px;height:1920px;transform-origin:540px 1300px}
-.mc{position:absolute;left:90px;width:860px;height:124px;border-radius:40px;background:linear-gradient(135deg,rgba(30,30,60,.95),rgba(10,10,26,.96));box-shadow:0 0 0 2px rgba(170,185,255,.35) inset,0 24px 70px rgba(5,3,30,.65);display:flex;align-items:center;gap:26px;padding:0 26px;overflow:hidden}
-.mc .n{width:84px;height:84px;font-size:48px}
-.mc .nm{font-size:84px;font-weight:700;letter-spacing:-.04em;white-space:nowrap;line-height:1}
-.mc.you{background:rgba(139,156,255,.10);box-shadow:none;border:5px dashed rgba(190,200,255,.9)}
-.mc.you .n{background:transparent;border:4px dashed rgba(190,200,255,.9);color:#d7dcff;box-shadow:none}
-.mc.you .nm{color:#d7dcff}
-#h3{top:930px;font-size:104px;line-height:1.05;transform-origin:0 0}
-#rows{left:0;top:0;width:1080px;height:1920px;transform-origin:540px 1300px}
-.cr{position:absolute;left:196px;font-size:66px;font-weight:600;letter-spacing:-.03em;white-space:nowrap;line-height:1}
+#m1of{font-size:210px;margin-bottom:40px;white-space:nowrap;letter-spacing:-.05em;display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+#m1u{display:block;font-size:150px;margin:0 0 4px 8px;transform-origin:0 100%}
+#m1pill{left:0;width:1080px;top:1180px;text-align:center}
+#m1pill span{display:inline-block;font-size:58px;font-weight:600;letter-spacing:-.01em;padding:12px 38px 16px;border-radius:46px;border:4px solid rgba(255,255,255,.85);color:#fff;background:rgba(28,14,120,.5);box-shadow:0 0 40px rgba(190,205,255,.45)}
+#h2{left:0;width:1080px;top:304px;text-align:center;font-size:126px;font-weight:700;line-height:1.02;letter-spacing:-.045em;white-space:nowrap;text-shadow:0 6px 40px rgba(10,8,40,.6)}
+#h2 .s1{font-size:112px}
+#mcs{left:0;top:0;width:1080px;height:1920px;transform-origin:540px 1100px;perspective:1500px;perspective-origin:540px 1080px}
+.mc{position:absolute;left:110px;width:860px;height:140px;border-radius:44px;background:linear-gradient(135deg,rgba(32,30,66,.96),rgba(10,10,28,.97));box-shadow:0 0 0 2px rgba(170,185,255,.38) inset,0 30px 80px rgba(5,3,30,.65),0 0 60px rgba(91,60,255,.35);display:flex;align-items:center;gap:30px;padding:0 30px;overflow:hidden}
+.mc .n{width:96px;height:96px;font-size:54px}
+.mc .nm{font-size:90px;font-weight:700;letter-spacing:-.04em;white-space:nowrap;line-height:1}
+.mc.you{background:rgba(139,156,255,.14);box-shadow:none;border:6px dashed rgba(200,210,255,.95)}
+.mc.you .n{background:transparent;border:5px dashed rgba(200,210,255,.95);color:#e3e7ff;box-shadow:none}
+.mc.you .nm{color:#e3e7ff}
+#h3a{left:0;width:1080px;top:574px;text-align:center;font-size:120px;font-weight:700;line-height:1;letter-spacing:-.045em;white-space:nowrap;text-shadow:0 6px 40px rgba(10,8,40,.6)}
+#h3a em,#h3 em{color:#fff;text-shadow:0 0 40px rgba(190,240,255,.9),0 0 90px rgba(111,227,255,.6)}
+#h3{left:0;width:1080px;top:716px;text-align:center;font-size:120px;font-weight:700;line-height:1;letter-spacing:-.045em;white-space:nowrap;transform-origin:540px 0;text-shadow:0 6px 40px rgba(10,8,40,.6)}
 
 /* RING labels */
 .rl{left:0;width:1080px;top:690px;height:380px;text-align:center;font-size:120px;font-weight:700;line-height:1.0;letter-spacing:-.04em;text-shadow:0 0 30px rgba(0,0,0,.9)}
@@ -99,11 +113,21 @@ em{font-style:normal;color:#c3cbff;text-shadow:0 0 36px rgba(139,156,255,.9)}
   <filter id="mby" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbyg" stdDeviation="0 0"/></filter>
   <filter id="mbk" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbkg" stdDeviation="0 0"/></filter>
   <filter id="mbd" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbdg" stdDeviation="0 0"/></filter>
+  <filter id="mbu" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbug" stdDeviation="0 0"/></filter>
+  <filter id="mbv" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbvg" stdDeviation="0 0"/></filter>
+  <filter id="mba" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbag" stdDeviation="0 0"/></filter>
+  <filter id="mbb" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbbg" stdDeviation="0 0"/></filter>
+  <filter id="mbp" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbpg" stdDeviation="0 0"/></filter>
 </svg>
 <div id="root">
   <canvas id="bg" width="1080" height="1920"></canvas>
   <div id="L">
-    <div id="hook" class="a"><span class="w">Клиент</span><br><span class="w"><em>спрашивает:</em></span></div>
+    <div id="hl0" class="a hl">Клиенты</div>
+    <div id="hl1" class="a hl">больше не</div>
+    <div id="hl2" class="a hl">гуглят.</div>
+    <i id="strike" class="a"></i>
+    <div id="ask1" class="a"><span class="w">Они</span> <span class="w">спрашивают</span></div>
+    <div id="ask2" class="a"><span id="iiw">ИИ</span><span id="pdot"><i id="pd">.</i><i id="pcol">:</i></span></div>
         <div id="box" class="a bx"><div class="rim"></div>
       <div class="qt"><span class="qtx" id="qtxt"></span><i id="caret"></i></div>
       <div class="row">
@@ -111,7 +135,7 @@ em{font-style:normal;color:#c3cbff;text-shadow:0 0 36px rgba(139,156,255,.9)}
         <span class="chip"></span>
         <span class="send"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#08090a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></span>
       </div>
-      <div class="hot"></div>
+      <div class="zm"></div><div class="hot"></div>
     </div>
     <div id="pillW" class="a"><div id="pill"><div id="thumb"></div></div></div>
 
@@ -125,22 +149,20 @@ em{font-style:normal;color:#c3cbff;text-shadow:0 0 36px rgba(139,156,255,.9)}
 
     <div id="kor" class="a" data-d="flex"><i id="korL"></i><span id="korT">Körin</span></div>
 
-    <div id="wl" class="a"></div>
-    <div id="q1" class="a sub"><span class="w">называет</span> <span class="w">ли</span> <span class="w">вас</span> <span class="w"><em>ИИ?</em></span></div>
-    <div id="r1" class="a sub"><span class="w l">вас</span> <span class="w l">назвали</span> <span class="w l">в</span><br><span class="w big"><span class="slot" id="slot"><span id="slotc"><b>1</b><b>2</b><b>3</b><b>4</b></span></span> из 30</span><span class="w tag">пример</span><br><span class="w l">ответов</span> <span class="w l"><em>ИИ</em></span></div>
-    <div id="h2" class="a sub"><span class="w">кого</span> <span class="w">советуют</span> <span class="w"><em>вместо</em></span> <span class="w"><em>вас</em></span></div>
+    <div id="m1" class="a">
+      <div id="m1cap" class="a"><span class="w"><em>ИИ</em></span> <span class="w">назвал</span> <span class="w">вас</span></div>
+      <div id="m1num" class="a" data-d="flex"><span class="slot" id="slot"><span id="slotc"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b></span></span><span id="m1of"><span id="m1u">раза</span><span>из 30</span></span></div>
+      <div id="m1pill" class="a"><span>пример</span></div>
+    </div>
+    <div id="h2" class="a"><span class="w s1"><em>Покажем,</em></span><br><span class="w">кого</span> <span class="w">советуют</span><br><span class="w"><em>вместо</em></span> <span class="w"><em>вас</em></span></div>
     <div id="mcs" class="a">
-      <div class="mc" id="m0" style="top:1036px"><div class="n">1</div><div class="nm">Zeta Mebel</div><div class="gl"></div></div>
-      <div class="mc" id="m1" style="top:1172px"><div class="n">2</div><div class="nm">Bella Casa</div><div class="gl"></div></div>
-      <div class="mc" id="m2" style="top:1308px"><div class="n">3</div><div class="nm">Dom Line</div><div class="gl"></div></div>
-      <div class="mc you" id="m3" style="top:1444px"><div class="n">?</div><div class="nm">а вы?</div></div>
+      <div class="mc" id="mc0" style="top:792px"><div class="n">1</div><div class="nm">Zeta Mebel</div><div class="gl"></div></div>
+      <div class="mc" id="mc1" style="top:952px"><div class="n">2</div><div class="nm">Bella Casa</div><div class="gl"></div></div>
+      <div class="mc" id="mc2" style="top:1112px"><div class="n">3</div><div class="nm">Dom Line</div><div class="gl"></div></div>
+      <div class="mc you" id="mc3" style="top:1272px"><div class="n">?</div><div class="nm">а вы?</div></div>
     </div>
-    <div id="h3" class="a sub"><span class="w">что</span> <span class="w"><em>исправить:</em></span></div>
-    <div id="rows" class="a">
-      <div class="cr" id="cr0" style="top:1112px"><span class="w">Цены</span> <span class="w">на</span> <span class="w">сайте</span></div>
-      <div class="cr" id="cr1" style="top:1252px"><span class="w">Отзывы</span> <span class="w">в</span> <span class="w">2ГИС</span></div>
-      <div class="cr" id="cr2" style="top:1392px"><span class="w">Вопросы</span> <span class="w">и</span> <span class="w">ответы</span></div>
-    </div>
+    <div id="h3a" class="a"><span class="w"><em>Подскажем,</em></span></div>
+    <div id="h3" class="a"><span class="w">что</span> <span class="w"><em>исправить:</em></span></div>
 
     <div id="rl1" class="a rl"><small>1</small>Цены<br>на сайте</div>
     <div id="rl2" class="a rl"><small>2</small>Отзывы<br>в 2ГИС</div>
@@ -157,7 +179,7 @@ em{font-style:normal;color:#c3cbff;text-shadow:0 0 36px rgba(139,156,255,.9)}
 </div>
 <script>
 window.READY = false;
-window.DURATION = 18.1;
+window.DURATION = 17.6;
 const ENG = {"ChatGPT":"M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z","Gemini":"M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81","Perplexity":"M22.3977 7.0896h-2.3106V.0676l-7.5094 6.3542V.1577h-1.1554v6.1966L4.4904 0v7.0896H1.6023v10.3976h2.8882V24l6.932-6.3591v6.2005h1.1554v-6.0469l6.9318 6.1807v-6.4879h2.8882V7.0896zm-3.4657-4.531v4.531h-5.355l5.355-4.531zm-13.2862.0676 4.8691 4.4634H5.6458V2.6262zM2.7576 16.332V8.245h7.8476l-6.1149 6.1147v1.9723H2.7576zm2.8882 5.0404v-3.8852h.0001v-2.6488l5.7763-5.7764v7.0111l-5.7764 5.2993zm12.7086.0248-5.7766-5.1509V9.0618l5.7766 5.7766v6.5588zm2.8882-5.0652h-1.733v-1.9723L13.3948 8.245h7.8478v8.087z"};
 const W = 1080, H = 1920, CX = 540;
 const $ = id => document.getElementById(id);
@@ -332,8 +354,12 @@ document.querySelector('.chip').innerHTML = svgE('ChatGPT') + '<svg width="36" h
 const ENGS = ['ChatGPT', 'Gemini', 'Perplexity'];
 const segs = ENGS.map((n, i) => { const d = document.createElement('div'); d.className = 'seg'; d.style.left = (20 + 920 * (i + 1)) + 'px'; d.innerHTML = svgE(n) + `<span>${n}</span>`; $('pill').appendChild(d); return d });
 $('hdr').innerHTML = ENGS.map(n => `<span class="eg">${svgE(n)}</span>`).join('') + '<span id="dots3"><i></i><i></i><i></i></span>';
-const WITEMS = ['Найдём', 'Спросим', 'Проверим', 'Покажем', 'Подскажем', 'Сравним', 'Поможем'];
-const wis = WITEMS.map(s => { const d = document.createElement('div'); d.className = 'wi'; d.textContent = s; $('wl').appendChild(d); return d });
+// opening lines, split into letters (each letter slams in on its own)
+const HL = [{ id: 'hl0', t0: -.13 }, { id: 'hl1', t0: .15 }, { id: 'hl2', t0: .33 }];
+const hls = HL.map((L, l) => {
+  const el = $(L.id), s = el.textContent; el.innerHTML = [...s].map(ch => `<span class="ch">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
+  const r = rng(300 + l * 41); return { el, chs: [...el.children], rnd: [...s].map(() => r()), ...L };
+});
 
 const qText = 'Где заказать\nкухню в Астане?';
 const qTimes = (() => { const r = rng(7); let tt = .02; return [...qText].map(ch => (tt += .02 + r() * .012 + (ch === ' ' ? .012 : 0) + (ch === '\n' ? .03 : 0))) })();
@@ -343,7 +369,40 @@ const qEnd = qTimes[qTimes.length - 1];
 const ghosts = [1, 2, 3, 4, 5, 6].map(i => { const g = $('box').cloneNode(true); g.removeAttribute('id'); g.querySelectorAll('[id]').forEach(e => e.removeAttribute('id')); g.querySelector('.qtx').textContent = qText; g.querySelector('.hot').style.opacity = .6; $('L').insertBefore(g, $('box')); return g });
 
 // ---------- particle samples (built after fonts load) ----------
-let S3 = null, LOGO = null, NET = null, KOR = null, H3W = 600;
+let S3 = null, LOGO = null, NET = null, KOR = null, SLOTC = { x: 330, y: 900 };
+// opening particles: «гуглят.» glyph points (a) re-form into «ИИ.» glyph points (b)
+let HP = null, HPN = 0, STRK = { x0: 200, x1: 880, y: 1100 };
+const HSH = 1.04, STK = [.74, .9], HCY = 900;   // shatter start, strike draw window, swirl centre
+function baselineOf(el) { const m = document.createElement('i'); m.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; el.appendChild(m); const y = m.getBoundingClientRect().top; m.remove(); return y }
+function buildHook() {
+  const L2 = hls[2], el = L2.el; el.style.display = 'block'; el.style.opacity = 1;
+  const base = baselineOf(el), rs = L2.chs.map(c => c.getBoundingClientRect()), fs = 270;
+  const g0 = document.createElement('canvas').getContext('2d'); g0.font = `700 ${fs}px Onest, Inter`; const xh = g0.measureText('г').actualBoundingBoxAscent;
+  STRK = { x0: rs[0].left - 26, x1: rs[rs.length - 2].right + 18, y: base - xh * .5 };
+  $('strike').style.width = (STRK.x1 - STRK.x0).toFixed(1) + 'px';
+  const A = sample(g => { g.font = `700 ${fs}px Onest, Inter`; g.textBaseline = 'alphabetic'; g.fillStyle = '#fff'; L2.chs.forEach((c, i) => g.fillText(c.textContent, rs[i].left, base)) }, 4, (d, p) => d[p + 3] > 140, true);
+  el.style.display = 'none'; el._d = 0;
+  const a2 = $('ask2'); a2.style.display = 'block';
+  const b2 = baselineOf(a2), ri = $('iiw').getBoundingClientRect(), rd = $('pd').getBoundingClientRect();
+  const B = sample(g => { g.font = '700 420px Onest, Inter'; g.letterSpacing = '-16.8px'; g.textBaseline = 'alphabetic'; g.fillStyle = '#fff'; g.fillText('ИИ', ri.left, b2); g.fillText('.', rd.left, b2) }, 5, (d, p) => d[p + 3] > 140, true);
+  a2.style.display = 'none'; a2._d = 0;
+  const na = A.length / 2, nb = B.length / 2, ia = [...Array(na).keys()].sort((i, j) => A[2 * i] - A[2 * j]), ib = [...Array(nb).keys()].sort((i, j) => B[2 * i] - B[2 * j]);
+  let bx0 = 1e9, bx1 = -1e9; for (let j = 0; j < nb; j++) { bx0 = Math.min(bx0, B[2 * j]); bx1 = Math.max(bx1, B[2 * j]) }
+  HPN = na; HP = new Float32Array(na * 9); const r = rng(919);
+  for (let n = 0; n < na; n++) {
+    const i = ia[n], j = ib[Math.floor(n * nb / na)], ax = A[2 * i], ay = A[2 * i + 1], bx = B[2 * j], by = B[2 * j + 1];
+    const ang = Math.atan2(ay - STRK.y, (ax - CX) * .7) + (r() - .5) * 1.3, mag = 120 + 420 * Math.pow(r(), 1.4);
+    HP.set([ax, ay, bx, by, ang, mag, .07 * (bx - bx0) / Math.max(1, bx1 - bx0) + .03 * r(), (r() - .5) * .9, r() < .5 ? 0 : 1], n * 9);
+  }
+}
+function hookP(i, t) {
+  const o = i * 9, u = E.outCubic(P(t, HSH, HSH + .34));
+  let x = HP[o] + Math.cos(HP[o + 4]) * HP[o + 5] * u, y = HP[o + 1] + Math.sin(HP[o + 4]) * HP[o + 5] * u;
+  const ro = HP[o + 7] * u, dx = x - CX, dy = y - HCY, cs = Math.cos(ro), sn = Math.sin(ro);
+  x = CX + dx * cs - dy * sn; y = HCY + dx * sn + dy * cs;
+  const w = E.inOutCubic(P(t, HSH + .1 + HP[o + 6], HSH + .34 + HP[o + 6]));
+  return [lerp(x, HP[o + 2], w), lerp(y, HP[o + 3], w), w];
+}
 const S3L = ['А вас', 'тут нет.'], S3Y = [840, 1060], SLC = 900, S3END = 1.04;
 let S3FS = 200;
 function sample(draw, step, pred, jit) {
@@ -385,26 +444,40 @@ function build() {
     const ang = r2() * 6.2832, rad = 480 + r2() * 800;
     LOGO.set([lp[2 * i], lp[2 * i + 1], CX + Math.cos(ang) * rad, 900 + Math.sin(ang) * rad * 1.1, r2() * .3, r2()], i * 6);
   }
-  // Körin word box (for the light spill) and the «что исправить:» width (for pinning it as a header)
+  // Körin word box (for the light spill)
   const k = $('kor'); k.style.display = 'flex'; const kr = $('korT').getBoundingClientRect(); KOR = { x: kr.left, w: kr.width, y: kr.top, h: kr.height }; k.style.display = 'none'; k._d = 0;
-  const h = $('h3'); h.style.display = 'block'; const sp = h.querySelectorAll('.w'); H3W = sp[sp.length - 1].getBoundingClientRect().right - sp[0].getBoundingClientRect().left; h.style.display = 'none'; h._d = 0;
+  buildHook();
+  // centre of the rolling digit (ring bursts start there)
+  const m1 = $('m1'), mn = $('m1num'); m1.style.display = 'block'; mn.style.display = 'flex'; const sr = $('slot').getBoundingClientRect();
+  SLOTC = { x: sr.left + sr.width / 2, y: sr.top + sr.height * .56 }; m1.style.display = 'none'; m1._d = 0; mn.style.display = 'none'; mn._d = 0;
   // when the streak head crosses each answer card
   FLARE = [0, 1, 2].map(i => { const cy = 668 + 88 + i * 204; let best = 4.3, bd = 1e9; for (let tt = 4.3; tt <= 4.52; tt += .002) { const [, y] = STREAKF(STREAKH(tt)); if (Math.abs(y - cy) < bd) { bd = Math.abs(y - cy); best = tt } } return best });
 }
 
 // ---------- timeline ----------
+// The scenes below the opening are written in their own clock ("old" time). WARP maps video time -> that clock:
+// the new opening plays first (old time < 0 = nothing of the old scenes shows), the prompt box / pill / answer run
+// faster so «А вас тут нет.» still lands at 5.5 s; the middle (8.66..11.95) is new and is written in video time.
+const WARP = [[0, -1.72], [1.72, 0], [2.76, 1.33], [3.86, 2.56], [5.54, 5.04], [8.66, 8.18], [11.95, 12.45], [17.6, 18.1]];
+function OT(t) {
+  if (t <= WARP[0][0]) return t + WARP[0][1] - WARP[0][0];
+  for (let i = 1; i < WARP.length; i++) if (t <= WARP[i][0]) { const [a, oa] = WARP[i - 1], [b, ob] = WARP[i]; return oa + (ob - oa) * (t - a) / (b - a) }
+  const [a, oa] = WARP[WARP.length - 1]; return oa + t - a;
+}
+let TN = 0;   // current video time (for the parts written in video time)
+// opening corridor: a rush at frame 0, a kick on every slammed line / the strike, a dive at the shatter
+const HIMP = [0, .28, .46, .88];
+const zHook = t => 5200 * E.outExpo(P(t, -.05, .9)) + 600 * Math.min(t, 1.72) + HIMP.reduce((s, x) => s + 700 * E.outExpo(P(t, x, x + .3)), 0) + 3800 * E.inOutCubic(P(t, 1.0, 1.42));
+const corrZ = tn => { const t = Math.max(OT(tn), -.05); return zHook(tn) + hookZ(t) - 2600 * E.outExpo(P(t, -.05, 1.0)) };   // the box rush at half strength: «ИИ.» is the beat
 // pill: section index (thumb leads, camera follows); -0.6 = still sliding in at the hard cut
-const PL = [1.47, 1.90, 2.26];
-const pillK = t => -.6 * (1 - E.outExpo(P(t, 1.33, 1.5))) + E.inOutExpo(P(t, 1.66, 1.9)) + E.inOutExpo(P(t, 2.02, 2.26));
-const pillC = t => -.6 * (1 - E.outExpo(P(t, 1.33, 1.6))) + E.inOutCubic(P(t, 1.68, 1.97)) + E.inOutCubic(P(t, 2.04, 2.33));
+const PL = [1.45, 1.79, 2.18];
+const pillK = t => -.6 * (1 - E.outExpo(P(t, 1.33, 1.45))) + E.inOutExpo(P(t, 1.69, 1.79)) + E.inOutExpo(P(t, 2.08, 2.18));
+const pillC = t => -.6 * (1 - E.outExpo(P(t, 1.33, 1.5))) + E.inOutCubic(P(t, 1.695, 1.81)) + E.inOutCubic(P(t, 2.085, 2.20));
 const hookZ = t => 5200 * E.outExpo(P(t, -.05, 1.0)) + 420 * t + 5200 * E.inExpo(P(t, 1.1, 1.33)) + 2600 * E.outExpo(P(t, 1.33, 1.75)) + 1400 * pillC(t) + 3000 * E.inExpo(P(t, 2.36, 2.56));
 // answer streak
 const STREAKH = t => 1.65 * E.inOutCubic(P(t, 4.30, 4.52));
 const STREAKF = u => [lerp(-260, 1340, u), lerp(1560, 240, u) + Math.sin(u * 3.1) * 90];
 let FLARE = [4.4, 4.4, 4.4];
-// wheel list position (index of the item at the centre row); rolls overshoot
-const R2 = 9.85, R3 = 11.3;
-const wheelPos = t => -3 + 5 * E.outExpo(P(t, 8.2, 8.64)) + E.outBack(P(t, R2, R2 + .3)) + E.outBack(P(t, R3, R3 + .3));
 // ring tunnel camera
 const HOLD = 760, RZ = k => k * 1500;
 const camZ = t => -2600 + 3340 * E.outExpo(P(t, 12.48, 12.95)) + 110 * P(t, 12.8, 13.3) + 1390 * E.inOutCubic(P(t, 13.3, 13.6))
@@ -420,9 +493,9 @@ const RING = k => ({ z: RZ(k), ox: 36 * Math.sin(k * 1.9 + .4), oy: 26 * Math.co
 const TCY = 880;
 
 // ---------- DOM scenes ----------
-const $send = document.querySelector('#box .send'), $box = $('box'), $hot = document.querySelector('#box .hot'), $qtxt = $('qtxt'), $caret = $('caret'), $pillW = $('pillW'), $pill = $('pill'), $thumb = $('thumb');
+const $send = document.querySelector('#box .send'), $box = $('box'), $hot = document.querySelector('#box .hot'), $zm = document.querySelector('#box .zm'), $qtxt = $('qtxt'), $caret = $('caret'), $pillW = $('pillW'), $pill = $('pill'), $thumb = $('thumb');
 const $hdr = $('hdr'), $cam = $('cam'), cards = [0, 1, 2].map(i => $('c' + i)), $kor = $('kor'), $korL = $('korL'), $korT = $('korT');
-const $wl = $('wl'), $mbx = $('mbxg'), $mby = $('mbyg'), $mbk = $('mbkg'), $mbd = $('mbdg');
+const $mbx = $('mbxg'), $mby = $('mbyg'), $mbk = $('mbkg'), $mbd = $('mbdg'), $mbu = $('mbug'), $mbv = $('mbvg');
 
 function boxState(t) {
   const kin = E.outExpo(P(t, 0, .32)), kz = E.inExpo(P(t, 1.10, 1.33));
@@ -430,14 +503,16 @@ function boxState(t) {
   return { kin, kz, s: lerp(.3, 1, kin) * (1 + .06 * punch) * (1 + 3 * kz), rx: lerp(40, 6, kin) - 3 * P(t, .3, 1.1) - 3 * kz, rz: lerp(-5, 0, kin), y: lerp(140, 0, kin) };
 }
 function sceneS1(t) {
-  const B = boxState(t), on = t < 1.33;
+  const B = boxState(t), on = t >= 0 && t < 1.33;
   S($box, on ? lerp(.55, 1, P(t, 0, .1)) : 0, TR({ y: B.y, s: B.s, rx: B.rx, rz: B.rz }), lerp(30, 0, B.kin) + 60 * B.kz);
-  $hot.style.opacity = (B.kz * 1.1 + .35 * Math.sin(Math.PI * P(t, .97, 1.15))).toFixed(3);
+  $hot.style.opacity = (B.kz * .45 + .35 * Math.sin(Math.PI * P(t, .97, 1.15))).toFixed(3);
+  const zt = clamp((B.kz - .04) * 2.2);
+  $zm.style.opacity = zt.toFixed(3);
   ghosts.forEach((g, i) => {
-    const gi = i + 1, ga = on && B.kz > .01 ? .42 * (1 - gi / 7.5) * clamp(B.kz * 5) : 0;
+    const gi = i + 1, ga = on && B.kz > .01 ? .42 * (1 - gi / 7.5) * clamp(B.kz * 5) * (1 - .5 * P(B.kz, .5, 1)) : 0;
+    g._zm = g._zm || g.querySelector('.zm'); g._zm.style.opacity = clamp(zt * 1.2).toFixed(3); g.querySelector('.hot').style.opacity = '.25';
     S(g, ga, TR({ y: B.y, s: (1 + 3 * B.kz * (1 - gi * .1)), rx: B.rx }), 8 + gi * 6 * B.kz + 30 * B.kz);
   });
-  words($('hook'), t, -.06, 1.08, { st: .06, d: .26, from: 60, sc: 1.3, bl: 30, le: -.045 });
   // send: squash 1 > .8 > 1.2 > 1 and a glow burst
   const sq = t < .92 ? 1 : t < .97 ? lerp(1, .8, E.inOutCubic(P(t, .92, .97))) : t < 1.03 ? lerp(.8, 1.2, E.outCubic(P(t, .97, 1.03))) : lerp(1.2, 1, E.outCubic(P(t, 1.03, 1.14)));
   const press = Math.sin(Math.PI * P(t, .95, 1.2));
@@ -449,7 +524,7 @@ function sceneS1(t) {
   $caret.style.opacity = t < qEnd + .1 ? 1 : (Math.floor((t - qEnd) * 3.4) % 2 === 0 ? 1 : 0);
 
   // zoomed segmented pill: hard cut in at 1.33 already sliding, heavy horizontal blur
-  const pin = E.outExpo(P(t, 1.33, 1.62)), pout = E.inExpo(P(t, 2.36, 2.56));
+  const pin = E.outExpo(P(t, 1.33, 1.55)), pout = E.inExpo(P(t, 2.40, 2.56));
   const po = t >= 1.33 && t < 2.56 ? 1 : 0;
   const k = pillK(t), kc = pillC(t), dt = 1 / 240;
   const v = Math.max(Math.abs(pillK(t + dt) - pillK(t - dt)), Math.abs(pillC(t + dt) - pillC(t - dt))) / (2 * dt) * 920;
@@ -487,10 +562,10 @@ function sceneS2(t) {
 
 function sceneS4(t) {
   const on = t > 6.84 && t < 8.2;
-  const lift = E.inExpo(P(t, 7.95, 8.18)), dr = E.inOutCubic(P(t, 7.0, 7.95)), dt = 1 / 240;
-  const vy = Math.abs(E.inExpo(P(t + dt, 7.95, 8.18)) - E.inExpo(P(t - dt, 7.95, 8.18))) / (2 * dt) * 1150, sd = Math.min(90, vy / 60);
+  const LF = [7.86, 8.03], lift = E.inExpo(P(t, LF[0], LF[1])), dr = E.inOutCubic(P(t, 7.0, 7.86)), dt = 1 / 240;
+  const vy = Math.abs(E.inExpo(P(t + dt, LF[0], LF[1])) - E.inExpo(P(t - dt, LF[0], LF[1]))) / (2 * dt) * 1150, sd = Math.min(90, vy / 60);
   $mbk.setAttribute('stdDeviation', `0 ${sd.toFixed(1)}`);
-  S($kor, on ? 1 - P(t, 8.14, 8.18) : 0, TR({ y: -1150 * lift, s: 1 + .04 * dr }), 0, sd > .5 ? 'url(#mbk)' : '');
+  S($kor, on ? 1 - P(t, 7.99, 8.03) : 0, TR({ y: -1150 * lift, s: 1 + .04 * dr }), 0, sd > .5 ? 'url(#mbk)' : '');
   if (!on) return;
   const kl = E.outBack(P(t, 6.88, 7.3)), kt = E.outExpo(P(t, 6.94, 7.5));
   $korL.style.transform = `scale(${kl.toFixed(4)}) rotate(${lerp(-120, 0, kl).toFixed(2)}deg)`;
@@ -502,57 +577,104 @@ function sceneS4(t) {
   $korT.style.letterSpacing = `${lerp(.32, -.04, kt).toFixed(3)}em`;
 }
 
-const $q1 = $('q1'), $r1 = $('r1'), $h2 = $('h2'), $h3 = $('h3'), $mcs = $('mcs'), mcs = [0, 1, 2, 3].map(i => $('m' + i)), $rows = $('rows'), crs = [0, 1, 2].map(i => $('cr' + i)), $slotc = $('slotc');
-const LIT = [9.08, 9.2, 9.32, 9.44];
-function sceneS5(t) {
-  const vis = P(t, 8.18, 8.22) * (1 - P(t, 12.5, 12.68));
-  const kz = E.inCubic(P(t, 12.4, 12.72)), push = (t - 8.2) * .006;
-  const pos = wheelPos(t), dt = 1 / 240, v = Math.abs(wheelPos(t + dt) - wheelPos(t - dt)) / (2 * dt) * 140;
-  const sd = Math.min(60, v / 70);
-  $mby.setAttribute('stdDeviation', `0 ${sd.toFixed(1)}`);
-  if (S($wl, vis, TR({ s: (1 + push * .4) * (1 + kz * 2.2), y: -kz * 160 }), kz * 34, sd > .5 ? 'url(#mby)' : '')) {
-    wis.forEach((w, i) => {
-      const d = i - pos, ad = Math.abs(d);
-      const o = ad < 1 ? lerp(1, .38, ad) : ad < 2 ? lerp(.38, .15, ad - 1) : lerp(.15, 0, clamp((ad - 2) / .7));
-      if (o <= .005) { if (w._d !== 0) { w.style.display = 'none'; w._d = 0 } return }
-      if (w._d !== 1) { w.style.display = 'block'; w._d = 1 }
-      const c = clamp(1 - ad);
-      w.style.opacity = o.toFixed(3);
-      w.style.transform = `translate(${(90 + 78 * c).toFixed(2)}px,${(520 - 60 + d * 140).toFixed(2)}px)`;
-      w.style.color = `rgb(${Math.round(lerp(205, 255, c))},${Math.round(lerp(212, 255, c))},${Math.round(lerp(255, 255, c))})`;
-      w.style.textShadow = c > .5 ? `0 0 40px rgba(139,156,255,${(.7 * c).toFixed(2)})` : 'none';
+// ---------- OPENING (video time) ----------
+const $strike = $('strike'), $ask1 = $('ask1'), $ask2 = $('ask2'), $pd = $('pd'), $pcol = $('pcol'), $mba = $('mbag'), $mbb = $('mbbg');
+const IMP = [[0, 7], [.27, 7], [.46, 12], [.88, 13], [1.42, 16]];   // camera kicks [t, px]
+function shakeXY(t) { let x = 0, y = 0; for (const [t0, a] of IMP) { const g = t - t0; if (g < 0 || g > .5) continue; const d = Math.exp(-g * 11) * a; x += Math.sin(g * 92 + t0 * 7) * d; y += Math.cos(g * 81 + t0 * 3) * d } return [x, y] }
+const ASKO = 2.58;   // the «Они спрашивают ИИ:» header leaves with the box whip
+function sceneHook(t) {
+  if (t > 2.9) { hls.forEach(L => S(L.el, 0)); S($strike, 0); S($ask1, 0); S($ask2, 0); return }
+  const [sx, sy] = shakeXY(t), zo = E.inExpo(P(t, HSH, HSH + .2));
+  const sp = E.outExpo(P(t, STK[0], STK[1])), struck = P(t, STK[1] - .03, STK[1] + .06), fr = Math.floor(t * 30 + 1e-6);
+  hls.forEach((L, l) => {
+    // lines 1-2 fly through the camera at the shatter; «гуглят.» is replaced by its particles
+    const o = l < 2 ? 1 - P(t, HSH + .05, HSH + .2) : (t < HSH ? 1 : 0);
+    const tr = l < 2 ? TR({ x: sx, y: sy + zo * (l ? 40 : -240), s: 1 + 1.5 * zo }) : TR({ x: sx * 1.4, y: sy * 1.4 });
+    if (!S(L.el, t > L.t0 - .01 ? o : 0, tr, l < 2 ? zo * 28 : 0)) return;
+    L.chs.forEach((ch, k) => {
+      const ts = L.t0 + k * .018, p = P(t, ts, ts + .27), e = E.outExpo(p), r = L.rnd[k];
+      ch.style.opacity = clamp(p * 5).toFixed(3);
+      ch.style.transform = `translateY(${((1 - e) * -80 * (r - .35)).toFixed(1)}px) rotate(${((1 - e) * (r - .5) * 46).toFixed(2)}deg) scale(${lerp(3.1, 1, e).toFixed(4)})`;
+      const b = (1 - e) * 26; ch.style.filter = b > .15 ? `blur(${b.toFixed(2)}px)` : 'none';
+      if (l === 2) {
+        // struck: the word goes cold grey and jitters in RGB for a few frames
+        const cs = struck > 0 && t < HSH ? (8 + 12 * rng(fr * 7 + k)()) * (1 - P(t, STK[1] + .04, HSH)) : 0;
+        ch.style.color = `rgb(${Math.round(lerp(203, 128, struck))},${Math.round(lerp(210, 134, struck))},${Math.round(lerp(255, 180, struck))})`;
+        ch.style.textShadow = cs > .5 ? `${(-cs).toFixed(1)}px 0 rgba(111,227,255,.85),${cs.toFixed(1)}px 0 rgba(255,79,160,.75)` : `0 0 46px rgba(139,156,255,${lerp(.95, .3, struck).toFixed(2)})`;
+      }
     });
+  });
+  // the strike: a white bar drawn left to right through «гуглят.»
+  S($strike, t >= STK[0] && t < HSH + .03 ? 1 : 0, `translate(${(STRK.x0 + sx * 1.4).toFixed(1)}px,${(STRK.y - 12 + sy * 1.4).toFixed(1)}px) scaleX(${(sp + .0001).toFixed(4)})`);
+  // «Они спрашивают» + the huge «ИИ.» (the particles of «гуглят» land in it), then both shrink into the header above the prompt box
+  // the shrink is a soft sine (peak speed ~1/2 of the old cubic) plus a speed-driven vertical blur, so MB=4 fuses instead of stacking copies
+  const hkf = x => E.inOutSine(P(x, 1.56, 1.9)), hk = hkf(t), vk = spd(hkf, t);
+  const sdA = Math.min(40, 242 * vk / 80);
+  $mba.setAttribute('stdDeviation', `0 ${sdA.toFixed(1)}`);
+  words($ask1, t, 1.2, ASKO, { st: .07, d: .32, from: 40, sc: 1.1, le: -.04, ls: false, tr: TR({ y: lerp(0, 324 - 566, hk) + sy * .5 }), f: sdA > .5 ? 'url(#mba)' : '' });
+  const ka = P(t, 1.36, 1.46), ko = E.inCubic(P(t, ASKO + .04, ASKO + .24)), punch = spring(t, 1.42, 30, 11);
+  const s2 = (1 + .06 * punch) * lerp(1, .286, hk) * (1 + .1 * ko), sdB = Math.min(70, 408 * vk / 80 / s2);
+  $mbb.setAttribute('stdDeviation', `0 ${sdB.toFixed(1)}`);
+  S($ask2, t < ASKO + .3 ? ka * (1 - ko) : 0, TR({ x: sx, y: lerp(0, 446 - 690, hk) - ko * 34 + sy, s: s2 }), ko * 26 + (1 - ka) * 10, sdB > .5 ? 'url(#mbb)' : '');
+  $pd.style.opacity = (1 - hk).toFixed(3); $pcol.style.opacity = hk.toFixed(3);
+}
+
+// ---------- MIDDLE (video time) ----------
+const $m1 = $('m1'), $m1cap = $('m1cap'), $m1num = $('m1num'), $m1pill = $('m1pill'), $slot = $('slot'), $slotc = $('slotc'), $m1u = $('m1u'), $mbp = $('mbpg');
+const $h2 = $('h2'), $mcs = $('mcs'), mcs = [0, 1, 2, 3].map(i => $('mc' + i)), $h3a = $('h3a'), $h3 = $('h3');
+const TICK = [8.8, 8.89, 8.98, 9.08];                       // the digit rolls 0 > 4; the last tick is the big hit
+const m1Y = t => 1150 * (1 - E.outExpo(P(t, 8.52, 8.9)));    // rises in from below once Körin has flown out (gone at 8.51)
+const m1Z = t => E.inExpo(P(t, 9.56, 9.74));                  // zooms through the camera
+const m1S = t => (1 + .03 * E.inOutSine(P(t, 8.8, 9.6)) + .04 * spring(t, TICK[3], 26, 9)) * (1 + 2 * m1Z(t));
+const m2Y = t => -1500 * E.inExpo(P(t, 10.86, 11.06));        // whip up out
+const m3Y = t => 1400 * (1 - E.outExpo(P(t, 10.95, 11.27)));   // whip up in
+const spd = (f, t) => Math.abs(f(t + 1 / 240) - f(t - 1 / 240)) * 120;
+function sceneMid(t) {
+  // M1: hero «4 раза из 30» (пример) on a full-colour field; «раза» lands with the 3rd tick
+  const sd1 = Math.min(90, spd(m1Y, t) / 60), zo = m1Z(t);
+  $mby.setAttribute('stdDeviation', `0 ${sd1.toFixed(1)}`);
+  if (S($m1, t > 8.5 && t < 9.76 ? 1 - P(t, 9.64, 9.76) : 0, TR({ y: m1Y(t), s: m1S(t) }), zo * 34, sd1 > .5 ? 'url(#mby)' : '')) {
+    words($m1cap, t, 8.6, 99, { st: .06, d: .36, from: 40, sc: 1.16, le: -.04, ls: false });
+    const tk = TICK.slice(0, 3).reduce((s, x) => s + spring(t, x, 32, 12), 0);
+    S($m1num, P(t, 8.52, 8.56), TR({ s: 1 + .035 * tk }), 0);
+    let cnt = 0; TICK.forEach(x => cnt += E.outCubic(P(t, x, x + .07)));
+    const cv = Math.abs(TICK.reduce((s, x) => s + E.outCubic(P(t + 1 / 240, x, x + .07)) - E.outCubic(P(t - 1 / 240, x, x + .07)), 0)) * 120;
+    $slotc.style.transform = `translateY(${(-cnt).toFixed(4)}em)`;
+    $mbd.setAttribute('stdDeviation', `0 ${Math.min(40, cv * 5).toFixed(1)}`);
+    $slot.style.filter = cv > .2 ? 'url(#mbd)' : 'none';
+    const ku = E.outBack(P(t, TICK[2], TICK[2] + .26));
+    $m1u.style.opacity = P(t, TICK[2], TICK[2] + .05).toFixed(3);
+    $m1u.style.transform = `translateY(${lerp(36, 0, ku).toFixed(1)}px) scale(${lerp(.55, 1, ku).toFixed(4)})`;
+    $m1u.style.filter = ku < .97 ? `blur(${((1 - Math.min(1, ku)) * 16).toFixed(2)}px)` : 'none';
+    const kp = E.outBack(P(t, 8.84, 9.08));
+    S($m1pill, P(t, 8.84, 8.9), TR({ s: lerp(.5, 1, kp), y: lerp(40, 0, kp) }), (1 - P(t, 8.84, 8.96)) * 10);
   }
-  // step 1: question > result with a rolling counter
-  words($q1, t, 8.42, 8.84, { st: .06 });
-  words($r1, t, 9.02, R2 - .02, { st: .045, tr: TR({ s: 1 + (t - 9) * .012 }) });
-  let cnt = 0; LIT.forEach(x => cnt += E.outCubic(P(t, x, x + .1)));
-  const cv = Math.abs(LIT.reduce((s, x) => s + (E.outCubic(P(t + dt, x, x + .1)) - E.outCubic(P(t - dt, x, x + .1))), 0)) / (2 * dt);
-  $slotc.style.transform = `translateY(${(-Math.max(0, cnt - 1)).toFixed(4)}em)`;
-  $mbd.setAttribute('stdDeviation', `0 ${Math.min(30, cv * 4).toFixed(1)}`);
-  $('slot').style.filter = cv > .2 ? 'url(#mbd)' : 'none';
-  // step 2: who is recommended instead of you
-  words($h2, t, 9.95, R3 - .04, { st: .07 });
-  const on2 = t > 9.98 && t < R3 + .2;
-  if (S($mcs, on2 ? 1 : 0, TR({ s: 1 + .03 * E.inOutSine(P(t, 10.3, R3)) }), 0)) {
+  // M2: «Покажем, кого советуют вместо вас», the cards fly in from depth, «а вы?» pulses
+  const on2 = t > 9.62 && t < 11.08, sd2 = Math.min(90, spd(m2Y, t) / 60), f2 = sd2 > .5 ? 'url(#mbu)' : '';
+  $mbu.setAttribute('stdDeviation', `0 ${sd2.toFixed(1)}`);
+  const push2 = 1 + .04 * E.inOutSine(P(t, 9.8, 11.0));
+  words($h2, t, 9.66, 99, { st: .055, d: .4, from: 50, sc: 1.35, le: -.045, ls: false, o: on2 ? 1 : 0, tr: TR({ y: m2Y(t), s: push2 }), f: f2 });
+  if (S($mcs, on2 ? 1 : 0, TR({ y: m2Y(t), s: push2 }), 0, f2)) {
     mcs.forEach((m, i) => {
-      const ti = 10.02 + i * .1, kin = E.outExpo(P(t, ti, ti + .55)), ko = E.inCubic(P(t, R3 - .06 + i * .03, R3 + .14 + i * .03));
-      const bob = Math.sin(t * 3.2 - i * 1.1) * 7 * P(t, ti + .4, ti + .7);
-      m.style.opacity = (P(t, ti, ti + .08) * (1 - ko)).toFixed(3);
-      m.style.transform = `translate3d(${((1 - kin) * 700 + ko * -120).toFixed(1)}px,${(bob - ko * 60).toFixed(1)}px,0) rotate(${((1 - kin) * 8).toFixed(2)}deg)`;
-      const b = (1 - kin) * 24 + ko * 20; m.style.filter = b > .2 ? `blur(${b.toFixed(1)}px)` : 'none';
-      if (i < 3) { const g0 = 10.7 + i * .14; m.lastChild.style.transform = `translateX(${lerp(-300, 1100, E.inOutCubic(P(t, g0, g0 + .5))).toFixed(1)}px) skewX(-20deg)` }
-      else { const pu = .5 + .5 * Math.sin(t * 8); m.style.boxShadow = `0 0 ${(30 + 50 * pu).toFixed(0)}px rgba(139,156,255,${(.35 + .4 * pu).toFixed(2)})` }
+      const ti = 9.84 + i * .075, kin = E.outExpo(P(t, ti, ti + .5)), sd = i % 2 ? 1 : -1;
+      const bob = Math.sin(t * 3.2 - i * 1.1) * 6 * P(t, ti + .4, ti + .7), land = spring(t, ti + .2, 30, 10);
+      const shake = i === 3 ? Math.sin(t * 60) * 8 * decay(t, ti + .22, .12) : 0;
+      m.style.opacity = P(t, ti, ti + .06).toFixed(3);
+      m.style.transform = `translate3d(${(sd * 760 * (1 - kin) + shake).toFixed(1)}px,${(bob + 30 * (1 - kin)).toFixed(1)}px,${(-1700 * (1 - kin)).toFixed(1)}px) rotateY(${(-sd * 58 * (1 - kin)).toFixed(2)}deg) rotateZ(${(sd * 9 * (1 - kin)).toFixed(2)}deg) scale(${(1 + .03 * land).toFixed(4)})`;
+      const b = (1 - kin) * 22; m.style.filter = b > .2 ? `blur(${b.toFixed(1)}px)` : 'none';
+      if (i < 3) { const g0 = 10.3 + i * .07; m.lastChild.style.transform = `translateX(${lerp(-300, 1100, E.inOutCubic(P(t, g0, g0 + .4))).toFixed(1)}px) skewX(-20deg)` }
+      else { const pu = .5 + .5 * Math.sin(t * 9); m.style.boxShadow = `0 0 ${(40 + 60 * pu).toFixed(0)}px rgba(139,156,255,${(.45 + .45 * pu).toFixed(2)})` }
     });
   }
-  // step 3: what to fix; the heading then moves up and stays pinned as the header of the ring tunnel
-  const kp = E.inOutCubic(P(t, 12.46, 12.86)), ps = .615;
-  const pinTr = `translate(${(lerp(0, 450 - H3W * ps / 2, kp)).toFixed(1)}px,${lerp(0, -680, kp).toFixed(1)}px) scale(${lerp(1, ps, kp).toFixed(4)})`;
-  words($h3, t, 11.38, 14.42, { st: .09, tr: pinTr });
-  const on3 = t > 11.45 && t < 12.85;
-  if (S($rows, on3 ? 1 - P(t, 12.5, 12.68) : 0, TR({ s: (1 + .02 * P(t, 11.6, 12.4)) * (1 + kz * 2), y: -kz * 100 }), kz * 30)) {
-    crs.forEach((el, i) => words(el, t, 11.5 + i * .08, 99, { st: .05, d: .45 }));
-  }
+  // M3: «Подскажем, что исправить:» whips up into place; the second line then pins as the header of the ring tunnel
+  const sd3 = Math.min(55, spd(m3Y, t) / 70), f3 = sd3 > .5 ? 'url(#mbv)' : '';
+  $mbv.setAttribute('stdDeviation', `0 ${sd3.toFixed(1)}`);
+  // the pin is a soft sine (peak speed ~1/2 of the old cubic) with a speed-driven vertical blur; 120 px * .517 keeps the header at ~62 px
+  const kpf = x => E.inOutSine(P(x, 11.8, 12.26)), kp = kpf(t), y3 = m3Y(t), push3 = 1 + .07 * E.inOutSine(P(t, 11.05, 11.95));
+  const sc3 = lerp(1, .517, kp) * lerp(push3, 1, kp), sdP = Math.max(sd3, Math.min(60, 495 * spd(kpf, t) / 100 / sc3));
+  $mbp.setAttribute('stdDeviation', `0 ${sdP.toFixed(1)}`);
+  words($h3a, t, 10.97, 11.7, { st: .05, d: .34, from: 30, sc: 1.12, le: -.045, ls: false, tr: TR({ y: y3, s: push3 }), f: f3 });
+  words($h3, t, 11.01, 13.92, { st: .07, d: .36, from: 30, sc: 1.12, le: -.045, ls: false, tr: `translate(0px,${(y3 + lerp(0, 250 - 716, kp)).toFixed(1)}px) scale(${sc3.toFixed(4)})`, f: sdP > .5 ? 'url(#mbp)' : '' });
 }
 
 const rls = [$('rl1'), $('rl2'), $('rl3')];
@@ -587,9 +709,12 @@ function drawBG(t) {
   if (a1 > 0) {
     vgrad(c, [[0, '#07061c'], [.32, '#120c52'], [.55, '#24168e'], [.8, '#160f62'], [1, '#08072a']], a1);
     c.globalCompositeOperation = 'lighter';
-    const zt = hookZ(t), vel = (hookZ(t + .004) - hookZ(t - .004)) / .008;
+    const zt = corrZ(TN), vel = (corrZ(TN + .004) - corrZ(TN - .004)) / .008;
     dotCorridor(c, zt, vel, a1, 950, '170,182,255', 1.15);
     const pulse = PL.reduce((s, tl) => s + decay(t, tl, .2), 0) * P(t, 1.33, 1.34);
+    // opening: the field flares on every slammed line, the strike, the shatter and «ИИ.»
+    const hp = HIMP.reduce((s, x) => s + decay(TN, x + .1, .16), 0) + 1.6 * decay(TN, HSH, .12) + 1.3 * decay(TN, 1.42, .14);
+    blob(c, CX, 900, 1000, '210,220,255', .2 * hp * a1, .62);
     blob(c, CX, 950, 980 * (1 + .05 * Math.sin(t * 3.1)), '91,60,255', (.62 + .2 * pulse) * a1);
     blob(c, CX, 950, 560, '139,156,255', (.34 + .25 * pulse) * a1, .8);
     blob(c, CX + 320 * Math.sin(t * 1.2), 470, 460, '111,227,255', .16 * a1);
@@ -622,26 +747,13 @@ function drawBG(t) {
   // REVEAL: glow blob swells behind Körin
   if (t > 6.6 && t < 8.4) {
     c.globalCompositeOperation = 'lighter';
-    const R = lerp(20, 950, E.outExpo(P(t, 6.86, 7.6))), a = P(t, 6.84, 6.92) * (1 - .25 * P(t, 7.5, 7.95)) * (1 - P(t, 7.96, 8.16));
+    const R = lerp(20, 950, E.outExpo(P(t, 6.86, 7.6))), a = P(t, 6.84, 6.92) * (1 - .25 * P(t, 7.5, 7.86)) * (1 - P(t, 7.88, 8.04));
     blob(c, CX, 900, R * 1.35, '91,60,255', .7 * a);
     blob(c, CX, 900, R * .85, '139,156,255', .6 * a);
     blob(c, CX, 900, R * .35, '225,232,255', .4 * a);
   }
-  // WHEEL: aurora field (violet / blue / cyan), slow drift
-  const a5 = P(t, 8.06, 8.3) * (1 - P(t, 12.5, 12.75));
-  if (a5 > 0) {
-    c.globalCompositeOperation = 'source-over';
-    vgrad(c, [[0, '#0b0832'], [.5, '#140d58'], [1, '#0a0a3e']], a5);
-    c.globalCompositeOperation = 'lighter';
-    blob(c, 780 + 120 * Math.sin(t * .7), 600 + 80 * Math.cos(t * .5), 1050, '91,60,255', .6 * a5, .85);
-    blob(c, 220 + 100 * Math.cos(t * .6), 1420, 950, '50,95,255', .45 * a5, .7);
-    blob(c, 900, 1250 + 120 * Math.sin(t * .8), 620, '111,227,255', .16 * a5);
-    dotCorridor(c, 300 * t + 1800 * wheelPos(t), 0, .22 * a5, 760, '170,182,255', .8);
-    const g1 = P(t, 8.95, 9.2) * (1 - P(t, R2, R2 + .2)), g2 = P(t, 10.0, 10.4) * (1 - P(t, R3, R3 + .2)), g3 = P(t, 11.45, 11.8) * (1 - P(t, 12.4, 12.6));
-    blob(c, 420, 1100, 560, '139,156,255', .3 * g1 * a5, .7);
-    blob(c, 540, 1300, 620, '91,60,255', .45 * g2 * a5, .7);
-    blob(c, 460, 1260, 560, '111,200,255', .22 * g3 * a5, .7);
-  }
+  // MIDDLE (video time)
+  drawMidBG(c, TN);
   // RING TUNNEL
   if (t > 12.45 && t < 15.07) drawTunnel(c, t);
   // END: glow field
@@ -657,6 +769,47 @@ function drawBG(t) {
     blob(c, CX + 260 * Math.cos(t * .7), 1500, 420, '111,227,255', .1 * a8);
   }
   c.globalCompositeOperation = 'source-over';
+}
+
+// light rays fanning out of a point (additive)
+function rays(c, x, y, rot, n, a) {
+  if (a <= .003) return;
+  c.save(); c.translate(x, y); c.rotate(rot);
+  const g = c.createRadialGradient(0, 0, 0, 0, 0, 2000); g.addColorStop(0, `rgba(255,255,255,${a.toFixed(3)})`); g.addColorStop(.45, `rgba(220,228,255,${(a * .5).toFixed(3)})`); g.addColorStop(1, 'rgba(220,228,255,0)');
+  c.fillStyle = g; c.beginPath();
+  for (let i = 0; i < n; i++) { const a0 = i / n * 6.2832; c.moveTo(0, 0); c.arc(0, 0, 2400, a0, a0 + 6.2832 / n * .42); c.closePath() }
+  c.fill(); c.restore();
+}
+function drawMidBG(c, t) {
+  // M1: a full-colour violet field that rises in from below, rotating rays, a rushing corridor; it flares on every tick of the counter
+  const a1 = P(t, 8.5, 8.57) * (1 - P(t, 9.64, 9.78));
+  if (a1 > 0) {
+    const cy = 880 + 1300 * (1 - E.outExpo(P(t, 8.5, 8.9))), hit = TICK.reduce((s, x, i) => s + (i === 3 ? 1 : .4) * decay(t, x, .14), 0);
+    c.globalCompositeOperation = 'source-over';
+    const R = 1750 * (1 + .05 * hit), g = c.createRadialGradient(CX, cy, 0, CX, cy, R);
+    g.addColorStop(0, '#c4baff'); g.addColorStop(.14, '#937cff'); g.addColorStop(.4, '#5e3ff2'); g.addColorStop(.7, '#3321bd'); g.addColorStop(1, '#190e70');
+    c.globalAlpha = a1; c.fillStyle = g; c.fillRect(0, 0, W, H); c.globalAlpha = 1;
+    c.globalCompositeOperation = 'lighter';
+    rays(c, CX, cy, t * .22, 20, (.06 + .05 * hit) * a1);
+    const zm = t => 800 * t + 2600 * E.outExpo(P(t, TICK[3], TICK[3] + .6)) + 2200 * E.inExpo(P(t, 9.5, 9.76));
+    dotCorridor(c, zm(t), (zm(t + .004) - zm(t - .004)) / .008, .42 * a1, cy, '240,244,255', 1);
+    blob(c, CX, cy, 760, '255,255,255', (.12 + .12 * hit) * a1, .8);
+    blob(c, CX + 300 * Math.sin(t * 1.3), 380, 560, '111,227,255', .22 * a1);
+    blob(c, CX - 260 * Math.cos(t), 1520, 620, '111,227,255', .16 * a1);
+  }
+  // M2 + M3: deep aurora; the corridor surges on each change and dives toward the ring tunnel
+  const a2 = P(t, 9.6, 9.76) * (1 - P(t, 11.95, 12.2));
+  if (a2 > 0) {
+    c.globalCompositeOperation = 'source-over';
+    vgrad(c, [[0, '#120a4c'], [.45, '#26178f'], [1, '#0d0942']], a2);
+    c.globalCompositeOperation = 'lighter';
+    blob(c, 780 + 140 * Math.sin(t * .9), 560 + 80 * Math.cos(t * .6), 1050, '91,60,255', .7 * a2, .85);
+    blob(c, 240 + 120 * Math.cos(t * .8), 1450, 950, '50,95,255', .5 * a2, .7);
+    blob(c, 900, 1200 + 140 * Math.sin(t), 620, '111,227,255', .2 * a2);
+    const zm = t => 420 * t + 2400 * E.outExpo(P(t, 9.6, 10.1)) + 2600 * E.inOutCubic(P(t, 10.86, 11.3)) + 5000 * E.inExpo(P(t, 11.5, 12.05));
+    dotCorridor(c, zm(t), (zm(t + .004) - zm(t - .004)) / .008, .32 * a2, 900, '170,182,255', .9);
+    const a3 = P(t, 11.0, 11.3); if (a3 > 0) blob(c, CX, 920, 820, '139,156,255', .35 * a3 * a2, .7);
+  }
 }
 
 // a thick glowing band: bright core on the inner edge, colour fading outward (fills the frame)
@@ -804,6 +957,91 @@ function spill(c, bx, yc, hh, a) {
   c.fillStyle = lg; c.fillRect(-110, -hh, 220, 2 * hh); c.restore();
 }
 
+// ---------- opening + middle fx (video time) ----------
+function hookFX(c, t) {
+  if (t > 2.1) return;
+  c.globalCompositeOperation = 'lighter';
+  // a soft bloom as each line lands
+  HL.forEach((L, l) => { const f = t > L.t0 + .1 ? decay(t, L.t0 + .1, .08) : 0; if (f > .01) blob(c, CX, [625, 841, 1079][l], 560, '220,228,255', .3 * f, .3) });
+  // strike head: hot white point + anamorphic flare running along the bar
+  if (t >= STK[0] && t < HSH) {
+    const sp = E.outExpo(P(t, STK[0], STK[1])), x = lerp(STRK.x0, STRK.x1, sp), y = STRK.y, f = 1 - .7 * P(t, STK[1], HSH);
+    blob(c, x, y, 140, '255,255,255', .95 * f); blob(c, x, y, 320, '111,227,255', .55 * f); blob(c, x, y, 780, '200,220,255', .5 * f, .04);
+  }
+  // shatter: white flash on the word
+  if (t >= HSH && t < HSH + .4) { const f = decay(t, HSH, .07); blob(c, CX, STRK.y, 700, '255,255,255', .75 * f, .35); blob(c, CX, STRK.y, 280, '255,255,255', .5 * f) }
+  // the letters of «гуглят» blow apart and swirl up into «ИИ.» (short motion trails)
+  if (HP && t >= HSH && t < 1.56) {
+    const fa = 1 - P(t, 1.42, 1.56), pW = new Path2D(), pB = new Path2D();
+    for (let i = 0; i < HPN; i++) { const [x, y] = hookP(i, t), [px, py] = hookP(i, t - .022), pa = HP[i * 9 + 8] ? pB : pW; pa.moveTo(px, py); pa.lineTo(x + .01, y) }
+    c.lineCap = 'round'; c.lineWidth = 3;
+    c.strokeStyle = `rgba(255,255,255,${(.9 * fa).toFixed(3)})`; c.stroke(pW);
+    c.strokeStyle = `rgba(165,182,255,${(.95 * fa).toFixed(3)})`; c.stroke(pB);
+    c.globalAlpha = .55 * fa; for (let i = 0; i < HPN; i += 6) { const [x, y] = hookP(i, t); c.drawImage(halos[i % 3], x - 10, y - 10, 20, 20) } c.globalAlpha = 1;
+  }
+  // «ИИ.» lands: bloom + two shockwave rings
+  const p = P(t, 1.42, 1.95);
+  if (p > 0 && p < 1) {
+    softRing(c, CX, 900, lerp(140, 1250, E.outCubic(p)), 60 * (1 - p) + 10, '220,230,255', .85 * (1 - p));
+    softRing(c, CX, 900, lerp(60, 900, E.outCubic(P(t, 1.47, 1.95))), 18, '255,255,255', .6 * (1 - p));
+    blob(c, CX, 900, 640, '255,255,255', .5 * decay(t, 1.42, .08), .6);
+  }
+}
+function midFX(c, t) {
+  if (t < 8.5 || t > 12.1) return;
+  c.globalCompositeOperation = 'lighter';
+  // M1: a ring pulse on every tick of the counter; the last one throws a shockwave and a burst of sparks
+  const a1 = P(t, 8.6, 8.7) * (1 - P(t, 9.6, 9.72));
+  if (a1 > 0) {
+    const s = m1S(t), X = 540 + (SLOTC.x - 540) * s, Y = 880 + (SLOTC.y + m1Y(t) - 880) * s;
+    TICK.forEach((x, i) => {
+      const big = i === 3, p = P(t, x, x + (big ? .7 : .4));
+      if (p <= 0 || p >= 1) return;
+      softRing(c, X, Y, lerp(120, big ? 1150 : 440, E.outCubic(p)), (big ? 64 : 24) * (1 - p) + 8, '255,255,255', (big ? .95 : .55) * (1 - p) * a1);
+      if (big) softRing(c, X, Y, lerp(80, 780, E.outCubic(P(t, x + .05, x + .7))), 30, '111,227,255', .6 * (1 - p) * a1);
+      blob(c, X, Y, big ? 420 : 260, '255,255,255', (big ? .4 : .25) * decay(t, x, .06) * a1);
+    });
+    const tb = TICK[3];
+    if (t > tb && t < tb + .95) {
+      const r = rng(808); c.lineCap = 'round';
+      for (let i = 0; i < 160; i++) {
+        const an = r() * 6.2832, sp = 380 + 1150 * r(), life = .45 + .45 * r(), w = 2 + 4.5 * r(), ci = Math.floor(r() * 3);
+        const k = E.outCubic(P(t, tb, tb + life)), k2 = E.outCubic(P(t - .035, tb, tb + life)), al = (1 - P(t, tb, tb + life)) * a1;
+        if (al <= .01) continue;
+        c.strokeStyle = `rgba(${['255,255,255', '175,238,255', '210,200,255'][ci]},${al.toFixed(3)})`; c.lineWidth = w;
+        c.beginPath(); c.moveTo(X + Math.cos(an) * sp * k2, Y + Math.sin(an) * sp * k2 * .85); c.lineTo(X + Math.cos(an) * sp * k + .01, Y + Math.sin(an) * sp * k * .85); c.stroke();
+      }
+    }
+    for (const [sx, sy, b0] of [[160, 760, 9.14], [930, 690, 9.22], [890, 1130, 9.3], [200, 1120, 9.38]]) { const life = P(t, b0, b0 + .5); if (life > 0 && life < 1) sparkle(c, sx, sy, 15, Math.sin(life * Math.PI) * a1, t * 2.5 + sx) }
+  }
+  // M2: a light streak cuts across the cards
+  if (t > 10.26 && t < 10.72) streak(c, u => [lerp(-260, 1340, u), lerp(1560, 700, u) + Math.sin(u * 3.1) * 70], 1.65 * E.inOutCubic(P(t, 10.28, 10.58)), .75, .8, .8);
+  // M3: a bloom behind «что исправить» as it lands; three numbered rings pop in, then dive into the tunnel (they become its rings)
+  if (t > 11.0 && t < 12.1) {
+    const f = t > 11.18 ? decay(t, 11.18, .2) : 0; blob(c, CX, 780, 760, '200,215,255', .4 * f, .45);
+    const dvf = x => E.inOutSine(P(x, 11.64, 12.0)), moving = spd(dvf, t) > .02;
+    for (let i = 0; i < 3; i++) {
+      const t0 = 11.22 + i * .09, kb = E.outBack(P(t, t0, t0 + .32)), a = P(t, t0, t0 + .06) * (1 - P(t, 11.98, 12.08));
+      if (a <= .01) continue;
+      const Rg = RING(i + 1), sg = 900 / (Rg.z + 2600), ts = Rg.R * sg / 92, col = RCOL[i + 1];   // where / how big tunnel ring i+1 sits when the tunnel opens
+      const pos = x => { const d = dvf(x); return [lerp(300 + 240 * i, CX + Rg.ox * sg, d), lerp(1260 + m3Y(x), TCY + Rg.oy * sg, d), 92 * kb * lerp(1, ts, d), d] };
+      // while diving, each (sub-)frame draws the ring over its own 1/120 s (4 samples), so the MB=4 copies fuse into one smear
+      const NS = moving ? 4 : 1;
+      for (let j = 0; j < NS; j++) {
+        const [x, y, r, d] = pos(t - j / (120 * NS)), aj = a / NS;
+        bandRing(c, x, y, r, 9 * lerp(1, .6, d), col, .9 * aj);
+        c.lineWidth = 4; c.strokeStyle = `rgba(255,255,255,${(.9 * aj).toFixed(3)})`; c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.stroke();
+        const ga = t * 4 + i * 2; c.lineCap = 'round'; c.lineWidth = 9; c.strokeStyle = `rgba(255,255,255,${aj.toFixed(3)})`; c.beginPath(); c.arc(x, y, r, ga, ga + .7); c.stroke();
+      }
+      const [x, y, , dv] = pos(t);
+      c.save(); c.globalCompositeOperation = 'source-over'; c.globalAlpha = a * (1 - P(dv, .06, .3)); c.fillStyle = '#fff'; c.font = `700 ${Math.round(84 * kb * lerp(1, ts, dv))}px Onest, Inter`; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.shadowColor = 'rgba(139,156,255,.9)'; c.shadowBlur = 24; if (kb > .05) c.fillText(String(i + 1), x, y + 4 * kb); c.restore();
+      blob(c, x, y, 260, '139,156,255', .5 * a * decay(t, t0, .15));
+    }
+  }
+}
+
+
 function drawFX(t) {
   const c = fx; c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1; c.filter = 'none';
   c.clearRect(0, 0, W, H);
@@ -873,68 +1111,19 @@ function drawFX(t) {
   // REVEAL: anamorphic sun-flare, lens ghosts, shine spill, sparkles
   if (t > 6.84 && t < 8.32) {
     c.globalCompositeOperation = 'lighter';
-    const k = E.outExpo(P(t, 6.9, 7.5)), a = P(t, 6.86, 6.94) * (1 - .65 * P(t, 7.05, 7.7)) * (1 - P(t, 7.96, 8.16));
+    const k = E.outExpo(P(t, 6.9, 7.5)), a = P(t, 6.86, 6.94) * (1 - .65 * P(t, 7.05, 7.7)) * (1 - P(t, 7.88, 8.04));
     blob(c, CX, 900, lerp(40, 1300, k), '170,200,255', .75 * a, .035);
     blob(c, CX, 900, lerp(20, 800, k), '255,255,255', .85 * a, .012);
     blob(c, CX, 900, 240, '255,255,255', .5 * a * (1 - P(t, 6.94, 7.3)));
     for (const [u, r, rgb] of [[-.55, 60, '111,227,255'], [-.25, 26, '139,156,255'], [.35, 90, '91,60,255'], [.7, 40, '111,227,255']]) blob(c, CX + u * 520 * (1 + .1 * k), 900 - u * 300, r, rgb, .35 * a);
     const sw = P(t, 7.42, 7.92);
     if (KOR && sw > 0 && sw < 1) { const p = 1 - E.inOutCubic(sw); spill(c, KOR.x - 2 * KOR.w * p + 1.5 * KOR.w, KOR.y + KOR.h / 2, 170, .55 * Math.sin(Math.PI * sw)) }
-    const fs = 1 - P(t, 7.96, 8.14);
+    const fs = 1 - P(t, 7.88, 8.02);
     for (const [sx, sy, b0] of [[150, 780, 7.05], [930, 810, 7.2], [700, 1030, 7.35], [330, 1040, 7.5], [980, 990, 7.62]]) { const life = P(t, b0, b0 + .6); if (life > 0 && life < 1) sparkle(c, sx, sy, 13, Math.sin(life * Math.PI) * fs, t * 2.5 + sx) }
   }
 
-  // WHEEL: sparkle bullet on the centre row, step visuals
-  const a5 = P(t, 8.3, 8.6) * (1 - P(t, 12.42, 12.56));
-  if (a5 > 0) {
-    c.globalCompositeOperation = 'lighter';
-    sparkle(c, 124, 520, 19, a5, t * 1.4);
-    // step 1: 30 answers as dots, 4 light up with ring pulses
-    const aA = P(t, 8.5, 8.6) * (1 - P(t, R2, R2 + .14));
-    if (aA > 0) {
-      const lit = { 2: LIT[0], 13: LIT[1], 19: LIT[2], 26: LIT[3] }, bob = 1 + .01 * (t - 8.5);
-      for (let i = 0; i < 30; i++) {
-        const col = i % 10, row = Math.floor(i / 10), x = 112 + col * 86 * bob, y = 1316 + row * 86;
-        const ks = E.outBack(P(t, 8.5 + col * .03 + row * .05, 8.8 + col * .03 + row * .05));
-        const L = lit[i] ? E.outExpo(P(t, lit[i], lit[i] + .3)) : 0, br = lit[i] ? .15 * Math.sin((t - lit[i]) * 6) * L : 0;
-        if (L > 0) { blob(c, x, y, 90 * L, '139,156,255', .75 * L * aA); softRing(c, x, y, lerp(20, 110, P(t, lit[i], lit[i] + .5)), 7, '220,228,255', .9 * (1 - P(t, lit[i], lit[i] + .5)) * aA) }
-        c.globalCompositeOperation = 'source-over';
-        c.fillStyle = L > 0 ? `rgba(${Math.round(lerp(120, 235, L))},${Math.round(lerp(126, 240, L))},${Math.round(lerp(170, 255, L))},${aA})` : `rgba(120,126,170,${(.75 * aA).toFixed(3)})`;
-        c.beginPath(); c.arc(x, y, 22 * ks * (1 + .25 * L + br), 0, 6.2832); c.fill();
-        c.globalCompositeOperation = 'lighter';
-      }
-    }
-    // step 3: check circles draw themselves, gradient bars fill with light
-    const aC = P(t, 11.45, 11.6);
-    if (aC > 0 && t < 12.85) {
-      const kz = E.inCubic(P(t, 12.4, 12.72)), sc = (1 + .02 * P(t, 11.6, 12.4)) * (1 + kz * 2), ao = aC * (1 - P(t, 12.5, 12.68));
-      c.save(); c.translate(540, 1300 - kz * 100); c.scale(sc, sc); c.translate(-540, -1300);
-      if (kz > .02) c.filter = `blur(${(kz * 30).toFixed(1)}px)`;
-      for (let i = 0; i < 3; i++) {
-        const top = 1112 + i * 140, cy = top + 34, x0 = 132, ki = E.outExpo(P(t, 11.5 + i * .08, 11.9 + i * .08)), tk = 11.72 + i * .2;
-        const kt = P(t, tk, tk + .22), kf = E.outCubic(P(t, tk + .04, tk + .5));
-        c.globalCompositeOperation = 'source-over'; c.globalAlpha = ao * ki;
-        c.fillStyle = 'rgba(255,255,255,.12)'; roundRect(c, 196, top + 84, 640 * ki, 12, 6); c.fill();
-        const g = c.createLinearGradient(196, 0, 836, 0); g.addColorStop(0, '#8b9cff'); g.addColorStop(.7, '#6fe3ff'); g.addColorStop(1, '#ffffff');
-        c.fillStyle = g; roundRect(c, 196, top + 84, 640 * kf * ki, 12, 6); c.fill();
-        c.lineWidth = 5; c.strokeStyle = 'rgba(170,185,255,.75)'; c.beginPath(); c.arc(x0, cy, 40, 0, 6.2832); c.stroke();
-        if (kt > 0) {
-          const kb = E.outBack(P(t, tk, tk + .3));
-          c.fillStyle = '#fff'; c.beginPath(); c.arc(x0, cy, 40 * kb, 0, 6.2832); c.fill();
-          c.lineWidth = 9; c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = '#2a1ea0';
-          const pts = [[-17, 1], [-5, 14], [19, -12]], L1 = 17.7, L2 = 35.4, dl = (L1 + L2) * E.outCubic(kt);
-          c.beginPath(); c.moveTo(x0 + pts[0][0], cy + pts[0][1]);
-          if (dl <= L1) c.lineTo(x0 + lerp(pts[0][0], pts[1][0], dl / L1), cy + lerp(pts[0][1], pts[1][1], dl / L1));
-          else { c.lineTo(x0 + pts[1][0], cy + pts[1][1]); const u = (dl - L1) / L2; c.lineTo(x0 + lerp(pts[1][0], pts[2][0], u), cy + lerp(pts[1][1], pts[2][1], u)) }
-          c.stroke();
-          c.globalCompositeOperation = 'lighter'; blob(c, x0, cy, 140, '139,156,255', .7 * (1 - P(t, tk + .1, tk + .6)) * ao);
-          blob(c, 196 + 640 * kf, top + 90, 90, '200,240,255', .8 * Math.sin(Math.PI * kf) * ao);
-        }
-        c.globalAlpha = 1;
-      }
-      c.restore();
-    }
-  }
+  // OPENING + MIDDLE (video time)
+  hookFX(c, TN); midFX(c, TN);
 
   // END: particles swirl in with streak trails and assemble into the logo (ring + dot), then the crisp logo
   if (LOGO && t > 15.04) {
@@ -974,25 +1163,27 @@ function roundRect(c, x, y, w, h, r) { r = Math.min(r, w / 2, h / 2); c.beginPat
 const $flash = $('flash');
 const flashA = (t, tp) => t < tp - .05 ? 0 : t < tp ? E.inCubic(P(t, tp - .05, tp)) : t < tp + .066 ? 1 : decay(t, tp + .066, .045);
 function flash(t) {
-  const f = Math.max(flashA(t, 2.50), flashA(t, 15.04));
+  const f = Math.max(flashA(t, 2.50), flashA(t, 15.02));
   if (f <= .003) { $flash.style.display = 'none'; return }
   $flash.style.display = 'block'; $flash.style.opacity = '1';
   const q = f >= .999 ? 1 : f * f, c0 = [lerp(120, 255, f), lerp(130, 255, f), 255].map(v => (v * f).toFixed(0)), c1 = [lerp(90, 238, q), lerp(100, 241, q), lerp(255, 255, q)].map(v => (v * q).toFixed(0)), c2 = [lerp(60, 196, q), lerp(50, 205, q), lerp(200, 255, q)].map(v => (v * q * q).toFixed(0));
   $flash.style.background = `radial-gradient(ellipse at 50% 48%,rgb(${c0}) 0%,rgb(${c1}) 50%,rgb(${c2}) 100%)`;
 }
 
-window.seek = function (t) {
-  t = Math.max(0, Math.min(window.DURATION, t));
+window.seek = function (tn) {
+  tn = Math.max(0, Math.min(window.DURATION, tn)); TN = tn;
+  const t = OT(tn);   // clock of the scenes written before the new opening
   drawBG(t);
-  sceneS1(t); sceneS2(t); sceneS4(t); sceneS5(t); sceneS7(t); sceneS8(t);
-  drawFX(t); flash(t); drawGrain(t);
+  sceneHook(tn); sceneS1(t); sceneS2(t); sceneS4(t); sceneMid(tn); sceneS7(t); sceneS8(t);
+  drawFX(t); flash(t); drawGrain(tn);
 };
 
 (async () => {
   try {
     await Promise.all([
       document.fonts.load('700 200px Onest', 'А вас тут нет.Körin'), document.fonts.load('500 104px Onest', 'Где заказать'),
-      document.fonts.load('600 64px Onest', 'kenesai.asia/korin ChatGPT'), document.fonts.load('700 116px Onest', 'Проверим'), document.fonts.load('700 136px Onest', 'Perplexity')]);
+      document.fonts.load('600 64px Onest', 'kenesai.asia/korin ChatGPT пример'), document.fonts.load('700 116px Onest', 'Клиенты больше не гуглят. Они спрашивают ИИ: 01234 из 30'), document.fonts.load('700 136px Onest', 'Perplexity Zeta Mebel'),
+      document.fonts.load('500 56px Onest', '1 минута · без регистрации')]);
     await document.fonts.ready;
   } catch (e) { }
   build();
