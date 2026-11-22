@@ -1,6 +1,7 @@
 // Renders an HTML animation to MP4, frame by frame, so every frame is exact.
 // The page must define window.DURATION (seconds) and window.seek(t) that draws the state at time t.
 // Usage: node ads/video/render.js <page.html> <out.mp4> [width] [height] [fps] [from] [to]
+// MB=4 node ... renders 4 sub-frames per frame and blends them: real motion blur on fast moves (4x slower).
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 const path = require('path');
@@ -23,16 +24,18 @@ const [page, out, W = 1920, H = 1080, FPS = 30, FROM, TO] = process.argv.slice(2
   }
   for (const f of frames) await f.waitForFunction(ready);
   const dur = Math.max(...await Promise.all(frames.map(f => f.evaluate(() => window.DURATION || 0))));
-  const a = FROM ? +FROM : 0, b = TO ? +TO : dur, n = Math.round((b - a) * FPS);
-  const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-',
+  const MB = Math.max(1, +(process.env.MB || 1)), RATE = FPS * MB;
+  const a = FROM ? +FROM : 0, b = TO ? +TO : dur, n = Math.round((b - a) * RATE);
+  const blur = MB > 1 ? ['-vf', `tmix=frames=${MB},fps=${FPS}`] : [];
+  const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(RATE), '-i', '-', ...blur,
     '-c:v', 'libx264', '-preset', 'medium', '-crf', '18', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
   for (let i = 0; i < n; i++) {
-    for (const f of frames) await f.evaluate(t => window.seek(t), a + i / FPS);
+    for (const f of frames) await f.evaluate(t => window.seek(t), a + i / RATE);
     ff.stdin.write(await p.screenshot({ type: 'jpeg', quality: 94 }));
     if (i % 90 === 0) process.stdout.write(`frame ${i}/${n}\r`);
   }
   ff.stdin.end();
   await new Promise(r => ff.on('close', r));
   await browser.close();
-  console.log(`\ndone ${out} (${n} frames, ${(n / FPS).toFixed(1)}s)`);
+  console.log(`\ndone ${out} (${n} frames, ${(n / RATE).toFixed(1)}s${MB > 1 ? ', motion blur x' + MB : ''})`);
 })();
