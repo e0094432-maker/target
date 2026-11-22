@@ -49,7 +49,7 @@ const nz=(x,s=0)=>{const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return lerp(hsh(i*7
 const pw=(t,S)=>{let v=S[0][2];for(const s of S){if(t>=s[0])v=t>=s[1]?s[3]:lerp(s[2],s[3],s[4](seg(t,s[0],s[1])))}return v};
 
 /* ---------- timeline ---------- */
-const TS=1.92, T3=4.42, T4=6.55, T5=8.82, T6=11.0, T7=12.85, TP=14.45, T8=15.6, T9=17.15, TC=19.2, TE=19.62;
+const TS=1.92, T3=4.42, T4=6.55, T5=8.82, T6=11.0, T7=12.85, TP=14.45, T8=15.66, T9=17.15, TC=19.2, TE=19.62;
 
 /* ---------- sprites ---------- */
 function sprite(rgb){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');const g=x.createRadialGradient(64,64,0,64,64,64);
@@ -74,8 +74,8 @@ function scratch(w,h){const bw=Math.ceil(w/64)*64,bh=Math.ceil(h/64)*64,k=bw+'x'
 function blurDraw(c,lw,lh,bl,draw){
   let d=bl>14?0.34:bl>5?0.5:1;if(lw*d>2000)d=2000/lw;if(lh*d>2000)d=Math.min(d,2000/lh);
   const sw=Math.ceil(lw*d),sh=Math.ceil(lh*d),[A,B]=scratch(sw,sh);
-  A.x.setTransform(1,0,0,1,0,0);A.x.clearRect(0,0,sw+2,sh+2);A.x.setTransform(d,0,0,d,sw/2,sh/2);A.x.save();draw(A.x,d);A.x.restore();
-  B.x.setTransform(1,0,0,1,0,0);B.x.clearRect(0,0,sw+2,sh+2);B.x.save();B.x.beginPath();B.x.rect(0,0,sw,sh);B.x.clip();B.x.filter=`blur(${(bl*d).toFixed(2)}px)`;B.x.drawImage(A.c,0,0);B.x.restore();
+  A.x.setTransform(1,0,0,1,0,0);A.x.clearRect(0,0,A.c.width,A.c.height);A.x.setTransform(d,0,0,d,sw/2,sh/2);A.x.save();draw(A.x,d);A.x.restore();
+  B.x.setTransform(1,0,0,1,0,0);B.x.clearRect(0,0,B.c.width,B.c.height);B.x.save();B.x.beginPath();B.x.rect(0,0,sw,sh);B.x.clip();B.x.filter=`blur(${(bl*d).toFixed(2)}px)`;B.x.drawImage(A.c,0,0);B.x.restore();
   c.drawImage(B.c,0,0,sw,sh,-sw/(2*d),-sh/(2*d),sw/d,sh/d);
 }
 function T(c,str,x,y,o){
@@ -101,12 +101,12 @@ function words(line,w,size){const ws=line.split(' '),tot=measure(line,w,size);le
 
 /* ---------- camera / shake ---------- */
 function cam(s,rot,ox,oy,px=CX,py=CY){ctx.translate(px+ox,py+oy);if(rot)ctx.rotate(rot);ctx.scale(s,s);ctx.translate(-px,-py)}
-const IMP=[[0.16,9],[0.53,9],[0.92,15],[TS,16],[8.3,13],[TP,22],[TE,14],[17.3,5],[17.98,5],[18.66,5]];
+const IMP=[[0.16,9],[0.53,9],[0.92,15],[TS,16],[8.22,13],[TP,22],[TE,14],[17.3,5],[17.98,5],[18.66,5]];
 function shake(t){let x=0,y=0;for(const [t0,a] of IMP){const g=t-t0;if(g<0||g>0.5)continue;const d=Math.exp(-g*10)*a;x+=Math.sin(g*92+t0*7)*d;y+=Math.cos(g*81+t0*3)*d}return [x,y]}
 
 /* ---------- background layers ---------- */
 const DOTS=[];for(let y=-24;y<=H+24;y+=48)for(let x=12;x<=W;x+=48)DOTS.push(x,y);
-const RIP=[[0.16,CX,690,1],[0.53,CX,880,1],[0.92,CX,1085,1.3],[TS,CX,880,1.7],[9.22,CX,CY,1],[11.66,CX,1010,1.1],[17.3,CX,810,1],[17.98,CX,810,1],[18.66,CX,810,1],[TE+0.02,CX,800,1.8]];
+const RIP=[[0.16,CX,690,1],[0.53,CX,880,1],[0.92,CX,1085,1.3],[TS,CX,880,1.7],[9.22,CX,CY,1],[11.55,CX,1010,1.1],[17.3,CX,810,1],[17.98,CX,810,1],[18.66,CX,810,1],[TE+0.02,CX,800,1.8]];
 function dotGrid(t,a){
   if(a<=0.01)return;
   ctx.save();ctx.globalCompositeOperation='lighter';
@@ -163,7 +163,7 @@ const Q1='Где заказать кухню',Q2='в Астане недорог
 let QX1=[],QX2=[];
 const WHEEL=['Кухни','Юристы','Стоматологии','Автосервисы','Курсы','Кафе'],WS={},WW={};
 const WSEG=[[T5,9.22,-5,0,eOutExpo],[9.30,9.55,0,1,eOutExpo],[9.62,9.87,1,2,eOutExpo],[9.94,10.19,2,3,eOutExpo],[10.26,10.51,3,4,eOutExpo],[10.58,10.83,4,5,eOutExpo],[10.88,11.1,5,10,eInExpo]];
-const QL=[{s:'Кого ИИ советует',size:94,w:600,y:620,col:'#edf2f5',t:[11.02,11.10,11.18]},{s:'в вашем',size:156,w:800,y:812,col:'#ffffff',t:[11.40,11.47]},{s:'городе?',size:196,w:800,y:1010,col:'#9aa9ff',t:[11.64]}];
+const QL=[{s:'Кого ИИ советует',size:94,w:600,y:620,col:'#edf2f5',t:[11.02,11.10,11.18]},{s:'в вашем',size:156,w:800,y:812,col:'#ffffff',t:[11.30,11.36]},{s:'городе?',size:196,w:800,y:1010,col:'#9aa9ff',t:[11.52]}];
 const TUN=[['Кого?',150],['Почему?',150],['Что делать?',124]];
 const ZSEG=[[T7,13.15,-2.4,0,eOutExpo],[13.15,13.40,0,0.08,x=>x],[13.40,13.62,0.08,1,eIOExpo],[13.62,13.88,1,1.08,x=>x],[13.88,14.10,1.08,2,eIOExpo],[14.10,14.34,2,2.08,x=>x],[14.34,14.52,2.08,3.4,eInExpo]];
 const LIT=[16.0,16.14,16.28,16.42];
@@ -193,7 +193,8 @@ function hookDraw(c,t,stat){
 }
 function sHook(t){
   if(t>TS+0.005)return;
-  ctx.save();cam(1+0.05*eOutCubic(seg(t,0,1.9)),0,0,0);hookDraw(ctx,t,false);ctx.restore();
+  let pu=0;for(const L of HOOK)pu+=0.035*Math.exp(-Math.pow((t-L.t0-0.13)/0.07,2));
+  ctx.save();cam((1+0.05*eOutCubic(seg(t,0,1.9)))*(1+pu),0,0,0);hookDraw(ctx,t,false);ctx.restore();
 }
 
 /* ---------- B2: particles re-form into «Они спрашивают ИИ.», AI marks orbit in 3D ---------- */
@@ -297,12 +298,12 @@ function sPrompt(t){
 /* ---------- B4: answer cards fly in 3D (DOM), then «А вас там нет.» ---------- */
 function sCards(t){
   if(t<T4||t>T5+0.15)return;
-  const hi=eOutExpo(seg(t,6.6,7.0)),ho=eInCubic(seg(t,8.02,8.25));
+  const hi=eOutExpo(seg(t,6.6,7.0)),ho=eInCubic(seg(t,7.94,8.17));
   T(ctx,'ИИ советует:',CX,440,{size:80,w:600,a:hi*(1-ho),blur:(1-hi)*24+ho*22,sc:lerp(1.2,1,hi)*(1+ho*.3),glow:14,gc:'rgba(139,156,255,.5)'});
-  const bi=seg(t,8.22,8.62),bo=eInCubic(seg(t,8.7,8.92));
-  if(bi>0){const e1=eOutExpo(bi),e2=eOutExpo(seg(t,8.3,8.7));
+  const bi=seg(t,8.12,8.52),bo=eInCubic(seg(t,8.7,8.92));
+  if(bi>0){const e1=eOutExpo(bi),e2=eOutExpo(seg(t,8.2,8.6));
     T(ctx,'А вас',CX,770,{size:130,w:700,a:clamp(bi*4)*(1-bo),blur:(1-e1)*30+bo*26,sc:lerp(1.5,1,e1)*(1-bo*.25)});
-    T(ctx,'там нет.',CX,950,{size:196,w:800,col:'#9aa9ff',a:clamp(seg(t,8.3,8.4))*(1-bo),blur:(1-e2)*34+bo*26,sc:lerp(1.7,1,e2)*(1-bo*.25),glow:44});
+    T(ctx,'там нет.',CX,950,{size:196,w:800,col:'#9aa9ff',a:clamp(seg(t,8.2,8.3))*(1-bo),blur:(1-e2)*34+bo*26,sc:lerp(1.7,1,e2)*(1-bo*.25),glow:44});
     ctx.save();ctx.globalCompositeOperation='lighter';glow(ctx,SPR.v,CX,940,560*(1+.05*Math.sin(t*3)),.5*e2*(1-bo));ctx.restore()}
 }
 let CARDS=[];
@@ -316,7 +317,7 @@ function domCards(t,sh){
   D.style.transform=`translate(${sh[0].toFixed(1)}px,${sh[1].toFixed(1)}px)`;
   CARDS.forEach((el,k)=>{
     const t0=k<3?6.64+k*0.12:7.5,p=seg(t,t0,t0+0.7),e=eOutExpo(p);
-    const q=eInExpo(seg(t,8.04+k*0.035,8.38+k*0.035));
+    const q=eInExpo(seg(t,7.96+k*0.035,8.3+k*0.035));
     let tz=-2600*(1-e)+Math.sin((t-t0)*2.2+k)*14+1500*q,ry=(k%2?1:-1)*44*(1-e)+Math.sin((t-t0)*1.6+k*2)*3,rx=-22*(1-e);
     const ty=(1-e)*(k-1.5)*-140+q*(k-1.5)*420;let op=clamp(p*4)*(1-q),bl=(1-e)*16+q*18;
     if(k===3&&t>7.95&&t<8.05)op*=hsh(Math.floor(t*60))>.5?1:.35;
@@ -353,7 +354,7 @@ function sWheel(t){
 function sQuestion(t){
   if(t<T6-0.02||t>13.1)return;
   ctx.save();cam(1+0.045*seg(t,T6,12.9),0.006*seg(t,T6,12.9),0,0);
-  const ba=eOutExpo(seg(t,11.6,12.1))*(1-eInCubic(seg(t,12.6,12.9)));
+  const ba=eOutExpo(seg(t,11.5,12.0))*(1-eInCubic(seg(t,12.6,12.9)));
   if(ba>0){ctx.save();ctx.globalCompositeOperation='lighter';const br=1+0.06*Math.sin(t*2.4);glow(ctx,SPR.v,CX+20,1010,640*br,.6*ba);glow(ctx,SPR.b,CX-40,1000,400*br,.42*ba);glow(ctx,SPR.c,CX+150,960,180,.16*ba);ctx.restore()}
   let n=0;
   for(const L of QL){L.wd.forEach((wd,j)=>{const ts=L.t[j],p=seg(t,ts,ts+0.5);if(p<=0)return;const e=eOutExpo(p);
@@ -426,7 +427,7 @@ function sRings(t){
 function sGauge(t){
   if(t<T8-0.06||t>T9+0.3)return;
   const gx0=CX,gy0=905,R=330,e=eOutExpo(seg(t,T8-0.04,T8+0.6)),out=eInCubic(seg(t,16.92,17.17));
-  const A=clamp(seg(t,T8-0.04,T8+0.14))*(1-out);
+  const A=clamp(seg(t,T8-0.03,T8+0.12))*(1-out);
   ctx.save();ctx.globalCompositeOperation='lighter';glow(ctx,SPR.v,gx0,gy0,620*(1+.05*Math.sin(t*2.6)),.45*A);glow(ctx,SPR.b,gx0,gy0-20,300,.35*A);ctx.restore();
   ctx.save();cam(lerp(0.55,1,e)*(1+out*0.6),(1-e)*-1.1,0,0,gx0,gy0);
   ctx.save();ctx.globalCompositeOperation='lighter';ring(ctx,gx0,gy0,R,70,'91,60,255',.32*A);ring(ctx,gx0,gy0,R-64,8,'139,156,255',.25*A);ctx.restore();
@@ -467,7 +468,7 @@ function sGauge(t){
 function sSteps(t){
   if(t<T9-0.05||t>TE+0.02)return;
   const col=eInExpo(seg(t,TC,TE-0.01));
-  ctx.save();cam(1-0.99*col,0,0,0,CX,LOGO.y);
+  ctx.save();cam((1-0.99*col)*(1+0.04*seg(t,T9,TC)),0,0,0,CX,LOGO.y);
   const hi=eOutExpo(seg(t,T9-0.02,T9+0.4));
   T(ctx,'Что сделать:',CX,560,{size:82,w:600,a:hi,blur:(1-hi)*26+col*12,sc:lerp(1.25,1,hi),glow:12,gc:'rgba(139,156,255,.5)'});
   for(let k=0;k<3;k++){const [a0,a1]=SW[k];if(t<a0||t>a1+0.02)continue;
@@ -523,8 +524,11 @@ function comet(c,t,[t0,dur,P,col,wd]){
   if(uh<=1){const h=pt(uh);glow(c,SPR.w,h[0],h[1],46,1);glow(c,SPR.c,h[0],h[1],140,.5)}
   c.restore();
 }
-const FL=[[TS,0.32,0.3,1],[T3,1.0,0.38,0],[TP,0.95,0.32,1],[TE,0.9,0.4,1]];
+const FL=[[TS,0.32,0.3,1],[T3,1.0,0.22,0],[TP,0.95,0.32,1],[TE,0.9,0.4,1]];
 function overlays(t){
+  for(const L of HOOK){const u=seg(t,L.t0+0.08,L.t0+0.5);if(u<=0||u>=1)continue;const a=(1-u)*(1-u),wd=lerp(240,1150,eOutExpo(u));
+    const g=fx.createLinearGradient(CX-wd/2,0,CX+wd/2,0);g.addColorStop(0,'rgba(111,227,255,0)');g.addColorStop(.5,`rgba(235,242,255,${a.toFixed(3)})`);g.addColorStop(1,'rgba(111,227,255,0)');
+    fx.save();fx.globalCompositeOperation='lighter';fx.fillStyle=g;fx.fillRect(CX-wd/2,L.y-2,wd,4);fx.globalAlpha=.3;fx.fillRect(CX-wd/2,L.y-22,wd,44);fx.restore()}
   for(const [x,y,r,a] of TOPDOT){fx.save();fx.globalAlpha=a;fx.fillStyle='#000';fx.beginPath();fx.arc(x,y,r,0,TAU);fx.fill();fx.restore()}
   for(const s of STR)comet(fx,t,s);
   // collapse: radial speed lines rushing into the dot
@@ -549,6 +553,18 @@ function overlays(t){
     fx.save();if(rad){fx.globalCompositeOperation='lighter';const fy=t0===TE?LOGO.y:CY;glow(fx,SPR.w,CX,fy,1500,a);glow(fx,SPR.b,CX,fy,900,a*.6)}else{fx.fillStyle=`rgba(255,255,255,${a.toFixed(3)})`;fx.fillRect(0,0,W,H)}fx.restore()}
   // vignette
   const vg=fx.createRadialGradient(CX,900,420,CX,900,1350);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.62)');fx.fillStyle=vg;fx.fillRect(0,0,W,H);
+}
+
+/* ---------- radial zoom blur for speed-ramped transitions ---------- */
+const ZB=[[TS-0.03,TS+0.3,0.07,0,880],[4.2,T3,0.22,1,880],[6.12,6.55,0.28,1,760],[7.94,8.26,0.12,0,CY],[8.7,8.95,0.10,0,CY],[10.88,11.08,0.16,0,CY],
+  [13.40,13.62,0.12,0,CY],[13.88,14.10,0.12,0,CY],[14.34,TP+0.16,0.30,0,CY],[15.44,15.66,0.18,1,880],[16.92,17.2,0.12,0,905],[19.25,TE,-0.22,1,800]];
+function zoomBlur(t){
+  let amt=0,cy=CY;for(const [a,b,pk,ramp,y] of ZB){if(t<a||t>b)continue;const v=ramp?pk*eInCubic(seg(t,a,b)):pk*Math.sin(Math.PI*seg(t,a,b));if(Math.abs(v)>Math.abs(amt)){amt=v;cy=y}}
+  if(Math.abs(amt)<0.004)return;
+  const L=LAY.x;L.setTransform(1,0,0,1,0,0);L.globalCompositeOperation='copy';L.globalAlpha=1;L.filter='none';L.drawImage(cv,0,0);L.globalCompositeOperation='source-over';
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalCompositeOperation='source-over';
+  for(let i=1;i<=8;i++){const s=1+amt*i/8;ctx.globalAlpha=1/(i+1);ctx.drawImage(LAY.c,CX-CX*s,cy-cy*s,W*s,H*s)}
+  ctx.restore();
 }
 
 /* ---------- bloom (cheap: quarter-res, squared as a soft threshold) ---------- */
@@ -599,6 +615,7 @@ window.seek=function(t){
   dust(t,(t>T5?0.7:0)*(1-seg(t,TC,TE))+0.8*seg(t,TE+0.3,TE+1.2),t>TE?50:0);
   meshScene(t);sHook(t);sAsk(t);sPrompt(t);sCards(t);sWheel(t);sQuestion(t);sRings(t);sGauge(t);sSteps(t);sEnd(t);
   ctx.setTransform(1,0,0,1,0,0);
+  zoomBlur(t);
   bloom(0.38);
   overlays(t);
   gx.drawImage(GR[Math.floor(t*30)%8],0,0);
