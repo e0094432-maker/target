@@ -572,7 +572,20 @@ const savedTheme = store.get('theme'); if(savedTheme) document.documentElement.d
 
 /* откуда пришёл посетитель: метка из рекламной ссылки, иначе сайт-источник */
 const SOURCE = (new URLSearchParams(location.search).get('utm_source') || (document.referrer ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
-document.getElementById('waBtn').addEventListener('click', () => { if (CONFIG.sheet) fetch(CONFIG.sheet, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: 'нажал «WhatsApp»', business: '—', whatsapp: '—', lang: lang + ' · ' + SOURCE }) }).catch(() => {}) });
+/* каждый посетитель получает номер; в таблицу пишем, что он сделал: зашёл, начал форму, нажал WhatsApp, ушёл */
+let VID = store.get('vid'); if (!VID) { VID = Math.random().toString(36).slice(2, 7).toUpperCase(); store.set('vid', VID) }
+const DEVICE = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'телефон' : 'компьютер', T0 = Date.now();
+let deep = 0; addEventListener('scroll', () => { deep = Math.max(deep, Math.round((scrollY + innerHeight) / document.documentElement.scrollHeight * 100)) }, { passive: true });
+function track(what, beacon) {
+  if (!CONFIG.sheet || navigator.webdriver) return;
+  const body = JSON.stringify({ name: what, business: 'откуда: ' + SOURCE, whatsapp: 'посетитель ' + VID + ' · ' + DEVICE, lang });
+  if (beacon && navigator.sendBeacon) navigator.sendBeacon(CONFIG.sheet, body); else fetch(CONFIG.sheet, { method: 'POST', mode: 'no-cors', body, keepalive: true }).catch(() => {});
+}
+let seen = false; try { seen = sessionStorage.getItem('seen'); sessionStorage.setItem('seen', 1) } catch (e) {}
+if (!seen) track('зашёл на сайт');
+let began = false; document.getElementById('leadForm').addEventListener('input', () => { if (!began) { began = true; track('начал заполнять форму') } });
+let left = false; addEventListener('pagehide', () => { if (!left) { left = true; track('ушёл: был ' + Math.round((Date.now() - T0) / 1000) + ' сек, пролистал ' + deep + '%', true) } });
+document.getElementById('waBtn').addEventListener('click', () => track('нажал «WhatsApp»'));
 
 /* заявка */
 const leadMsg = $('#leadMsg');
@@ -582,7 +595,7 @@ $('#leadForm').addEventListener('submit', async e => {
   const show = m => { leadMsg.textContent = m; leadMsg.classList.add('show') };
   if(!f.name.value.trim() || !f.business.value.trim() || !f.whatsapp.value.trim()) return show(t.required);
   const data = {
-    name: f.name.value.trim(), business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang: lang + ' · ' + SOURCE
+    name: f.name.value.trim(), business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang: lang + ' · ' + SOURCE + ' · посетитель ' + VID
   };
   if(CONFIG.sheet){
     // text/plain без своих заголовков: иначе браузер шлёт предварительный запрос, который Apps Script не принимает
