@@ -674,7 +674,7 @@ def marketer_plan(body):
     topic = brand["topics"][n % len(brand["topics"])]
     fmt = "carousel" if slot == 0 else "text" if slot == 1 else ("image" if day % 2 else "text")
     who = f"Ты ведёшь Threads «{brand['name']}». {brand['about']} Сайт: {brand['site']}. Работает в Казахстане.\n\nЧитатели: владельцы малого бизнеса в Казахстане. Тема: {topic}."
-    rules = "Правила: очень простые слова и короткие предложения, как будто пишешь другу; первая строка такая, чтобы захотелось читать дальше; без слов «уникальный», «инновационный», «под ключ», «эффективный»; не обещай результат; не выдумывай клиентов, цифры, проценты и отзывы; пиши как человек, а не как реклама."
+    rules = "Правила: начни с одной конкретной боли владельца бизнеса, которую он узнает с первой строки (заявок стало меньше, реклама дорожает, клиент ушёл к соседу, непонятно, куда уходят деньги), а не с общих слов про рынок; очень простые слова и короткие предложения, как будто пишешь другу; первая строка такая, чтобы захотелось читать дальше; без слов «уникальный», «инновационный», «под ключ», «эффективный»; не обещай результат; не выдумывай клиентов, цифры, проценты и отзывы; пиши как человек, а не как реклама."
     tags_rule = '"tags": ["от 2 до 4 хэштегов без решётки, одним словом, по теме"]'
     if fmt == "text":
         prompt = f"""{who} Подача: {HOOKS[n % len(HOOKS)]}.
@@ -739,12 +739,18 @@ def marketer_replies(body):
             break
         talk = _threads("GET", f"/{post.get('id', '')}/conversation", {"fields": "id,text,username,timestamp,replied_to", "reverse": "false", "access_token": token}).get("data", [])
         answered = {(x.get("replied_to") or {}).get("id") for x in talk if x.get("username") == me}
+        by_id = {x.get("id"): x for x in talk}
+        told = {}  # how many times we have already answered each person under this post
+        for x in talk:
+            if x.get("username") == me:
+                who = by_id.get((x.get("replied_to") or {}).get("id"), {}).get("username")
+                told[who] = told.get(who, 0) + 1
         for c in talk:
             if len(done) >= limit:
                 break
             text = re.sub(r"\s+", " ", str(c.get("text", ""))).strip()
             # only comments written to the post itself or to us, by someone else, not answered yet
-            if c.get("username") == me or c.get("id") in answered or len(text) < 4:
+            if c.get("username") == me or c.get("id") in answered or len(text) < 4 or told.get(c.get("username"), 0) >= 2:
                 continue
             parent = (c.get("replied_to") or {}).get("id")
             if parent and parent != post.get("id") and parent not in {x.get("id") for x in talk if x.get("username") == me}:
@@ -755,7 +761,7 @@ def marketer_replies(body):
 Комментарий от @{c.get('username', '')}: «{text[:600]}»
 
 Реши, отвечать ли. Не отвечай, если комментарий — оскорбление, спам, реклама чужого, политика, религия, личная беда или просто набор символов.
-Если отвечать: сначала согласись с тем, в чём человек прав, потом одной фразой спокойно поверни к нашей мысли. Если он задал вопрос — ответь прямо. Пиши как живой человек: просто, коротко, с уважением, можно с лёгкой иронией, но без колкостей и без спора. Без ссылок, без хэштегов, без обещаний и выдуманных цифр. До 230 знаков.
+Если отвечать: сначала согласись с тем, в чём человек прав, потом одной фразой спокойно поверни к нашей мысли. Если он задал вопрос — ответь прямо. Пиши как живой человек: просто, коротко, с уважением, можно с лёгкой иронией, но без колкостей и без спора. Без ссылок, без хэштегов, без обещаний и выдуманных цифр. Не говори, что мы можем «научить» или «заставить» нейросеть называть компанию: мы только проверяем и подсказываем, что сделать. Не обращайся через @. До 230 знаков.
 Верни ТОЛЬКО JSON: {{"answer": true, "reply": "текст ответа"}} или {{"answer": false, "reply": ""}}"""
             obj = parse_json(ask(prompt, "Ты вежливый и остроумный представитель бренда. Отвечаешь только валидным JSON на русском языке.")[0]) or {}
             reply = str(obj.get("reply", "")).strip()[:300]
@@ -767,6 +773,7 @@ def marketer_replies(body):
             time.sleep(2)
             _threads("POST", "/me/threads_publish", {"creation_id": made.get("id", ""), "access_token": token})
             answered.add(c.get("id"))
+            told[c.get("username")] = told.get(c.get("username"), 0) + 1
             done.append({"to": c.get("username", ""), "comment": text[:140], "reply": reply})
             print(f"marketer replied to @{c.get('username', '')} ({key}): {reply[:120]}", flush=True)
     return {"ok": True, "brand": key, "replied": done, "skipped": skipped}
