@@ -69,7 +69,16 @@ nav.menu a:hover::after{transform:scaleX(1)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .icon-btn{width:40px;height:40px;display:grid;place-items:center;border:var(--bw) solid var(--ink);border-radius:11px;background:var(--paper);flex:none}
 .icon-btn svg{width:18px;height:18px}
-.bar .btn-primary{display:none}
+/* на телефоне кнопка заявки в шапке компактная, в две строки: без неё на первом экране не было ни одной кнопки */
+@media (max-width:559px){
+  .bar{gap:6px}
+  .logo{flex:none}
+  #theme{width:36px;height:36px}
+  .bar .btn-primary{width:min-content;min-height:44px;padding:4px 7px;font-size:10.5px;line-height:1.1;border-radius:10px;box-shadow:2px 2px 0 var(--ink)}
+}
+/* RU/KZ уже только там, где иначе кнопка заявки не помещается */
+@media (max-width:374px){.seg button{padding:0 7px}}
+@media (max-width:359px){#theme{display:none}}
 .drawer{display:none;border-top:var(--bw) solid var(--ink);padding:6px 16px 22px;background:var(--bg)}
 .drawer.open{display:block}
 .drawer a:not(.btn){display:flex;justify-content:space-between;padding:15px 0;font:700 18px var(--disp);letter-spacing:-.02em;border-bottom:1px solid var(--hair)}
@@ -387,8 +396,8 @@ footer{background:var(--ink);color:var(--bg);padding:48px 0 0;font-size:14px;ove
       <div class="field"><label for="f_biz" data-i="l_biz">Название бизнеса или сайт</label><input type="text" id="f_biz" name="business" autocomplete="organization" required></div>
       <div class="field"><label for="f_wa">WhatsApp</label><input type="tel" id="f_wa" name="whatsapp" autocomplete="tel" inputmode="tel" placeholder="+7 7__ ___ __ __" required></div>
       <button class="btn btn-primary btn-block"><span data-i="l_btn">Отправить заявку</span><span class="arrow">→</span></button>
-      <a class="btn btn-block" id="waBtn" target="_blank" rel="noopener" href="https://wa.me/77076234637?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D1%80%D0%B5%D0%BA%D0%BB%D0%B0%D0%BC%D1%83%20%D0%B2%20ChatGPT."><span data-i="l_wa">Или сразу написать в WhatsApp</span></a>
       <div class="form-msg" id="leadMsg" role="status"></div>
+      <a class="btn btn-block" id="waBtn" target="_blank" rel="noopener" href="https://wa.me/77076234637?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D1%80%D0%B5%D0%BA%D0%BB%D0%B0%D0%BC%D1%83%20%D0%B2%20ChatGPT."><span data-i="l_wa">Или сразу написать в WhatsApp</span></a>
       <p class="fine" style="margin:0" data-i="l_fine">Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности.</p>
     </form>
   </div>
@@ -505,6 +514,7 @@ const KZ = {
 const T = {
   ru:{
     required:'Заполните имя, название бизнеса и WhatsApp.',
+    phone:'Напишите номер WhatsApp полностью, например +7 707 123 45 67.',
     sent:'Спасибо! Заявка отправлена. Напишем в WhatsApp в течение рабочего дня.',
     wa:'Открываем WhatsApp — отправьте сообщение, и мы ответим.',
     demo:'Демо-режим: форма ещё не подключена к приёму заявок, данные никуда не отправлены.',
@@ -519,11 +529,12 @@ const T = {
     a_agent:'ИИ-агент отвечает клиентам на сайте, в WhatsApp и Instagram 24/7, собирает заявки и передаёт менеджеру. Вы сейчас общаетесь с таким же. От 200 000 ₸ разово + от 30 000 ₸/мес.',
     a_pay:'Мы казахстанское ТОО: договор по законам РК, счёт в тенге, закрывающие документы.',
     a_phone:'Спасибо, записал номер! Менеджер напишет вам в WhatsApp в течение рабочего дня.',
-    a_phone_demo:'Спасибо! Это демо-версия чата, номер пока никуда не передаётся. Оставьте заявку в форме ниже на странице.',
+    a_phone_wa:'Если не напишем — WhatsApp +7\u00a0707\u00a0623\u00a046\u00a037.',
     a_else:'Хороший вопрос — на него лучше ответит менеджер. Оставьте номер WhatsApp, и мы напишем. Или спросите про цены, аудит или услуги.'
   },
   kz:{
     required:'Атыңызды, бизнес атауын және WhatsApp нөмірін толтырыңыз.',
+    phone:'WhatsApp нөмірін толық жазыңыз, мысалы +7 707 123 45 67.',
     sent:'Рақмет! Өтінім жіберілді. Жұмыс күні ішінде WhatsApp-қа жазамыз.',
     wa:'WhatsApp ашылып жатыр — хабарламаны жіберіңіз, біз жауап береміз.',
     demo:'Демо-режим: форма әлі өтінім қабылдауға қосылмаған, деректер ешқайда жіберілген жоқ.',
@@ -538,7 +549,7 @@ const T = {
     a_agent:'ЖИ-агент сайтта, WhatsApp пен Instagram-да клиенттерге 24/7 жауап береді, өтінімдерді жинап, менеджерге береді. Қазір дәл сондаймен сөйлесіп отырсыз. Бір рет 200 000 ₸ бастап + айына 30 000 ₸ бастап.',
     a_pay:'Біз қазақстандық ЖШС-міз: ҚР заңдары бойынша шарт, теңгемен шот, жабу құжаттары.',
     a_phone:'Рақмет, нөмірді жазып алдым! Менеджер жұмыс күні ішінде WhatsApp-қа жазады.',
-    a_phone_demo:'Рақмет! Бұл чаттың демо нұсқасы, нөмір әзірге ешқайда берілмейді. Беттің төменгі жағындағы формада өтінім қалдырыңыз.',
+    a_phone_wa:'Жазбасақ — WhatsApp +7\u00a0707\u00a0623\u00a046\u00a037.',
     a_else:'Жақсы сұрақ — оған менеджер жақсырақ жауап береді. WhatsApp нөміріңізді қалдырыңыз, біз жазамыз. Немесе бағалар, аудит не қызметтер туралы сұраңыз.'
   }
 };
@@ -587,32 +598,44 @@ let began = false; document.getElementById('leadForm').addEventListener('input',
 let left = false; addEventListener('pagehide', () => { if (!left) { left = true; track('ушёл: был ' + Math.round((Date.now() - T0) / 1000) + ' сек, пролистал ' + deep + '%', true) } });
 document.getElementById('waBtn').addEventListener('click', () => track('нажал «WhatsApp»'));
 
-/* заявка */
+/* заявка: форма и номер из чата уходят одной дорогой. Ответ: 'sent' | 'wa' | 'demo' (ключи текстов в T) */
+async function sendLead(data){
+  if(CONFIG.sheet){
+    // text/plain без своих заголовков: иначе браузер шлёт предварительный запрос, который Apps Script не принимает
+    await fetch(CONFIG.sheet, {method:'POST', mode:'no-cors', body:JSON.stringify(data)}); return 'sent';
+  }
+  if(CONFIG.endpoint){
+    const r = await fetch(CONFIG.endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+    if(!r.ok) throw 0; return 'sent';
+  }
+  if(CONFIG.whatsapp){
+    const text = `Заявка с сайта\nИмя: ${data.name}\nБизнес: ${data.business}\nWhatsApp: ${data.whatsapp}`;
+    window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(text), '_blank', 'noopener'); return 'wa';
+  }
+  return 'demo';
+}
 const leadMsg = $('#leadMsg');
 $('#leadForm').addEventListener('submit', async e => {
   e.preventDefault();
   const f = e.target, t = T[lang];
-  const show = m => { leadMsg.textContent = m; leadMsg.classList.add('show') };
+  const show = m => {
+    leadMsg.textContent = m; leadMsg.classList.add('show');
+    // на телефоне сообщение оказывалось ниже края экрана и человек видел пустую форму: показываем его вместе с кнопкой WhatsApp под ним
+    const head = $('header').getBoundingClientRect().bottom + 12, top = leadMsg.getBoundingClientRect().top, bottom = $('#waBtn').getBoundingClientRect().bottom;
+    if(bottom > innerHeight - 12) scrollBy({top: Math.min(bottom - innerHeight + 12, top - head), behavior:'smooth'});
+    else if(top < head) scrollBy({top: top - head, behavior:'smooth'});
+  };
   if(!f.name.value.trim() || !f.business.value.trim() || !f.whatsapp.value.trim()) return show(t.required);
+  if(f.whatsapp.value.replace(/\D/g,'').length < 10) return show(t.phone);
+  if(f.dataset.busy) return;  // повторные нажатия, пока заявка уходит, создавали дубли в таблице
   const data = {
     name: f.name.value.trim(), business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang: lang + ' · ' + SOURCE + ' · посетитель ' + VID
   };
-  if(CONFIG.sheet){
-    // text/plain без своих заголовков: иначе браузер шлёт предварительный запрос, который Apps Script не принимает
-    if(f.dataset.busy) return;  // повторные нажатия, пока заявка уходит, создавали дубли в таблице
-    f.dataset.busy = '1'; const btn = f.querySelector('button'); btn.disabled = true; show('…');
-    try{ await fetch(CONFIG.sheet, {method:'POST', mode:'no-cors', body:JSON.stringify(data)}); f.reset(); show(t.sent); }
-    catch(err){ show(t.fail) }
-    finally{ delete f.dataset.busy; btn.disabled = false }
-  } else if(CONFIG.endpoint){
-    try{
-      const r = await fetch(CONFIG.endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
-      if(!r.ok) throw 0; f.reset(); show(t.sent);
-    }catch(err){ show(t.fail) }
-  } else if(CONFIG.whatsapp){
-    const text = `Заявка с сайта\nИмя: ${data.name}\nБизнес: ${data.business}\nWhatsApp: ${data.whatsapp}`;
-    window.open('https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(text), '_blank', 'noopener'); show(t.wa);
-  } else show(t.demo);
+  f.dataset.busy = '1'; const btn = f.querySelector('button'); btn.disabled = true; show('…');
+  // кнопка «Или сразу написать в WhatsApp» остаётся под формой и после «Спасибо»: запасной путь, если строка не записалась (ответ no-cors не прочитать)
+  try{ const res = await sendLead(data); if(res === 'sent') f.reset(); show(t[res]) }
+  catch(err){ show(t.fail) }
+  finally{ delete f.dataset.busy; btn.disabled = false }
 });
 
 /* чат (демо на сценариях; подключить настоящего агента — заменить reply()) */
@@ -623,7 +646,6 @@ function say(text, who='bot'){
 }
 function reply(q){
   const t = T[lang], s = q.toLowerCase();
-  if((s.match(/\d/g) || []).length >= 10) return CONFIG.endpoint ? t.a_phone : t.a_phone_demo;
   if(/цен|стои|сколько|тариф|баға|қанша|тұрады/.test(s)) return t.a_price;
   if(/аудит|провер|тексер/.test(s)) return t.a_audit;
   if(/гарант|кепіл/.test(s)) return t.a_guar;
@@ -633,7 +655,29 @@ function reply(q){
   if(/реклам|жарнама|chatgpt|что такое|деген не/.test(s)) return t.a_what;
   return t.a_else;
 }
-function ask(q){ say(q, 'user'); setTimeout(() => say(reply(q)), 450) }
+/* номер WhatsApp из чата уходит в ту же таблицу, что и форма: в «Имя» пометка «из чата», в «Бизнес» последние сообщения человека */
+/* номер — одна группа цифр (можно с +, пробелами, скобками, дефисами), в которой 10–15 цифр: «бюджет 1 000 000 тенге, 2025 год» номером не считается.
+   key — последние 10 цифр, чтобы «+7 707…» и «8 707…» считались одним номером */
+function phoneOf(q){
+  for(const m of q.matchAll(/\+?\d[\d\s()\-]{8,20}\d/g)){
+    const d = m[0].replace(/\D/g, '');
+    if(d.length >= 10 && d.length <= 15) return { raw: m[0].trim(), key: d.slice(-10) };
+  }
+  return null;
+}
+const chatSent = new Set();
+function chatLead(p){
+  const t = T[lang];
+  const said = $$('.msg.user', chatBody).slice(-3).map(d => d.textContent).join(' / ').slice(-300);
+  const wait = new Promise(r => setTimeout(r, 450));
+  if(chatSent.has(p.key)) return wait.then(() => say(t.a_phone));  // тот же номер второй раз не дублируем
+  chatSent.add(p.key);
+  Promise.all([sendLead({ name: 'Заявка из чата', business: said, whatsapp: p.raw, lang: lang + ' · ' + SOURCE + ' · посетитель ' + VID }), wait])
+    // ответ no-cors не прочитать, поэтому после «Спасибо» номер WhatsApp текстом: запасной путь, как под формой
+    .then(([res]) => { if(res === 'sent'){ say(t.a_phone); say(t.a_phone_wa) } else say(t[res]) })
+    .catch(() => { chatSent.delete(p.key); say(t.fail) });
+}
+function ask(q){ say(q, 'user'); const p = phoneOf(q); if(p) return chatLead(p); setTimeout(() => say(reply(q)), 450) }
 function renderQuick(){
   quick.innerHTML = '';
   T[lang].q.forEach(q => { const b = document.createElement('button'); b.type = 'button'; b.textContent = q; b.onclick = () => ask(q); quick.appendChild(b) });

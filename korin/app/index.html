@@ -815,7 +815,11 @@ const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9
 /* каждый посетитель получает номер; в таблицу пишем, что он сделал */
 const TRK = (() => {
   let vid = null; try { vid = localStorage.getItem('vid'); if (!vid) { vid = Math.random().toString(36).slice(2, 7).toUpperCase(); localStorage.setItem('vid', vid) } } catch (e) { vid = 'без номера' }
-  const src = (new URLSearchParams(location.search).get('utm_source') || new URLSearchParams(location.search).get('src') || (document.referrer && !document.referrer.includes(location.hostname) ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
+  const P = new URLSearchParams(location.search);
+  let src = (P.get('utm_source') || P.get('src') || (document.referrer && !document.referrer.includes(location.hostname) ? new URL(document.referrer).hostname : '')).slice(0, 40);
+  /* метка живёт до конца визита: та же, что на странице Körin (ключ korin-src) */
+  try { if (src) sessionStorage.setItem('korin-src', src); else src = sessionStorage.getItem('korin-src') || '' } catch (e) {}
+  src = src || 'прямой заход';
   const dev = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'телефон' : 'компьютер', t0 = Date.now();
   let deep = 0, left = false; addEventListener('scroll', () => { deep = Math.max(deep, Math.round((scrollY + innerHeight) / document.documentElement.scrollHeight * 100)) }, { passive: true });
   const track = (what, extra, beacon) => {
@@ -826,7 +830,7 @@ const TRK = (() => {
   let seen = false; try { seen = sessionStorage.getItem('seen-Körin кабинет'); sessionStorage.setItem('seen-Körin кабинет', 1) } catch (e) {}
   if (!seen) track('зашёл');
   addEventListener('pagehide', () => { if (!left) { left = true; track('ушёл: был ' + Math.round((Date.now() - t0) / 1000) + ' сек, пролистал ' + deep + '%', '', true) } });
-  return { track, vid };
+  return { track, vid, src };
 })();
 const FREE = ['overview', 'serp'];
 const needReg = () => !st.user && !data.sample;
@@ -846,7 +850,7 @@ function regModal(next){
     if (!name) return $('#rgErr').textContent = 'Напишите имя.';
     if (phone.replace(/\D/g, '').length < 10) return $('#rgErr').textContent = 'Напишите номер WhatsApp полностью.';
     st.user = { name, phone, at: Date.now() }; store.save(st); try { sessionStorage.setItem('korin-in', '1') } catch (err) {}
-    fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name, business: [st.company, st.niche, st.city].filter(Boolean).join(' · '), whatsapp: phone, lang: 'korin · регистрация · посетитель ' + TRK.vid }) }).catch(() => {});
+    fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name, business: [st.company, st.niche, st.city].filter(Boolean).join(' · '), whatsapp: phone, lang: 'korin · регистрация · ' + TRK.src + ' · посетитель ' + TRK.vid }) }).catch(() => {});
     close(); if (next) location.hash = next; render() };
 }
 /* Повторный визит: войти в кабинет с прошлыми данными или сделать новую проверку */

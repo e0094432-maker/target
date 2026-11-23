@@ -233,6 +233,13 @@ h2{font-weight:500;font-size:clamp(23px,3.8vw,38px);line-height:1.2;letter-spaci
 .qc-src{font:400 12px var(--mono,monospace);color:var(--dim);margin-top:8px}
 .qc-next{display:grid;gap:10px;margin-top:20px}
 .qc-note{font-size:13px;color:var(--dim);margin-top:14px;line-height:1.5}
+.qc-wa{display:grid;gap:10px;margin-top:20px;padding:16px;border:1px solid var(--line2);border-radius:16px}
+.qc .qc-wa label{margin:0;font-size:15px;line-height:1.45;color:var(--text)}
+.qc .qc-wa .btn{margin-top:0}
+.qc-ok{margin:0;font-size:14px;line-height:1.5;color:var(--muted)}
+.qc-ok:empty{display:none}
+.qc-done{color:var(--text)}
+.qc-next>:only-child{grid-column:1/-1}
 @media (min-width:720px){.qc{align-items:center}.qc-box{border-radius:24px;padding:30px}.qc-next{grid-template-columns:1fr 1fr}}
 
 /* ---------- black, quiet, Inter ---------- */
@@ -581,7 +588,11 @@ const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9
 /* каждый посетитель получает номер; в таблицу пишем, что он сделал */
 const TRK = (() => {
   let vid = null; try { vid = localStorage.getItem('vid'); if (!vid) { vid = Math.random().toString(36).slice(2, 7).toUpperCase(); localStorage.setItem('vid', vid) } } catch (e) { vid = 'без номера' }
-  const src = (new URLSearchParams(location.search).get('utm_source') || new URLSearchParams(location.search).get('src') || (document.referrer && !document.referrer.includes(location.hostname) ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
+  const P = new URLSearchParams(location.search);
+  let src = (P.get('utm_source') || P.get('src') || (document.referrer && !document.referrer.includes(location.hostname) ? new URL(document.referrer).hostname : '')).slice(0, 40);
+  /* метка живёт до конца визита: после возврата из кабинета по логотипу («../», без параметров) она не теряется */
+  try { if (src) sessionStorage.setItem('korin-src', src); else src = sessionStorage.getItem('korin-src') || '' } catch (e) {}
+  src = src || 'прямой заход';
   const dev = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'телефон' : 'компьютер', t0 = Date.now();
   let deep = 0, left = false; addEventListener('scroll', () => { deep = Math.max(deep, Math.round((scrollY + innerHeight) / document.documentElement.scrollHeight * 100)) }, { passive: true });
   const track = (what, extra, beacon) => {
@@ -592,8 +603,16 @@ const TRK = (() => {
   let seen = false; try { seen = sessionStorage.getItem('seen-Körin'); sessionStorage.setItem('seen-Körin', 1) } catch (e) {}
   if (!seen) track('зашёл');
   addEventListener('pagehide', () => { if (!left) { left = true; track('ушёл: был ' + Math.round((Date.now() - t0) / 1000) + ' сек, пролистал ' + deep + '%', '', true) } });
-  return { track, vid };
+  return { track, vid, src };
 })();
+/* метка источника уходит и в кабинет: без неё кабинет пишет «прямой заход» */
+const withSrc = href => { if (TRK.src === 'прямой заход') return href; const u = new URL(href, location.href); u.searchParams.set('src', TRK.src); return u.href };
+document.querySelectorAll('a[href^="app/"]').forEach(a => { a.href = withSrc(a.getAttribute('href')) });
+/* заявка: нижняя форма и поле WhatsApp в окне проверки уходят одной дорогой; источник в колонке «Язык», как у Kenes */
+const sendLead = (name, business, whatsapp) => fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name, business, whatsapp, lang: 'korin · ' + TRK.src + ' · посетитель ' + TRK.vid }) });
+/* запасной путь, если строка в таблицу не записалась: ответ no-cors не прочитать */
+const WA_HELP = () => `${L('Если сообщение не придёт, напишите нам:', 'If no message comes, write to us:')} <a href="https://wa.me/77076234637" target="_blank" rel="noopener" style="text-decoration:underline">WhatsApp +7 707 623 46 37</a>`;
+const LEAD_OK = () => L("Спасибо! Напишем в WhatsApp в течение рабочего дня.", "Thank you! We will message you on WhatsApp within one business day.");
 const $ = s => document.querySelector(s);
 /* Живая сцена: клиент спрашивает нейросеть, она отвечает, Körin показывает итог и шаги */
 (() => {
@@ -683,6 +702,7 @@ fetch(API + '/api/health').catch(() => {});  // будим сервер зара
 const escH = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const qc = $('#qc'), qcBody = $('#qcBody'), qcTitle = $('#qcTitle');
 const qcClose = () => qc.classList.remove('open');
+let qcPhone = '';  // номер, оставленный в окне проверки
 $('#qcX').onclick = qcClose; qc.addEventListener('click', e => { if (e.target === qc) qcClose() }); addEventListener('keydown', e => { if (e.key === 'Escape') qcClose() });
 function qcAsk(company){
   qcTitle.textContent = L('Что спросить у нейросети про «' + company + '»', 'What to ask the AI about “' + company + '”');
@@ -693,17 +713,30 @@ function qcAsk(company){
 async function qcRun(company, niche, city){
   TRK.track('бесплатная проверка', [company, niche, city].filter(Boolean).join(' · ').slice(0, 120));
   if (!niche || !city) return;
-  const cab = 'app/index.html?company=' + encodeURIComponent(company);
+  const cab = withSrc('app/index.html?company=' + encodeURIComponent(company)), biz = [company, niche, city].join(' · ').slice(0, 120);
+  /* поле WhatsApp прямо в окне: одно поле и одна кнопка, название, ниша и город уже есть из проверки */
+  /* номер уже оставлен в этом окне: вместо поля «Спасибо», чтобы «Попробовать ещё раз» и новая проверка не просили его снова */
+  const waDone = () => `<p class="qc-ok qc-done">${LEAD_OK()}<br>${WA_HELP()}</p>`;
+  const waBox = txt => qcPhone ? `<div class="qc-wa">${waDone()}</div>` : `<form class="qc-wa" id="qcWa" novalidate><label>${txt}<input name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+7 7__ ___ __ __"></label><button class="btn btn-w">${L('Отправить', 'Send')}</button><p class="qc-ok" role="status"></p></form>`;
+  const bindWa = name => { const f = $('#qcWa'); if (!f) return; f.onsubmit = async e => { e.preventDefault(); const m = f.querySelector('.qc-ok'), w = f.whatsapp.value.trim();
+    if (f.dataset.busy) return;
+    if (w.replace(/\D/g, '').length < 10) { m.textContent = L('Напишите номер WhatsApp полностью.', 'Enter your full WhatsApp number.'); return }
+    f.dataset.busy = '1'; m.textContent = '…';
+    try { await sendLead(name, biz, w); qcPhone = w; f.innerHTML = waDone(); const l = $('#qcLead'); if (l) l.remove() }
+    catch (err) { m.textContent = L('Не получилось отправить. Попробуйте ещё раз.', 'Could not send. Please try again.') }
+    finally { delete f.dataset.busy } } };
   qcTitle.textContent = L("Спрашиваем нейросеть", "Asking the AI");
   qcBody.innerHTML = `<div class="qc-wait"><div class="qc-orb"></div><p>${L('Задаём три вопроса про', 'Asking three questions about')} «${escH(niche)}», ${escH(city)}.<br>${L('Обычно это 20–60 секунд.', 'This usually takes 20–60 seconds.')}</p></div>`;
   const hl = t => escH(t).split(escH(company)).join('<mark>' + escH(company) + '</mark>');
-  const again = msg => { qcTitle.textContent = L("Не получилось спросить нейросеть", "Could not ask the AI"); qcBody.innerHTML = `<p class="qc-err" style="margin:0 0 16px">${escH(msg === 'Failed to fetch' ? L("Сервер не ответил. Он просыпается около минуты, попробуйте ещё раз.", "The server did not respond. It takes about a minute to wake up, please try again.") : msg)}</p><div class="qc-next"><button class="btn btn-w" id="qcAgain">${L('Попробовать ещё раз', 'Try again')}</button><a class="btn" href="${cab}">${L('Открыть пример кабинета', 'Open the example workspace')}</a></div>`; $('#qcAgain').onclick = () => qcRun(company, niche, city) };
+  const again = msg => { qcTitle.textContent = L("Не получилось спросить нейросеть", "Could not ask the AI"); qcBody.innerHTML = `<p class="qc-err" style="margin:0 0 16px">${escH(msg === 'Failed to fetch' ? L("Сервер не ответил. Он просыпается около минуты, попробуйте ещё раз.", "The server did not respond. It takes about a minute to wake up, please try again.") : msg)}</p>${waBox(L('Оставьте WhatsApp — напишем в течение рабочего дня.', 'Leave your WhatsApp and we will message you within one business day.'))}<div class="qc-next"><button class="btn" id="qcAgain">${L('Попробовать ещё раз', 'Try again')}</button><a class="btn" href="${cab}">${L('Открыть пример кабинета', 'Open the example workspace')}</a></div>`; bindWa('Körin: заявка, проверка не прошла'); $('#qcAgain').onclick = () => qcRun(company, niche, city) };
   const got = [], errs = []; let shown = false;
   const paint = () => {
-    if (!shown) { shown = true; qcTitle.textContent = L("Ответы нейросети", "AI answers"); qcBody.innerHTML = `<p class="qc-sum" id="qcSum"></p><div id="qcCards"></div><div id="qcTail"></div>` }
+    /* поле WhatsApp сразу под итогом, с первым ответом: под тремя карточками его было не видно без долгой прокрутки */
+    if (!shown) { shown = true; qcTitle.textContent = L("Ответы нейросети", "AI answers"); qcBody.innerHTML = `<p class="qc-sum" id="qcSum"></p>${waBox(L('Хотите полный замер? Оставьте WhatsApp — напишем в течение рабочего дня.', 'Want the full check? Leave your WhatsApp and we will message you within one business day.'))}<div id="qcCards"></div><div id="qcTail"></div>`; bindWa('Körin: заявка после проверки') }
     const left = 3 - got.length - errs.length, named = got.filter(x => x.named).length;
     $('#qcSum').textContent = left ? L(`Пришло ответов: ${got.length} из 3…`, `Answers received: ${got.length} of 3…`) : named ? L(`Вас назвали в ${named} из ${got.length} ответов`, `You were named in ${named} of ${got.length} answers`) : L(`Вас не назвали ни в одном из ${got.length} ответов`, `You were not named in any of ${got.length} answers`);
-    if (!left) { $('#qcTail').innerHTML = `<div class="qc-next"><a class="btn btn-w" href="#start" id="qcLead">${L('Проверить подробнее', 'Get the full check')}</a><a class="btn" href="${cab}">${L('Открыть кабинет', 'Open workspace')}</a></div><p class="qc-note">${L('Это настоящие ответы модели', 'These are real answers from')} ${escH(got[0].model)}. ${L('Нейросеть собирает ответ заново при каждом вопросе, поэтому в другой раз он может отличаться. Ответы на частые вопросы мы храним до трёх дней. Три вопроса — это проба, а не полный замер.', 'The AI builds each answer from scratch, so it may differ next time. Answers to common questions are kept for up to three days. Three questions are a sample, not a full check. Questions are asked in Russian and Kazakh, as customers in Kazakhstan ask them.')}</p>`; $('#qcLead').onclick = qcClose }
+    if (!left) { $('#qcTail').innerHTML = `<div class="qc-next">${qcPhone ? '' : `<a class="btn" href="#leadForm" id="qcLead">${L('Проверить подробнее', 'Get the full check')}</a>`}<a class="btn" href="${cab}">${L('Открыть кабинет', 'Open workspace')}</a></div><p class="qc-note">${L('Это настоящие ответы модели', 'These are real answers from')} ${escH(got[0].model)}. ${L('Нейросеть собирает ответ заново при каждом вопросе, поэтому в другой раз он может отличаться. Ответы на частые вопросы мы храним до трёх дней. Три вопроса — это проба, а не полный замер.', 'The AI builds each answer from scratch, so it may differ next time. Answers to common questions are kept for up to three days. Three questions are a sample, not a full check. Questions are asked in Russian and Kazakh, as customers in Kazakhstan ask them.')}</p>`;
+      const l = $('#qcLead'); if (l) l.onclick = () => { const lf = $('#leadForm'); if (!lf.business.value.trim()) lf.business.value = company + ', ' + city; qcClose() } }
   };
   await Promise.all([0, 1, 2].map(async i => {
     try {
@@ -723,8 +756,9 @@ $('#leadForm').addEventListener('submit', async e => {
   e.preventDefault(); const f = e.target, m = $('#leadMsg');
   if (f.dataset.busy) return;
   if (!f.business.value.trim() || !f.whatsapp.value.trim()) { m.textContent = L("Заполните компанию и WhatsApp.", "Fill in the company and WhatsApp."); return }
+  if (f.whatsapp.value.replace(/\D/g, '').length < 10) { m.textContent = L('Напишите номер WhatsApp полностью.', 'Enter your full WhatsApp number.'); return }
   f.dataset.busy = '1'; m.textContent = '…';
-  try { await fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: 'Körin: заявка на замер', business: f.business.value.trim(), whatsapp: f.whatsapp.value.trim(), lang: 'korin · посетитель ' + TRK.vid }) }); f.reset(); m.textContent = L("Спасибо! Напишем в WhatsApp в течение рабочего дня.", "Thank you! We will message you on WhatsApp within one business day.") }
+  try { await sendLead('Körin: заявка на замер', f.business.value.trim(), f.whatsapp.value.trim()); f.reset(); m.innerHTML = LEAD_OK() + '<br>' + WA_HELP() }
   catch (err) { m.textContent = L("Не получилось отправить. Попробуйте ещё раз.", "Could not send. Please try again.") }
   finally { delete f.dataset.busy }
 });
