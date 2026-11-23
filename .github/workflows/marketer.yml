@@ -3,16 +3,21 @@ name: Marketer
 # Every day, for each brand: the model writes a post and the text for the pictures, the pictures are drawn in the brand's style, the post goes to its Threads account.
 on:
   schedule:
+    # GitHub runs scheduled jobs hours late or drops them, so there are extra tries;
+    # the server checks the account and posts only what is due, so extra runs are harmless
     - cron: "40 5 * * *"    # 10:40 in Almaty: a carousel
+    - cron: "50 6 * * *"    # 11:50: a second try for the morning
     - cron: "10 9 * * *"    # 14:10: short text
+    - cron: "40 10 * * *"   # 15:40: a second try for midday
     - cron: "30 14 * * *"   # 19:30: a question or one picture
+    - cron: "20 16 * * *"   # 21:20: a second try for the evening
   workflow_dispatch:
     inputs:
       brand:
         description: "korin, kenes or both"
         default: both
       slot:
-        description: "0 morning carousel, 1 midday text, 2 evening"
+        description: "empty: whatever is due now; 0 morning carousel, 1 midday text, 2 evening: post that one now, even at night (to fill a gap, pick the number of posts out today)"
         default: ""
 
 permissions:
@@ -38,6 +43,8 @@ jobs:
           npm install --no-save playwright@1.48.0
           npx playwright install --with-deps chromium
       - name: Write, draw and publish
+        env:
+          SLOT: ${{ github.event.inputs.slot }}
         run: |
           token() { curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=korin-api" | node -pe 'JSON.parse(require("fs").readFileSync(0)).value'; }
           # the server restarts after every update of the site; a page instead of JSON means it has not seen the request yet
@@ -49,19 +56,21 @@ jobs:
           git config user.name "marketer"
           git config user.email "marketer@users.noreply.github.com"
           curl -s -m 120 "$API/api/health" || true
-          SLOT="${{ github.event.inputs.slot }}"
-          if [ -z "$SLOT" ]; then H=$(date -u +%H); if [ "$H" -lt 8 ]; then SLOT=0; elif [ "$H" -lt 12 ]; then SLOT=1; else SLOT=2; fi; fi
-          echo "slot $SLOT"
+          # without a slot the server picks it from what the account already posted today (auto)
+          case "$SLOT" in ""|0|1|2) ;; *) echo "slot must be 0, 1, 2 or empty"; exit 1;; esac
+          echo "slot ${SLOT:-auto}"
           FAILED=0
           for BRAND in korin kenes; do
             [ "$ONLY" = "both" ] || [ "$ONLY" = "$BRAND" ] || continue
             echo "::group::$BRAND"
             OIDC=$(token); echo "::add-mask::$OIDC"
-            OIDC="$OIDC" BRAND="$BRAND" SLOT="$SLOT" node -e 'console.log(JSON.stringify({oidc:process.env.OIDC, brand:process.env.BRAND, slot:process.env.SLOT}))' > /tmp/ask.json
+            OIDC="$OIDC" BRAND="$BRAND" SLOT="$SLOT" node -e 'console.log(JSON.stringify({oidc:process.env.OIDC, brand:process.env.BRAND, ...(process.env.SLOT ? {slot:process.env.SLOT} : {auto:true})}))' > /tmp/ask.json
             ask /api/marketer-plan /tmp/ask.json /tmp/plan.json || { echo "no answer from the server"; FAILED=1; echo "::endgroup::"; continue; }
-            if ! node -e 'const p=JSON.parse(require("fs").readFileSync("/tmp/plan.json")); if(!p.ok){console.log("skipped: "+(p.error||"no plan")); process.exit(1)} console.log(p.format+": "+p.topic+"\n\n"+p.text)'; then
-              # an account that is not connected yet is not a failure
-              grep -q "ещё не подключён" /tmp/plan.json || FAILED=1
+            # an old server ignores "auto" and would answer with a carousel at any hour, so that answer is not posted
+            R=0; node -e 'const p=JSON.parse(require("fs").readFileSync("/tmp/plan.json")); if(p.skip){console.log((p.alarm?"not posted, the account needs a look: ":"skipped: ")+p.skip); process.exit(p.alarm?1:2)} if(!p.ok){console.log("skipped: "+(p.error||"no plan")); process.exit(1)} if(!process.env.SLOT&&!("posted_today" in p)){console.log("the server does not know auto mode yet, not posting"); process.exit(1)} console.log(p.format+" (slot "+p.slot+"): "+p.topic+"\n\n"+p.text)' || R=$?
+            if [ "$R" != 0 ]; then
+              # nothing is due now, or the account is not connected yet: not a failure; an alarm (the account cannot be read) is
+              [ "$R" = 2 ] || grep -q "ещё не подключён" /tmp/plan.json || FAILED=1
               echo "::endgroup::"; continue
             fi
             FILES="[]"

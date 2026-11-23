@@ -7,6 +7,7 @@ import json
 import os
 import re
 import base64
+import datetime
 import hashlib
 import hmac
 import socket
@@ -661,15 +662,66 @@ HOOKS = [
     "сравни «раньше» и «теперь» в двух коротких строках",
     "начни с ошибки, которую делают почти все, и скажи, как проще",
 ]
+ALMATY = 5 * 3600  # Kazakhstan is UTC+5 all year, no summer time
+SLOT_TIMES = [10 * 60 + 30, 14 * 60, 19 * 60]  # minutes after midnight in Almaty: morning, midday, evening
+OPEN, CLOSE = 9 * 60 + 30, 21 * 60 + 45  # auto posts start only in this window, so one with pictures is out before 22:00
+
+
+def _stamp(raw):
+    """Threads time like "2026-11-22T20:49:36+0000" (also with Z or +00:00) as Unix seconds; None if unreadable."""
+    m = re.match(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.\d+)?(Z|[+-]\d\d:?\d\d)?$", str(raw).strip())
+    if not m:
+        return None
+    zone = (m[2] or "Z").replace("Z", "+0000").replace(":", "")  # no zone means UTC
+    try:
+        return datetime.datetime.strptime(m[1] + zone, "%Y-%m-%dT%H:%M:%S%z").timestamp()
+    except ValueError:  # a date that does not exist, like month 13
+        return None
+
+
+def _auto_guard(token):
+    """For scheduled runs: how many posts are out today, and why to post nothing now (None when a post is due).
+    GitHub runs come hours late, twice or not at all, so the account itself says what is left to post today.
+    A skip with "alarm" needs a person (the account cannot be read), so the run fails instead of staying green."""
+    now = time.time()
+    day, minute = int((now + ALMATY) // 86400), int((now + ALMATY) % 86400 // 60)
+    clock = f"{minute // 60}:{minute % 60:02d}"
+    if minute < OPEN or minute >= CLOSE:
+        return 0, {"skip": f"в Алматы {clock}: новые посты начинаем с 9:30 до 21:45, чтобы ничего не вышло ночью"}
+    try:
+        posts = _threads("GET", "/me/threads", {"fields": "id,timestamp,media_type", "limit": "10", "access_token": token}).get("data") or []
+    except BadRequest as e:
+        return 0, {"skip": f"не удалось прочитать свои посты, вслепую не публикуем: {e}", "alarm": True}
+    posts = [p if isinstance(p, dict) else {} for p in posts]
+    stamps = [_stamp(p.get("timestamp")) for p in posts if p.get("media_type") != "REPOST_FACADE"]  # our reposts of others are listed too
+    if None in stamps:
+        return 0, {"skip": "не понятно время своих постов, вслепую не публикуем", "alarm": True}
+    # only posts inside today's window take a slot: a stray post after midnight does not use up the morning carousel
+    posted = sum(int((s + ALMATY) // 86400) == day and (s + ALMATY) % 86400 >= OPEN * 60 for s in stamps)
+    due = sum(minute >= t for t in SLOT_TIMES)
+    if posted >= due:
+        return posted, {"skip": f"уже вышло {posted} из {due} на сегодня" if due else f"в Алматы {clock}, первый пост в 10:30"}
+    if stamps and now - max(stamps) < 150 * 60:
+        return posted, {"skip": f"прошлый пост вышел {int((now - max(stamps)) // 60)} мин назад, между постами нужно хотя бы 2,5 часа"}
+    return posted, None
 
 
 def marketer_plan(body):
-    """Today's post for a brand and a time slot. Morning: a carousel. Midday: short text. Evening: a question or one picture."""
-    _admin(body)
+    """Today's post for a brand and a time slot. Morning: a carousel. Midday: short text. Evening: a question or one picture.
+    With "auto" the slot is chosen by what is already posted today; with an explicit slot a person forces a post."""
+    token = _admin(body)
     key = str(body.get("brand", "korin")) if str(body.get("brand", "korin")) in BRANDS else "korin"
     brand = BRANDS[key]
-    day = int(time.time() // 86400)
-    slot = int(body.get("slot", 0)) % 3 if str(body.get("slot", 0)).isdigit() else 0
+    day = int((time.time() + ALMATY) // 86400)  # the Almaty day, so the three posts of one day get three topics
+    extra = {}
+    if body.get("auto"):
+        posted, skip = _auto_guard(token)
+        if skip:
+            print(f"marketer {key}: skipped: {skip['skip']}", flush=True)
+            return {"ok": False, "brand": key, **skip}
+        slot, extra = min(posted, 2), {"posted_today": posted}
+    else:
+        slot = int(body.get("slot", 0)) % 3 if str(body.get("slot", 0)).isdigit() else 0
     n = day * 3 + slot
     topic = brand["topics"][n % len(brand["topics"])]
     fmt = "carousel" if slot == 0 else "text" if slot == 1 else ("image" if day % 2 else "text")
@@ -701,7 +753,7 @@ def marketer_plan(body):
     if not post or (fmt != "text" and not slides):
         raise providers.ProviderError("нейросеть вернула пост в неверном виде")
     post = (post + "\n\n" + " ".join("#" + t for t in tags))[:500]
-    return {"ok": True, "brand": key, "format": fmt, "single": fmt == "image", "topic": topic, "text": post, "slides": slides if fmt != "text" else [], "theme": n % 3, "model": model}
+    return {"ok": True, "brand": key, "format": fmt, "single": fmt == "image", "topic": topic, "text": post, "slides": slides if fmt != "text" else [], "theme": n % 3, "model": model, "slot": slot, **extra}
 
 
 def marketer_publish(body):

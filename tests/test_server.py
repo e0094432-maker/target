@@ -312,6 +312,96 @@ class ApiTest(unittest.TestCase):
         self.assertEqual((noon["format"], noon["slides"], text_calls[0]), ("text", [], "TEXT"))
         self.assertIn("#малыйбизнес", noon["text"])
 
+    def test_marketer_auto_mode_posts_each_slot_once_a_day(self):
+        # scheduled runs come hours late, twice or at night: the account's own posts today (Almaty, UTC+5) decide what is due
+        import datetime
+        at = lambda s: datetime.datetime.fromisoformat(s).timestamp()
+        almaty = lambda s: at(s + "+05:00")
+        utc = lambda s: datetime.datetime.fromtimestamp(almaty(s), datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+0000")
+        os.environ.update(KORIN_ADMIN_KEY="secret", THREADS_TOKEN="tok")
+        state, reads, writes, asked = {"posts": [], "fail": False}, [], [], []
+
+        def fake(method, path, params):
+            if method == "GET" and path == "/me/threads":
+                reads.append((params["fields"], params["limit"], params["access_token"]))
+                if state["fail"]:
+                    raise app.BadRequest("Threads не ответил: timed out")
+                return {"data": [{"id": str(i), **(t if isinstance(t, dict) else {"timestamp": t, "media_type": "TEXT_POST"})} for i, t in enumerate(state["posts"])]}
+            writes.append(path)
+            return {"id": "1"}
+
+        def model(prompt, system=None):
+            asked.append(prompt)
+            return ('{"text": "Клиент уже спросил нейросеть.", "tags": ["малыйбизнес"], "slides": [{"tag": "вопрос", "title": "Вас советует нейросеть?"}, {"tag": "шаги", "title": "Что проверить", "points": ["Цены"]}]}', [], "test-model")
+
+        def plan(now, posts=(), **body):
+            state["posts"], when = list(posts), now
+            app.time.time = lambda: when
+            return app.marketer_plan({"key": "secret", **body})
+
+        real_t, real_a, real_clock = app._threads, app.ask, app.time.time
+        app._threads, app.ask = fake, model
+        try:
+            # night in Almaty: a skip with HTTP 200, nothing is read, asked or written
+            app.time.time = lambda: almaty("2026-11-23T02:47")
+            app._hits.clear()
+            code, night, _ = post(self.api.server_port, "/api/marketer-plan", {"key": "secret", "auto": True})
+            late = plan(almaty("2026-11-23T22:00"), auto=True)
+            self.assertEqual((code, night["ok"], reads, asked), (200, False, [], []))
+            self.assertIn("ночью", night["skip"])
+            self.assertIn("ночью", late["skip"])
+            # a post with pictures takes a while, so none is started just before 22:00
+            self.assertIn("21:45", plan(almaty("2026-11-23T21:50"), auto=True)["skip"])
+            self.assertNotIn("alarm", night)
+            self.assertIn("10:30", plan(almaty("2026-11-23T10:00"), auto=True)["skip"])
+            # both of today's slots are out already
+            full = plan(almaty("2026-11-23T15:00"), [utc("2026-11-23T14:05"), utc("2026-11-23T10:35")], auto=True)
+            self.assertIn("уже вышло 2 из 2", full["skip"])
+            self.assertNotIn("alarm", full)
+            # the morning post is out, now it is midday: a text post for slot 1
+            noon = plan(almaty("2026-11-23T14:20"), [utc("2026-11-23T10:31"), utc("2026-11-22T19:05")], auto=True)
+            self.assertEqual((noon["ok"], noon["slot"], noon["posted_today"], noon["format"]), (True, 1, 1, "text"))
+            # nothing yet today: the morning carousel, on another topic than midday
+            morning = plan(almaty("2026-11-23T10:40"), [utc("2026-11-22T19:05")], auto=True)
+            self.assertEqual((morning["slot"], morning["posted_today"], morning["format"]), (0, 0, "carousel"))
+            self.assertNotEqual(morning["topic"], noon["topic"])
+            # the last post went out an hour ago: wait even though a slot is due
+            soon = plan(almaty("2026-11-23T19:30"), [utc("2026-11-23T18:30"), utc("2026-11-23T10:31")], auto=True)
+            self.assertIn("60 мин", soon["skip"])
+            # yesterday's real late runs: 01:49 Almaty is already today but outside the posting window, so it takes no slot
+            # and today's carousel still goes out; every Threads time format is read
+            real = plan(almaty("2026-11-23T15:00"), ["2026-11-22T20:49:36+0000", "2026-11-22T17:06:00Z", "2026-11-22T13:34:00+00:00"], auto=True)
+            self.assertEqual((real["slot"], real["posted_today"], real["format"]), (0, 0, "carousel"))
+            # our repost of someone else's thread is not our post: neither a slot nor a reason to wait
+            repost = plan(almaty("2026-11-23T10:37"), [{"timestamp": utc("2026-11-23T10:20"), "media_type": "REPOST_FACADE"}], auto=True)
+            self.assertEqual((repost["slot"], repost["posted_today"]), (0, 0))
+            asked_before = len(asked)
+            # a failed or unreadable read never turns into a blind post
+            # and it is an alarm, so the run fails and someone sees it (an expired token looks like this)
+            state["fail"] = True
+            broken = plan(almaty("2026-11-23T14:20"), auto=True)
+            self.assertEqual((broken["ok"], broken.get("alarm")), (False, True))
+            self.assertIn("вслепую", broken["skip"])
+            state["fail"] = False
+            unreadable = plan(almaty("2026-11-23T14:20"), ["вчера"], auto=True)
+            self.assertEqual(unreadable.get("alarm"), True)
+            self.assertIn("вслепую", unreadable["skip"])
+            self.assertEqual(len(asked), asked_before)
+            # a person with an explicit slot is not stopped, even at night, and the account is not read
+            reads_before = len(reads)
+            forced = plan(almaty("2026-11-23T02:47"), slot=1)
+            self.assertEqual((forced["ok"], forced["slot"], forced["format"], len(reads)), (True, 1, "text", reads_before))
+            self.assertNotIn("posted_today", forced)
+            # topics follow the Almaty day: 20:30 UTC is already 01:30 of the next day there
+            evening_utc = plan(at("2026-11-22T20:30+00:00"), slot=0)["topic"]
+            self.assertEqual(evening_utc, plan(almaty("2026-11-23T12:00"), slot=0)["topic"])
+            self.assertNotEqual(evening_utc, plan(almaty("2026-11-22T12:00"), slot=0)["topic"])
+        finally:
+            app._threads, app.ask, app.time.time = real_t, real_a, real_clock
+            del os.environ["KORIN_ADMIN_KEY"], os.environ["THREADS_TOKEN"]
+        self.assertEqual(writes, [])
+        self.assertEqual(set(reads), {("id,timestamp,media_type", "10", "tok")})
+
     def test_github_token_is_checked_with_a_real_rsa_signature(self):
         import subprocess, tempfile, base64 as b64
         enc = lambda raw: b64.urlsafe_b64encode(raw).rstrip(b"=").decode()
