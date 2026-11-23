@@ -20,6 +20,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -133,11 +134,25 @@ def main():
     target = -14.0 if (use_music or voice) else -20.0
     # ---- two-pass loudnorm ----
     ln = f'loudnorm=I={target}:TP=-1.5:LRA=11'
-    err = run(['ffmpeg', '-nostats', '-i', pre, '-af', ln + ':print_format=json', '-f', 'null', '-']).stderr
-    m = json.loads(err[err.rindex('{'):err.rindex('}') + 1])
+
+    def measure(path):
+        e = run(['ffmpeg', '-nostats', '-i', path, '-af', ln + ':print_format=json', '-f', 'null', '-']).stderr
+        return json.loads(e[e.rindex('{'):e.rindex('}') + 1])
+    m = measure(pre)
+    # linear loudnorm only works if the needed gain does not push the true peak over -1.5 dBTP;
+    # otherwise it silently switches to dynamic mode (pumping, misses the target). Pre-limit the peaks.
+    for it in range(3):
+        gain = target - float(m['input_i'])
+        if float(m['input_tp']) + gain <= -2.0:
+            break
+        ceil = float(m['input_i']) + 11.0   # cap the peak-to-loudness ratio at ~11 dB (12.5 dB is the most -14 LUFS / -1.5 dBTP allows)
+        lim = os.path.join(tmp, f'pre_lim{it}.wav')
+        to_wav(['-i', pre, '-af', f'alimiter=limit={min(1.0, max(0.0625, 10 ** (ceil / 20))):.5f}:level=0:attack=2:release=60,aresample=48000'], lim)
+        pre = lim
+        m = measure(pre)
     ln2 = (f"{ln}:measured_I={m['input_i']}:measured_TP={m['input_tp']}:measured_LRA={m['input_lra']}"
            f":measured_thresh={m['input_thresh']}:offset={m['target_offset']}:linear=true:print_format=json")
-    chain = f'{ln2},alimiter=limit={10 ** (-1.5 / 20):.4f}:level=0,aresample=48000'
+    chain = f'{ln2},alimiter=limit={10 ** (-1.8 / 20):.4f}:level=0,aresample=48000'
     r = run(['ffmpeg', '-v', 'info', '-nostats', '-y', '-i', a.video, '-i', pre, '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy',
              '-af', chain, '-c:a', 'aac', '-b:a', '192k', '-cutoff', '18000', '-ar', '48000', '-ac', '2', '-shortest', '-movflags', '+faststart', a.out])
     if r.returncode:
@@ -148,6 +163,7 @@ def main():
     except ValueError:
         mode = '?'
     I, P, LRA = lufs(a.out)
+    shutil.rmtree(tmp, ignore_errors=True)
     print(json.dumps({'out': a.out, 'target_lufs': target, 'music': use_music, 'voice': bool(voice), 'sfx': bool(a.sfx),
                       'loudnorm_pass1': {k: m[k] for k in ('input_i', 'input_tp', 'input_lra')}, 'loudnorm_mode': mode,
                       'ebur128': {'I': I, 'true_peak_dbfs': P, 'LRA': LRA}}, ensure_ascii=False))

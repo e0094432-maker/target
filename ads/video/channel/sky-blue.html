@@ -277,9 +277,9 @@ function ledLayer(c, ox, oy, base, spots) {
 
 // ======================= timeline (all in beats) =======================
 const H4 = HT(4), H8 = HT(8), H16 = HT(16), H24 = HT(24), H32 = HT(32), H38 = HT(38);
-const GL0 = HT(36) - .005, GL1 = T(36) + .003, BLK1 = T(36) + .15;     // glitch frame, then hard cut to black
+const GL0 = T(36) - .02, GL1 = T(36) + .0125, BLK1 = T(36) + .149;   // MB=4 frame k = sub-frames k/30-1/60 .. k/30+1/120: glitch = exactly frame floor(TB*30), black = next 4 frames     // glitch frame, then hard cut to black
 const A0 = BLK1 + .02;                                                    // answer starts to assemble
-const LOOP0 = DUR - 2 / 30 - 3 / 120 - 1e-6, BLOOM0 = LOOP0 - 5 / 30;     // from LOOP0 the picture = frame 0 (also under MB=4)
+const LOOP0 = DUR - 2 / 30 - 1 / 60 - 1e-6, BLOOM0 = LOOP0 - 5 / 30;     // from LOOP0 the picture = frame 0; MB=4 frame k averages sub-frames k/30-1/60..k/30+1/120, so the last 2 frames are exact
 const CAMS = [0, H4, T(12), T(20), T(27), BLK1, T(41), T(44), BLOOM0];
 const pulse = t => { const k = Math.floor(BT(t) + 1e-6); return decay(t, TB(k), .17) * ((k - B0) % 4 === 0 ? 1 : .55) };
 
@@ -302,13 +302,13 @@ function camera(t) {
 const camY = t => camera(t).by;
 
 // ---------- HOOK ----------
-const R0 = { x: 0, y: 0, w: W, h: H, r: 0 }, R1 = { x: 110, y: 548, w: 860, h: 644, r: 46 }, HCY = 870, TS1 = .79;
+const R0 = { x: 0, y: 0, w: W, h: H, r: 0 }, R1 = { x: 84, y: 520, w: 912, h: 700, r: 46 }, HCY = 870, TS1 = .86;
 const hookK = t => { const u = P(t, 0, .42); return E.inOutCubic(u) + .09 * Math.sin(Math.PI * P(u, .42, 1)) };
 function hookState(t) {
   if (t >= BLOOM0) {   // the channel dot blooms back into the cover
-    const u = E.outExpo(P(t, BLOOM0, LOOP0 - 1 / 120)), d = { x: 540 - 34, y: 960 - 34, w: 68, h: 68, r: 34 };
+    const bk = x => E.outCubic(P(x, BLOOM0, LOOP0 - 1 / 120)), u = bk(t), d = { x: 540 - 34, y: 960 - 34, w: 68, h: 68, r: 34 };
     const R = { x: lerp(d.x, 0, u), y: lerp(d.y, 0, u), w: lerp(d.w, W, u), h: lerp(d.h, H, u), r: lerp(34, 0, u) };
-    return { R, ts: lerp(.35, 1, u), tb: lerp(14, 0, u), rx: 0, ry: 0, rz: 0, s: 1, oy: lerp(90, 0, u), pb: 0 };
+    return { R, ts: lerp(.35, 1, u), tb: lerp(14, 0, u), rx: 0, ry: 0, rz: 0, s: 1, oy: lerp(90, 0, u), pb: Math.min(40, spd(bk, t) * 1900 / 260) };
   }
   const k = hookK(t), u = P(t, 0, .42);
   const R = { x: lerp(R0.x, R1.x, k), y: lerp(R0.y, R1.y, k), w: lerp(R0.w, R1.w, k), h: lerp(R0.h, R1.h, k), r: lerp(0, R1.r, clamp(k)) };
@@ -355,8 +355,9 @@ function sceneC1(t) {
   if (!on) { S($('c1'), 0); return }
   const kin = E.outExpo(P(t, T(5), T(5.8))), fl = decay(t, T(6), .25) + 1.2 * decay(t, H8, .2);
   const sway = Math.sin(t * 1.5) * 2.5;
-  const fv = spd(tt => 620 * (1 - E.outExpo(P(tt, T(5), T(5.8)))), t), f = setMB('mb1', 0, Math.min(30, fv / 90));
-  S($('c1'), P(t, T(5), T(5.12)), TR({ y: lerp(620, 0, kin), rx: lerp(42, 13, kin), ry: sway, rz: -.8 }), 0, f);
+  const q = E.inCubic(P(t, T(11.6), T(11.95)));
+  const fv = spd(tt => 620 * (1 - E.outExpo(P(tt, T(5), T(5.8)))), t), f = setMB('mb1', 0, Math.min(40, fv / 90 + 40 * q));
+  S($('c1'), P(t, T(5), T(5.12)) * Math.pow(1 - q, 2), TR({ y: lerp(620, 0, kin) - 260 * q, rx: lerp(42, 13, kin), ry: sway, rz: -.8 }), 0, f);
   $('c1').style.boxShadow = `0 46px 80px rgba(0,0,0,.42),0 0 ${(40 + 120 * fl).toFixed(0)}px rgba(255,230,170,${(.12 + .5 * clamp(fl)).toFixed(3)}),0 0 0 1px rgba(255,255,255,${(.03 + .25 * clamp(fl)).toFixed(3)}) inset`;
   words($('c1a'), t, T(6), 99, { st: .09 });
   // «все цвета»: letters fall one by one (step 2 frames) when the spectrum bursts out
@@ -418,7 +419,7 @@ function drawC2(c, t) {
   // lanes: warm colours run straight through, blue / violet stop at their molecule
   LANE.forEach((rgb, i) => {
     const f = laneF(i, t);
-    if (i < 4) { ribbon(c, f, 0, 1, .9, rgb, { tail: 0, gw: 140, white: .45 }); return }
+    if (i < 4) { ribbon(c, f, 0, 1, lerp(.9, .55, P(t, T(12.3), T(13))), rgb, { tail: 0, gw: 120, white: .4 }); return }
     const which = i === 4 ? 'b' : 'v', tb = which === 'b' ? T(13) : T(13.5), us = uOf((which === 'b' ? MOLB : MOLV).y);
     ribbon(c, f, 0, t < tb ? 1 : us, 1, rgb, { tail: 0, gw: 150, white: .5, head: t < tb ? 0 : 1, hk: .8 });
     if (t >= tb) ribbon(c, f, lerp(us, 1, E.inCubic(P(t, tb, tb + .35))), 1, 1 - P(t, tb + .25, tb + .35), rgb, { tail: 0, gw: 140, white: .45 });
@@ -437,7 +438,7 @@ function drawC2(c, t) {
       if (tau > s.L) continue;
       const q = tau / s.L, d = s.v * s.L * E.outCubic(q) * .62, d0 = s.v * s.L * E.outCubic(Math.max(0, q - .09)) * .62;
       const cx = Math.cos(s.a), sy = Math.sin(s.a);
-      spark(c, p[0] + cx * d0, p[1] + sy * d0, p[0] + cx * d, p[1] + sy * d, rgb, Math.pow(1 - q, 1.2), s.s);
+      spark(c, p[0] + cx * d0, p[1] + sy * d0, p[0] + cx * d, p[1] + sy * d, rgb, Math.pow(1 - q, 1.1), s.s * 1.45);
     }
   }
 }
@@ -462,7 +463,7 @@ function sceneC3(t) {
   const kin = E.outExpo(P(t, T(20.6), T(21.05)));
   const vx = spd(tt => -1150 * (1 - E.outExpo(P(tt, T(20.6), T(21.05)))), t), vy = spd(camY, t);
   const f = setMB('mb3', Math.min(40, vx / 70), Math.min(40, vy / 70 * (t > T(26.4) ? 1 : 0)));
-  S($('c3'), P(t, T(20.6), T(20.68)), TR({ x: -1150 * (1 - kin), rx: 12, ry: lerp(-18, 0, kin) + 2.5 * Math.sin(t * 1.2), rz: -.7 }), 0, f);
+  S($('c3'), P(t, T(20.6), T(20.68)) * Math.pow(1 - E.inCubic(P(t, T(26.4), T(26.85))), 2), TR({ x: -1150 * (1 - kin), rx: 12, ry: lerp(-18, 0, kin) + 2.5 * Math.sin(t * 1.2), rz: -.7 }), 0, f);
   words($('c3a'), t, T(20.95), 99); words($('c3b'), t, T(21.3), 99, { sc: .9, from: 50 });
 }
 function drawC3(c, t) {
@@ -497,8 +498,8 @@ function drawC3(c, t) {
 // ---------- HOW 3: at sunset the path through the air is longer ----------
 const PL3 = { x: 540, y: 1905, r: 505 }, BAND = 265, OB3 = { x: 540, y: PL3.y - PL3.r };
 const sunsetK = t => E.inOutCubic(P(t, T(28.6), T(29.6)));
-function sun3(t) { const k = sunsetK(t), th = lerp(-Math.PI / 2, -Math.PI, k); return { x: 540 + 510 * Math.cos(th), y: OB3.y - 8 + 1060 * Math.sin(th) + 8 * k, r: lerp(60, 92, k), k } }
-const SSF = u => [lerp(64, OB3.x - 16, u), lerp(OB3.y - 14, OB3.y - 50, u) - 16 * Math.sin(Math.PI * u)];
+function sun3(t) { const k = sunsetK(t), th = lerp(-Math.PI / 2, -Math.PI, k); return { x: 540 + 545 * Math.cos(th), y: OB3.y - 8 + 1060 * Math.sin(th) + 8 * k, r: lerp(60, 92, k), k } }
+const SSF = u => [lerp(-10, OB3.x - 16, u), lerp(OB3.y - 14, OB3.y - 50, u) - 16 * Math.sin(Math.PI * u)];
 const SSCOL = [[0, '255,250,236'], [.35, '255,214,120'], [.7, '255,140,50'], [1, '255,82,36']];
 const PEEL = []; { const r = rng(9191); for (let j = 0; j < 30; j++) { const tt = T(29.7) + j * .067; PEEL.push({ t: tt, a: -Math.PI / 2 + (r() - .5) * 2.2, v: 380 + 380 * r(), L: .7 + .3 * r(), s: .8 + .5 * r() }) } }
 const PEELN = [{ t: T(28.15), y: 1230, a: -2.4 }, { t: T(28.35), y: 1310, a: -.7 }];
@@ -537,12 +538,12 @@ function drawC4(c, t) {
   c.globalCompositeOperation = 'lighter';
   // the sun: high at noon, then down to the left horizon
   const sunA = fd * (1 + .2 * pu);
-  drawSun(c, sn.x, sn.y, sn.r, sunA, mixC('255,180,80', '255,90,31', sn.k), mixC('255,226,150', '255,150,60', sn.k), t * .25);
+  drawSun(c, sn.x, sn.y, sn.r * (1 - .35 * sn.k), sunA, mixC('255,180,80', '255,90,31', sn.k), mixC('255,226,150', '255,150,60', sn.k), t * .25);
   // atmosphere band around the planet (lit blue; orange glow where the low sun shines)
   const g = c.createRadialGradient(PL3.x, PL3.y, PL3.r, PL3.x, PL3.y, PL3.r + BAND);
   g.addColorStop(0, `rgba(90,150,255,${(.5 * fd).toFixed(3)})`); g.addColorStop(.35, `rgba(70,125,255,${(.26 * fd).toFixed(3)})`); g.addColorStop(1, 'rgba(47,91,255,0)');
   c.fillStyle = g; c.beginPath(); c.arc(PL3.x, PL3.y, PL3.r + BAND, 0, 6.2832); c.fill();
-  blob(c, 160, OB3.y - 40, 700, '255,110,40', (.55 * sn.k + .5 * fo) * fd, .55);
+  blob(c, 160, OB3.y - 40, 700, '255,110,40', (.3 * sn.k + .5 * fo) * fd, .55);
   c.globalCompositeOperation = 'source-over';
   c.globalAlpha = fd; c.fillStyle = '#07060a'; c.beginPath(); c.arc(PL3.x, PL3.y, PL3.r, 0, 6.2832); c.fill(); c.globalAlpha = 1;
   c.globalCompositeOperation = 'lighter';
@@ -719,7 +720,7 @@ function drawBG(t, cam) {
   c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1; c.filter = 'none';
   // whole-layer motion blur on the big camera moves (fall / rise / crash zoom)
   const vy = Math.abs(spd(camY, t)), zoom = (t > T(11.72) && t < T(12)) || (t > T(19.6) && t < T(20));
-  $('bg').style.filter = setMB('mbBG', zoom ? 6 : 0, Math.min(60, vy / 60) + (zoom ? 6 : 0)) || 'none';
+  $('bg').style.filter = setMB('mbBG', zoom ? 14 : 0, Math.min(60, vy / 60) + (zoom ? 14 : 0)) || 'none';
 }
 
 // ======================= front effects =======================
@@ -757,7 +758,7 @@ function drawFX(t, cam) {
 
 // ======================= flash: additive white, 100% for 2 frames, then straight into the next scene's colour ======
 const $flash = $('flash');
-const flashA = (t, tp) => t < tp - .05 ? 0 : t < tp ? E.inCubic(P(t, tp - .05, tp)) : t < tp + .067 ? 1 : decay(t, tp + .067, .045);
+const flashA = (t, tp) => t < tp - .05 ? 0 : t < tp ? E.inCubic(P(t, tp - .05, tp)) : t < tp + .074 ? 1 : decay(t, tp + .074, .045);   // 100% on 2 whole MB=4 frames
 const FLASHES = [[H4, '255,214,140'], [H24, '120,165,255'], [H32, '255,140,60'], [H38, '232,130,111']];
 function flash(t) {
   let f = 0, tint = '255,255,255';

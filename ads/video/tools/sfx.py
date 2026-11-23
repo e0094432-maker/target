@@ -50,7 +50,7 @@ def whoosh(d, seed):
     x = ff(f'anoisesrc=color=pink:seed={seed}:sample_rate={SR}:amplitude=1',
            'highpass=f=350,bandpass=f=1400:width_type=h:w=2200,lowpass=f=6000', d)
     u = np.linspace(0, 1, len(x))
-    env = np.where(u < .62, np.sin(np.pi / 2 * u / .62) ** 2, np.cos(np.pi / 2 * (u - .62) / .38) ** 1.5)
+    env = np.where(u < .62, np.sin(np.pi / 2 * u / .62) ** 2, np.clip(np.cos(np.pi / 2 * (u - .62) / .38), 0, 1) ** 1.5)
     return norm(x * env, -12)
 
 
