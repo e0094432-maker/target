@@ -3,3 +3,8 @@ __pycache__/
 data/
 reports/
 .env
+ads/video/channel/**/*.mp3
+ads/video/channel/**/*.wav
+ads/video/channel/**/*.m4a
+ads/video/channel/**/*.mp4
+ads/video/channel/out/

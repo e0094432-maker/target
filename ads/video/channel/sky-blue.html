@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="ru"><head><script>window.READY=false</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<title>Почему небо синее, а закат оранжевый</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="sky-blue.beats.js"></script>
+<style>
+*{box-sizing:border-box}
+html{margin:0;background:#0A0A0E}
+body{width:1080px;height:1920px;overflow:hidden;margin:0;background:#0A0A0E;font-family:Onest,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+#root{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;background:#0A0A0E}
+canvas{position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none}
+#L{position:absolute;left:0;top:0;width:1080px;height:1920px;perspective:1600px;perspective-origin:540px 900px;z-index:1}
+#cam{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;transform-style:preserve-3d}
+.a{position:absolute;display:none}
+.ln{position:absolute;left:0;width:100%;text-align:center;white-space:nowrap;line-height:1;font-weight:700;letter-spacing:-.035em}
+.w{display:inline-block}
+.ch{display:inline-block}
+
+/* HOOK plate (channel colour) */
+#hookG{left:0;top:0;width:1080px;height:1920px;transform-origin:540px 870px}
+#plate{position:absolute;overflow:hidden;background:
+  radial-gradient(circle at 84% 12%,rgba(63,224,200,.42),rgba(63,224,200,0) 36%),
+  radial-gradient(ellipse 78% 52% at 50% 44%,#7d98ff 0%,#4a70ff 34%,#2f5bff 58%,#2343e0 82%,#1d36c4 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.22) inset,0 50px 120px rgba(4,8,40,.55),0 0 160px rgba(47,91,255,.55)}
+#plate::after{content:"";position:absolute;inset:-12px;background-image:radial-gradient(circle,rgba(255,255,255,.26) 0 1.9px,rgba(255,255,255,0) 2.6px);background-size:22px 22px;background-position:center center}
+#plate .gl{position:absolute;top:-20%;height:140%;width:240px;left:0;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.28),rgba(255,255,255,0));transform:translateX(-400px) skewX(-18deg)}
+#hook{left:0;top:0;width:1080px;height:1920px;transform-origin:540px 870px}
+#hook .ln{text-shadow:0 6px 30px rgba(6,12,70,.45)}
+#h2 .k,#h4 .k{display:inline-block}
+#h2 .k{color:#c9fff6}
+#h4 .k{color:#ff8a4a}
+
+/* glass cards */
+.glass{border-radius:22px;background:linear-gradient(165deg,rgba(44,44,62,.58),rgba(14,14,22,.70));-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.15);box-shadow:0 46px 80px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.03) inset;transform-origin:50% 50%}
+.glass .ln{font-weight:700}
+.glass .s{font-size:74px;font-weight:600;letter-spacing:-.025em;color:#E9E3D7}
+.kY{color:#ffc83d;text-shadow:0 0 34px rgba(255,200,61,.55)}
+.kB{color:#86a4ff;text-shadow:0 0 34px rgba(47,91,255,.95),0 0 80px rgba(47,91,255,.5)}
+.kO{color:#ff7d47;text-shadow:0 0 34px rgba(255,90,31,.8)}
+#c1{left:150px;top:905px;width:780px;height:250px}
+#c2{left:120px;top:505px;width:840px;height:270px}
+#c3{left:120px;top:525px;width:840px;height:280px}
+#c4{left:120px;top:505px;width:840px;height:270px}
+.car{display:inline-block;width:10px;margin-left:8px;border-radius:5px;background:#fff;box-shadow:0 0 18px #ffb27a,0 0 6px #fff;vertical-align:-6%}
+#type{left:0;top:790px;width:1080px;height:140px}
+#type .ln{font-size:110px;font-weight:700}
+#ans2{left:0;top:948px;width:1080px;height:80px}
+#ans2 .ln{font-size:64px;font-weight:500;color:#E9E3D7;letter-spacing:-.015em}
+
+/* END plate (channel colour) */
+#endG{left:0;top:0;width:1080px;height:1920px;transform-origin:540px 960px}
+#endp{position:absolute;left:150px;top:790px;width:780px;height:390px;border-radius:40px;overflow:hidden;background:
+  radial-gradient(circle at 88% 10%,rgba(63,224,200,.40),rgba(63,224,200,0) 40%),
+  radial-gradient(ellipse 80% 70% at 50% 40%,#7090ff 0%,#3d66ff 40%,#2f5bff 62%,#2142d8 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.22) inset,0 50px 110px rgba(4,8,40,.6),0 0 140px rgba(47,91,255,.6)}
+#endp::after{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.22) 0 1.8px,rgba(255,255,255,0) 2.5px);background-size:22px 22px}
+#endp .gl{position:absolute;top:-20%;height:140%;width:200px;left:0;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.32),rgba(255,255,255,0));transform:translateX(-400px) skewX(-18deg)}
+#endp .ln{text-shadow:0 6px 26px rgba(6,12,70,.45)}
+#endp .src{font-size:48px;font-weight:500;color:#E9E3D7;letter-spacing:-.01em}
+
+#fx{z-index:2}
+#tx{z-index:3}
+#flash{position:absolute;inset:0;z-index:4;opacity:0;display:none;mix-blend-mode:plus-lighter}
+#vig{position:absolute;inset:0;z-index:5;pointer-events:none;background:radial-gradient(ellipse 88% 70% at 50% 47%,rgba(0,0,0,0) 55%,rgba(0,0,0,.52) 100%)}
+#grain{z-index:6;opacity:.055}
+#dbg{position:absolute;left:24px;top:24px;z-index:9;display:none;font:700 40px Onest;color:#000;background:#fff;padding:6px 16px;border-radius:12px}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <filter id="mbBG" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbBGg" stdDeviation="0 0"/></filter>
+  <filter id="mbH" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbHg" stdDeviation="0 0"/></filter>
+  <filter id="mb1" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB"><feGaussianBlur id="mb1g" stdDeviation="0 0"/></filter>
+  <filter id="mb2" x="-40%" y="-60%" width="180%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mb2g" stdDeviation="0 0"/></filter>
+  <filter id="mb3" x="-60%" y="-40%" width="220%" height="180%" color-interpolation-filters="sRGB"><feGaussianBlur id="mb3g" stdDeviation="0 0"/></filter>
+  <filter id="mb4" x="-40%" y="-60%" width="180%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mb4g" stdDeviation="0 0"/></filter>
+  <filter id="mbE" x="-40%" y="-60%" width="180%" height="220%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbEg" stdDeviation="0 0"/></filter>
+</svg>
+<div id="root">
+  <canvas id="bg" width="1080" height="1920"></canvas>
+  <div id="L"><div id="cam">
+    <div id="hookG" class="a">
+      <div id="plate"><div class="gl"></div></div>
+      <div id="hook">
+        <div class="ln" id="h1" style="top:520px;font-size:112px"><span class="w">Почему</span> <span class="w">небо</span></div>
+        <div class="ln" id="h2" style="top:648px;font-size:200px"><span class="w k">синее,</span></div>
+        <div class="ln" id="h3" style="top:872px;font-size:112px"><span class="w">а</span> <span class="w">закат</span></div>
+        <div class="ln" id="h4" style="top:1004px;font-size:126px"><span class="w k">оранжевый?</span></div>
+      </div>
+    </div>
+    <div id="c1" class="a glass">
+      <div class="ln s" id="c1a" style="top:34px"><span class="w">Белый</span> <span class="w">свет</span> <span class="w">—</span></div>
+      <div class="ln kY" id="c1b" style="top:118px;font-size:120px"></div>
+    </div>
+    <div id="c2" class="a glass">
+      <div class="ln s" id="c2a" style="top:36px"><span class="w">Воздух</span> <span class="w">рассеивает</span></div>
+      <div class="ln" id="c2b" style="top:128px;font-size:110px"><span class="w kB">синий</span> <span class="w">сильнее</span></div>
+    </div>
+    <div id="c3" class="a glass">
+      <div class="ln s" id="c3a" style="top:38px"><span class="w">Синий</span> <span class="w">летит</span> <span class="w">к</span> <span class="w">нам</span></div>
+      <div class="ln kB" id="c3b" style="top:128px;font-size:132px"><span class="w">отовсюду</span></div>
+    </div>
+    <div id="c4" class="a glass">
+      <div class="ln s" id="c4a" style="top:36px"><span id="c4at">На закате путь</span><i class="car" id="car4a" style="height:62px"></i></div>
+      <div class="ln" id="c4b" style="top:126px;font-size:120px"><span id="c4bt">света <b class="kO" style="font-weight:700">длиннее</b></span><i class="car" id="car4b" style="height:100px"></i></div>
+    </div>
+    <div id="type" class="a"><div class="ln" style="top:0"><span id="typet"></span><i class="car" id="cart" style="height:96px"></i></div></div>
+    <div id="ans2" class="a"><div class="ln"><span class="w">света</span> <span class="w">в</span> <span class="w">воздухе</span></div></div>
+    <div id="endG" class="a">
+      <div id="endp"><div class="gl"></div>
+        <div class="ln src" id="e0" style="top:40px"><span class="w">Источник:</span> <span class="w">NASA</span></div>
+        <div class="ln" id="e1" style="top:132px;font-size:100px"><span class="w">Подпишись</span> <span class="w">—</span></div>
+        <div class="ln" id="e2" style="top:250px;font-size:100px"><span class="w">будет</span> <span class="w">ещё</span></div>
+      </div>
+    </div>
+  </div></div>
+  <canvas id="fx" width="1080" height="1920"></canvas>
+  <canvas id="tx" width="1080" height="1920"></canvas>
+  <div id="flash"></div>
+  <div id="vig"></div>
+  <canvas id="grain" width="1080" height="1920"></canvas>
+  <div id="dbg"></div>
+</div>
+<script>
+// ======================= beats =======================
+const BB = BEATS.beats, BP = BEATS.beat;
+const TB = b => { const n = BB.length - 1, i = Math.floor(b); if (i < 0) return BB[0] + b * BP; if (i >= n) return BB[n] + (b - n) * BP; return BB[i] + (BB[i + 1] - BB[i]) * (b - i) };
+const BT = t => { const n = BB.length - 1; if (t <= BB[0]) return (t - BB[0]) / BP; if (t >= BB[n]) return n + (t - BB[n]) / BP; let i = 0; while (BB[i + 1] <= t) i++; return i + (t - BB[i]) / (BB[i + 1] - BB[i]) };
+const B0 = BB.indexOf(BEATS.downbeats[0]);
+const HIT = k => Math.floor(TB(k) * 30) / 30 - 0.025;   // impact time in frames: on the beat or earlier, with margin for MB=4
+const T = k => TB(B0 + k), HT = k => HIT(B0 + k);
+const BARS = 12;
+window.DURATION = TB(B0 + 4 * BARS);
+const DUR = window.DURATION;
+const DEBUG = /[?&]debug=1/.test(location.search);
+
+// ======================= helpers (from ads/video/scene-a.html) =======================
+const W = 1080, H = 1920, CX = 540;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const E = {
+  outExpo: x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x),
+  inExpo: x => x <= 0 ? 0 : Math.pow(2, 10 * x - 10),
+  inOutExpo: x => x <= 0 ? 0 : x >= 1 ? 1 : x < .5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2,
+  outCubic: x => 1 - Math.pow(1 - x, 3), inCubic: x => x * x * x,
+  inOutCubic: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  inOutSine: x => -(Math.cos(Math.PI * x) - 1) / 2,
+  outBack: (x, c1 = 1.70158) => { const c3 = c1 + 1; return x <= 0 ? 0 : 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2) },
+};
+const spring = (t, t0, f = 34, d = 13) => t < t0 ? 0 : Math.exp(-(t - t0) * d) * Math.sin((t - t0) * f);
+const decay = (t, t0, tau) => t < t0 ? 0 : Math.exp(-(t - t0) / tau);
+function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296 } }
+const spd = (f, t) => Math.abs(f(t + 1 / 240) - f(t - 1 / 240)) * 120;
+function S(el, o, tr, b, extraFilter) {
+  if (o <= 0.002) { if (el._d !== 0) { el.style.display = 'none'; el._d = 0 } return false }
+  if (el._d !== 1) { el.style.display = el.dataset.d || 'block'; el._d = 1 }
+  el.style.opacity = Math.min(1, o).toFixed(3);
+  el.style.transform = tr || 'none';
+  const f = (extraFilter || '') + (b > 0.15 ? ` blur(${b.toFixed(2)}px)` : '');
+  el.style.filter = f.trim() || 'none';
+  return true;
+}
+const TR = ({ x = 0, y = 0, z = 0, s = 1, sx = 1, sy = 1, rx = 0, ry = 0, rz = 0 } = {}) =>
+  `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,${z.toFixed(2)}px) rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg) rotateZ(${rz.toFixed(3)}deg) scale(${(s * sx).toFixed(4)},${(s * sy).toFixed(4)})`;
+// word-by-word: each word comes out of blur with scale .9 -> 1 and a lift; ls:false (centred lines)
+function words(el, t, tin, tout, opt = {}) {
+  const st = opt.st ?? .08, d = opt.d ?? .42, from = opt.from ?? 40, sc = opt.sc ?? .9, bl = opt.bl ?? 22;
+  const ws = el._ws || (el._ws = [...el.querySelectorAll('.w')]);
+  ws.forEach((w, i) => {
+    const a = tin + i * st, k = E.outExpo(P(t, a, a + d)), ko = E.inCubic(P(t, tout + i * .025, tout + i * .025 + .2));
+    const o = P(t, a, a + d * .3) * (1 - ko);
+    w.style.opacity = o.toFixed(3);
+    w.style.transform = `translateY(${((1 - k) * from - ko * 60).toFixed(1)}px) scale(${(lerp(sc, 1, k) * (1 + ko * .1)).toFixed(4)})`;
+    const b = (1 - k) * bl + ko * 26;
+    w.style.filter = b > .15 ? `blur(${b.toFixed(2)}px)` : 'none';
+  });
+}
+function setMB(id, sx, sy) { const g = $(id + 'g'); const v = `${sx.toFixed(1)} ${sy.toFixed(1)}`; if (g._v !== v) { g.setAttribute('stdDeviation', v); g._v = v } return sx > .4 || sy > .4 ? `url(#${id})` : '' }
+const mixW = (rgb, k) => rgb.split(',').map(v => Math.round(lerp(+v, 255, k))).join(',');
+const mixC = (a, b, k) => { const A = a.split(',').map(Number), B = b.split(',').map(Number); return A.map((v, i) => Math.round(lerp(v, B[i], k))).join(',') };
+
+// ======================= canvases =======================
+const bg = $('bg').getContext('2d'), fx = $('fx').getContext('2d'), tx = $('tx').getContext('2d'), gr = $('grain').getContext('2d');
+const grainTiles = [0, 1, 2, 3].map(i => { const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'); const im = g.createImageData(256, 256); const r = rng(101 + i * 17); for (let p = 0; p < im.data.length; p += 4) { const v = r() * 255; im.data[p] = im.data[p + 1] = im.data[p + 2] = v; im.data[p + 3] = 255 } g.putImageData(im, 0, 0); return c });
+function drawGrain(t) {
+  const f = Math.floor(t * 30 + 1e-6), r = rng(f * 7 + 3), tile = grainTiles[((f % 4) + 4) % 4];
+  const ox = -Math.floor(r() * 256), oy = -Math.floor(r() * 256);
+  for (let y = oy; y < H; y += 256) for (let x = ox; x < W; x += 256) gr.drawImage(tile, x, y);
+}
+function blob(c, x, y, r, rgb, a, sy = 1) {
+  if (a <= .001 || r <= 1) return;
+  c.save(); c.translate(x, y); c.scale(1, sy);
+  const g = c.createRadialGradient(0, 0, 0, 0, 0, r);
+  g.addColorStop(0, `rgba(${rgb},${Math.min(1, a)})`); g.addColorStop(.35, `rgba(${rgb},${Math.min(1, a) * .55})`); g.addColorStop(.7, `rgba(${rgb},${Math.min(1, a) * .15})`); g.addColorStop(1, `rgba(${rgb},0)`);
+  c.fillStyle = g; c.fillRect(-r, -r, 2 * r, 2 * r); c.restore();
+}
+function softRing(c, x, y, r, spread, rgb, a) {
+  if (a <= .002 || r <= 0) return;
+  const r0 = Math.max(0, r - spread), r1 = r + spread;
+  const g = c.createRadialGradient(x, y, r0, x, y, r1);
+  g.addColorStop(0, `rgba(${rgb},0)`); g.addColorStop(.5, `rgba(${rgb},${a})`); g.addColorStop(1, `rgba(${rgb},0)`);
+  c.fillStyle = g; c.beginPath(); c.arc(x, y, r1, 0, 6.2832); c.arc(x, y, r0, 0, 6.2832, true); c.fill();
+}
+function vgrad(c, stops, a = 1, y0 = 0, y1 = H) {
+  if (a <= .002) return;
+  const g = c.createLinearGradient(0, y0, 0, y1); stops.forEach(([p, col]) => g.addColorStop(p, col));
+  c.globalAlpha = Math.min(1, a); c.fillStyle = g; c.fillRect(-400, -600, W + 800, H + 1200); c.globalAlpha = 1;
+}
+// shockwave ring with a wavy edge
+function wavyRing(c, x, y, r, a, rgb, seed) {
+  if (a <= .005 || r <= 1) return;
+  const N = 120, ph = seed * 1.7, path = new Path2D();
+  for (let i = 0; i <= N; i++) { const th = i / N * 6.2832, rr = r * (1 + .024 * Math.sin(th * 7 + ph) + .013 * Math.sin(th * 13 - ph * 2)); const px = x + Math.cos(th) * rr, py = y + Math.sin(th) * rr; i ? path.lineTo(px, py) : path.moveTo(px, py) }
+  c.save(); c.filter = 'blur(12px)'; c.lineWidth = Math.max(18, r * .09); c.strokeStyle = `rgba(${rgb},${(.45 * a).toFixed(3)})`; c.stroke(path);
+  c.filter = 'none'; c.lineWidth = Math.max(5, r * .018); c.strokeStyle = `rgba(${mixW(rgb, .6)},${(.95 * a).toFixed(3)})`; c.stroke(path); c.restore();
+}
+// 2 rings, the second 2 frames later; 20% -> 120% of the frame width in 0.25 s
+function shock(c, t, t0, x, y, rgb, k = 1) { [[0, 1], [2 / 30, .75]].forEach(([d, m], j) => { const u = P(t, t0 + d, t0 + d + .25); if (u <= 0 || u >= 1) return; wavyRing(c, x, y, lerp(.1, .6, E.outCubic(u)) * W * k, (1 - u) * m, rgb, t0 * 10 + j * 3) }) }
+// star glint: 4 thin long rays + soft halo
+function star4(c, x, y, L, a, rot, rgb = '255,255,255') {
+  if (a <= .01 || L <= 1) return;
+  blob(c, x, y, L * .6, rgb, .45 * a); blob(c, x, y, L * .14, '255,255,255', .9 * a);
+  c.save(); c.translate(x, y); c.rotate(rot); c.globalAlpha = Math.min(1, a);
+  for (let k = 0; k < 4; k++) { c.rotate(Math.PI / 2); const g = c.createLinearGradient(0, 0, L, 0); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(.3, `rgba(${rgb},.75)`); g.addColorStop(1, `rgba(${rgb},0)`); c.fillStyle = g; c.beginPath(); c.moveTo(0, -Math.max(3, L * .022)); c.lineTo(L, 0); c.lineTo(0, Math.max(3, L * .022)); c.closePath(); c.fill() }
+  c.restore(); c.globalAlpha = 1;
+}
+// particle sprite: 2 px core + halo, drawn additively
+const SPR = {};
+function spr(rgb) { if (SPR[rgb]) return SPR[rgb]; const c = document.createElement('canvas'); c.width = c.height = 48; const g = c.getContext('2d'); const q = g.createRadialGradient(24, 24, 0, 24, 24, 24); q.addColorStop(0, 'rgba(255,255,255,1)'); q.addColorStop(.085, 'rgba(255,255,255,1)'); q.addColorStop(.14, `rgba(${rgb},.9)`); q.addColorStop(.4, `rgba(${rgb},.3)`); q.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = q; g.fillRect(0, 0, 48, 48); return SPR[rgb] = c }
+function dot(c, x, y, s, rgb, a) { if (a <= .01 || s <= .05) return; c.globalAlpha = Math.min(1, a); const z = 48 * s; c.drawImage(spr(rgb), x - z / 2, y - z / 2, z, z); c.globalAlpha = 1 }
+// short glowing spark streak from (x0,y0) (tail) to (x1,y1) (head)
+function spark(c, x0, y0, x1, y1, rgb, a, w = 1) {
+  if (a <= .01) return;
+  const g = c.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, `rgba(${rgb},0)`); g.addColorStop(1, `rgba(${rgb},${(.5 * a).toFixed(3)})`);
+  c.lineCap = 'round'; c.strokeStyle = g; c.lineWidth = 22 * w; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+  const g2 = c.createLinearGradient(x0, y0, x1, y1); g2.addColorStop(0, `rgba(${mixW(rgb, .7)},0)`); g2.addColorStop(1, `rgba(${mixW(rgb, .7)},${Math.min(1, a).toFixed(3)})`);
+  c.strokeStyle = g2; c.lineWidth = 6 * w; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+  dot(c, x1, y1, 1.1 * w, rgb, a);
+}
+// neon ribbon along f(u): white-hot core >= 22 px + coloured glow 130..260 px, comet head
+function ribbon(c, f, u0, u1, a, rgb, o = {}) {
+  if (a <= .005 || u1 - u0 <= 1e-4) return;
+  const N = o.n || 36, pts = [];
+  for (let i = 0; i <= N; i++) pts.push(f(lerp(u0, u1, i / N)));
+  const path = new Path2D(); pts.forEach((p, i) => i ? path.lineTo(p[0], p[1]) : path.moveTo(p[0], p[1]));
+  const [tx0, ty0] = pts[0], [hx, hy] = pts[N], tail = o.tail ?? .35, cols = o.cols || [[0, rgb], [1, rgb]];
+  const grad = (al, wk) => {
+    const g = c.createLinearGradient(tx0, ty0, hx + .01, hy + .01);
+    cols.forEach(([p, col]) => { const q = tail > 0 && p < tail ? p / tail : 1; g.addColorStop(p, `rgba(${wk ? mixW(col, wk) : col},${(al * q).toFixed(3)})`) });
+    if (tail > 0) g.addColorStop(0, `rgba(${cols[0][1]},0)`);
+    return g;
+  };
+  const gw = o.gw || 170, cw = o.cw || 22;
+  c.save(); c.lineCap = 'round'; c.lineJoin = 'round';
+  c.filter = `blur(${(gw * .16).toFixed(0)}px)`; c.lineWidth = gw; c.strokeStyle = grad(.34 * a); c.stroke(path);
+  c.filter = 'blur(6px)'; c.lineWidth = cw * 2.4; c.strokeStyle = grad(.6 * a, .15); c.stroke(path);
+  c.filter = 'none'; c.lineWidth = cw; c.strokeStyle = grad(Math.min(1, a), o.white ?? .62); c.stroke(path);
+  c.restore();
+  if (o.head) { const hc = cols[cols.length - 1][1]; blob(c, hx, hy, 170 * (o.hk || 1), hc, .55 * a * o.head); blob(c, hx, hy, 50 * (o.hk || 1), '255,255,255', .95 * a * o.head) }
+}
+// LED dot grid: dim everywhere, lit by the coloured light spots
+const SP = 24, led = document.createElement('canvas'); led.width = W + SP; led.height = H + SP;
+{ const g = led.getContext('2d'); g.fillStyle = '#fff'; for (let y = SP / 2; y < H + SP; y += SP) for (let x = SP / 2; x < W + SP; x += SP) { g.beginPath(); g.arc(x, y, 1.8, 0, 6.2832); g.fill() } }
+const tmpC = document.createElement('canvas'); tmpC.width = W; tmpC.height = H; const tg = tmpC.getContext('2d');
+function ledLayer(c, ox, oy, base, spots) {
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'source-over';
+  c.globalAlpha = base; c.drawImage(led, -ox, -oy); c.globalAlpha = 1;
+  tg.setTransform(1, 0, 0, 1, 0, 0); tg.globalCompositeOperation = 'source-over'; tg.clearRect(0, 0, W, H); tg.globalCompositeOperation = 'lighter';
+  let any = false;
+  for (const s of spots) { if (s.a <= .003) continue; any = true; const g = tg.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r); g.addColorStop(0, `rgba(${s.rgb},${Math.min(1, s.a)})`); g.addColorStop(.5, `rgba(${s.rgb},${Math.min(1, s.a) * .4})`); g.addColorStop(1, `rgba(${s.rgb},0)`); tg.fillStyle = g; tg.fillRect(s.x - s.r, s.y - s.r, 2 * s.r, 2 * s.r) }
+  if (any) { tg.globalCompositeOperation = 'destination-in'; tg.drawImage(led, -ox, -oy); c.globalCompositeOperation = 'lighter'; c.drawImage(tmpC, 0, 0) }
+  c.restore();
+}
+
+// ======================= timeline (all in beats) =======================
+const H4 = HT(4), H8 = HT(8), H16 = HT(16), H24 = HT(24), H32 = HT(32), H38 = HT(38);
+const GL0 = HT(36) - .005, GL1 = T(36) + .003, BLK1 = T(36) + .15;     // glitch frame, then hard cut to black
+const A0 = BLK1 + .02;                                                    // answer starts to assemble
+const LOOP0 = DUR - 2 / 30 - 3 / 120 - 1e-6, BLOOM0 = LOOP0 - 5 / 30;     // from LOOP0 the picture = frame 0 (also under MB=4)
+const CAMS = [0, H4, T(12), T(20), T(27), BLK1, T(41), T(44), BLOOM0];
+const pulse = t => { const k = Math.floor(BT(t) + 1e-6); return decay(t, TB(k), .17) * ((k - B0) % 4 === 0 ? 1 : .55) };
+
+// camera: affine p -> k p + (bx,by), shared by the DOM scene and every canvas
+function camera(t) {
+  let s0 = 0; for (const x of CAMS) if (t >= x) s0 = x;
+  let k = 1, bx = 0, by = 0;
+  const sc = (s, ox, oy) => { bx = ox + s * (bx - ox); by = oy + s * (by - oy); k *= s };
+  sc(1 + .021 * (t - s0), 540, 900);                                     // constant slow push
+  bx += 7 * Math.sin(6.2832 * 3 * t / DUR + .3); by += 6 * Math.sin(6.2832 * 4 * t / DUR + 1.1);   // drift, periodic over the loop
+  // crash zoom into the spectrum (detail without text), 4 frames
+  if (t > T(11.6) && t < T(12)) sc(lerp(1, 2.3, E.inCubic(P(t, T(11.72), T(12)))), 540, 1640);
+  // fly through a flaring molecule
+  if (t > T(19.35) && t < T(20)) sc(Math.exp(Math.log(26) * E.inExpo(P(t, T(19.35), T(20)))), MOLB.x, MOLB.y);
+  // HOW2 drops into the dark, HOW3 rises from below
+  if (t > T(26.4) && t < T(27)) by += 2100 * E.inCubic(P(t, T(26.4), T(26.95)));
+  if (t >= T(27) && t < T(27.7)) by += 1100 * (1 - E.outExpo(P(t, T(27), T(27.6))));
+  return { k, bx, by };
+}
+const camY = t => camera(t).by;
+
+// ---------- HOOK ----------
+const R0 = { x: 0, y: 0, w: W, h: H, r: 0 }, R1 = { x: 110, y: 548, w: 860, h: 644, r: 46 }, HCY = 870, TS1 = .79;
+const hookK = t => { const u = P(t, 0, .42); return E.inOutCubic(u) + .09 * Math.sin(Math.PI * P(u, .42, 1)) };
+function hookState(t) {
+  if (t >= BLOOM0) {   // the channel dot blooms back into the cover
+    const u = E.outExpo(P(t, BLOOM0, LOOP0 - 1 / 120)), d = { x: 540 - 34, y: 960 - 34, w: 68, h: 68, r: 34 };
+    const R = { x: lerp(d.x, 0, u), y: lerp(d.y, 0, u), w: lerp(d.w, W, u), h: lerp(d.h, H, u), r: lerp(34, 0, u) };
+    return { R, ts: lerp(.35, 1, u), tb: lerp(14, 0, u), rx: 0, ry: 0, rz: 0, s: 1, oy: lerp(90, 0, u), pb: 0 };
+  }
+  const k = hookK(t), u = P(t, 0, .42);
+  const R = { x: lerp(R0.x, R1.x, k), y: lerp(R0.y, R1.y, k), w: lerp(R0.w, R1.w, k), h: lerp(R0.h, R1.h, k), r: lerp(0, R1.r, clamp(k)) };
+  const sway = P(t, .35, .9);
+  const wu = E.inOutSine(P(t, T(3.55), H4 - .15)), cs = E.inExpo(P(t, H4 - .16, H4));
+  const pb = Math.min(36, spd(hookK, t) * 1300 / 260);
+  return { R, ts: lerp(1, TS1, k), tb: Math.min(2.2, pb / 12) + 20 * cs, rx: 13 * E.outCubic(u) * (1 - cs), ry: 3.5 * Math.sin(t * 2.1) * sway, rz: -2.2 * E.outCubic(u) + .9 * Math.sin(t * 1.7) * sway + 35 * cs, s: (1 - .06 * wu) * (1 - .985 * cs), oy: 0, pb: pb + 30 * cs };
+}
+function sceneHook(t) {
+  const on = t < H4 + .01 || t >= BLOOM0;
+  if (!S($('hookG'), on ? 1 : 0, '', 0)) return;
+  const st = hookState(t);
+  $('hookG').style.transform = TR({ y: st.oy, rx: st.rx, ry: st.ry, rz: st.rz, s: st.s });
+  const pl = $('plate').style;
+  pl.left = st.R.x.toFixed(1) + 'px'; pl.top = st.R.y.toFixed(1) + 'px'; pl.width = st.R.w.toFixed(1) + 'px'; pl.height = st.R.h.toFixed(1) + 'px'; pl.borderRadius = st.R.r.toFixed(1) + 'px';
+  pl.filter = st.pb > .5 ? `blur(${Math.min(40, st.pb).toFixed(1)}px)` : 'none';
+  $('plate').querySelector('.gl').style.transform = `translateX(${lerp(-400, 1300, P(t, .55, 1.25)).toFixed(0)}px) skewX(-18deg)`;
+  const hk = $('hook').style;
+  hk.transform = `scale(${st.ts.toFixed(4)})`;
+  hk.filter = st.tb > .15 ? `blur(${st.tb.toFixed(2)}px)` : 'none';
+  // something changes on every beat: «синее,» lights up on beat 1, «оранжевый?» on beat 2
+  const k1 = $('h2').firstElementChild, k2 = $('h4').firstElementChild;
+  const p1 = decay(t, T(1), .22) + .35 * P(t, T(1), T(1.2)), p2 = decay(t, T(2), .22) + .35 * P(t, T(2), T(2.2));
+  k1.style.textShadow = `0 0 ${(26 + 60 * p1).toFixed(0)}px rgba(63,224,200,${(.55 + .4 * clamp(p1)).toFixed(3)}),0 6px 30px rgba(6,12,70,.45)`;
+  k1.style.transform = `scale(${(1 + .07 * spring(t, T(1), 30, 9)).toFixed(4)})`;
+  k2.style.textShadow = `0 0 ${(18 + 60 * p2).toFixed(0)}px rgba(255,110,40,${(.35 + .5 * clamp(p2)).toFixed(3)}),0 8px 34px rgba(6,12,70,.55)`;
+  k2.style.transform = `scale(${(1 + .07 * spring(t, T(2), 30, 9)).toFixed(4)})`;
+}
+
+// ---------- CONTEXT: sun -> white beam -> glass prism card -> spectrum fan ----------
+const C1 = { x: 150, y: 905, w: 780, h: 250 }, EXITY = C1.y + C1.h - 20;
+const SPEC = ['255,62,54', '255,132,40', '255,214,64', '70,232,122', '64,124,255', '152,92,255'];
+const XE = SPEC.map((_, i) => 100 + i * 176);
+function sunCtx(t) { const k = E.outExpo(P(t, H4 + .03, T(5.3))); return { x: 540, y: lerp(HCY, 470, k), r: 92 * E.outBack(P(t, H4, H4 + .42), 2.2) } }
+const fanF = i => u => [540 + (XE[i] - 540) * Math.pow(u, 1.15), EXITY + (2040 - EXITY) * u];
+function drawSun(c, x, y, r, a, rgbOut = '255,170,50', rgbMid = '255,214,110', rot = 0) {
+  if (a <= .01 || r <= 1) return;
+  blob(c, x, y, r * 6.5, rgbOut, .32 * a); blob(c, x, y, r * 2.8, rgbMid, .75 * a); blob(c, x, y, r * 1.25, '255,244,214', a);
+  c.fillStyle = `rgba(255,252,240,${Math.min(1, a)})`; c.beginPath(); c.arc(x, y, r * .78, 0, 6.2832); c.fill();
+  star4(c, x, y, r * 4.4, .85 * a, rot + .3, mixW(rgbMid, .2));
+}
+function sceneC1(t) {
+  const on = t > T(4.9) && t < T(12.05);
+  if (!on) { S($('c1'), 0); return }
+  const kin = E.outExpo(P(t, T(5), T(5.8))), fl = decay(t, T(6), .25) + 1.2 * decay(t, H8, .2);
+  const sway = Math.sin(t * 1.5) * 2.5;
+  const fv = spd(tt => 620 * (1 - E.outExpo(P(tt, T(5), T(5.8)))), t), f = setMB('mb1', 0, Math.min(30, fv / 90));
+  S($('c1'), P(t, T(5), T(5.12)), TR({ y: lerp(620, 0, kin), rx: lerp(42, 13, kin), ry: sway, rz: -.8 }), 0, f);
+  $('c1').style.boxShadow = `0 46px 80px rgba(0,0,0,.42),0 0 ${(40 + 120 * fl).toFixed(0)}px rgba(255,230,170,${(.12 + .5 * clamp(fl)).toFixed(3)}),0 0 0 1px rgba(255,255,255,${(.03 + .25 * clamp(fl)).toFixed(3)}) inset`;
+  words($('c1a'), t, T(6), 99, { st: .09 });
+  // «все цвета»: letters fall one by one (step 2 frames) when the spectrum bursts out
+  C1B.forEach((ch, i) => {
+    const a = H8 + .02 + i * 2 / 30, k = E.outCubic(P(t, a, a + .22));
+    ch.style.opacity = P(t, a, a + .05).toFixed(3);
+    ch.style.transform = `translateY(${((1 - k) * -90).toFixed(1)}px)`;
+    const b = (1 - k) * 9; ch.style.filter = b > .15 ? `blur(${b.toFixed(2)}px)` : 'none';
+  });
+}
+function drawC1(c, t) {
+  if (t < H4 - .01 || t > T(12.1)) return;
+  const sn = sunCtx(t);
+  drawSun(c, sn.x, sn.y, sn.r, 1 + .25 * pulse(t), '255,160,40', '255,210,100', t * .25);
+  // white beam: comet from the sun into the card, then it stays and flows
+  const by0 = sn.y + sn.r * .6, by1 = C1.y + C1.h * .55;
+  const beamF = u => [540 + 22 * Math.sin(u * Math.PI) * (1 - P(t, T(6), T(7))), lerp(by0, by1, u)];
+  const hu = E.inOutCubic(P(t, T(5.5), T(6)));
+  ribbon(c, beamF, 0, hu, 1, '255,246,226', { head: 1 - P(t, T(6), T(6.3)), tail: hu < 1 ? .3 : 0, gw: 150, hk: .9 });
+  // spectrum fan out of the card bottom
+  SPEC.forEach((rgb, i) => {
+    const u1 = E.outCubic(P(t, H8 + i * .03, H8 + .6 + i * .03));
+    ribbon(c, fanF(i), 0, u1, 1, rgb, { head: 1 - P(t, H8 + .6, H8 + .9), tail: 0, gw: 150, cw: 22, white: .45 });
+    // energy pulses flowing down each ribbon
+    for (let j = 0; j < 2; j++) { const q = ((t - H8) * .55 + j * .5 + i * .13) % 1; if (t > H8 + .7) { const [x, y] = fanF(i)(q); blob(c, x, y, 70, mixW(rgb, .3), .5) } }
+  });
+  blob(c, 540, EXITY, 260, '255,240,210', 1.1 * decay(t, H8, .25) + .25, .7);
+}
+
+// ---------- HOW 1: the colours pass through the air; blue bounces off molecules ----------
+const LX = [140, 290, 440, 590, 740, 890], LANE = SPEC;
+const laneF = (i, t) => u => [LX[i] + 16 * Math.sin(u * 5 + i * 1.3 + t * 1.1), lerp(-80, 2000, u)];
+const MOLB = { x: 740, y: 1010 }, MOLV = { x: 890, y: 1135 };
+const uOf = y => (y + 80) / 2080;
+let MOLS = [];
+{ const r = rng(5150); for (let n = 0; MOLS.length < 26 && n < 600; n++) { const x = 90 + r() * 900, y = 860 + r() * 950; if (Math.hypot(x - MOLB.x, y - MOLB.y) < 120 || Math.hypot(x - MOLV.x, y - MOLV.y) < 120 || MOLS.some(m => Math.hypot(m.x - x, m.y - y) < 120)) continue; MOLS.push({ x, y, a: r() * 6.28, w: (r() - .5) * 1.4, ph: r() * 6.28 }) } }
+// scatter events: blue on every beat, violet in between, a big one on beat 16
+const SCAT = [];
+for (let j = 0; j < 6; j++) { SCAT.push({ t: T(13 + j), m: 'b', n: 9, seed: 10 + j }); SCAT.push({ t: T(13.5 + j), m: 'v', n: 8, seed: 40 + j }) }
+SCAT.push({ t: H16, m: 'b', n: 20, seed: 90 }, { t: H16, m: 'v', n: 16, seed: 91 });
+SCAT.forEach(e => { const r = rng(e.seed * 77 + 1); e.sp = [...Array(e.n)].map(() => ({ a: r() * 6.2832, v: 950 + 700 * r(), L: .5 + .3 * r(), s: .7 + .5 * r() })) });
+function molPos(m, t) { return { x: m.x + 14 * Math.sin(t * .7 + m.ph), y: m.y + 10 * Math.cos(t * .6 + m.ph) } }
+function drawMol(c, x, y, ang, a, flare = 0, rgb = '205,228,255') {
+  const dx = Math.cos(ang) * 13, dy = Math.sin(ang) * 13;
+  dot(c, x - dx, y - dy, 1.4 + .6 * flare, rgb, a); dot(c, x + dx, y + dy, 1.4 + .6 * flare, rgb, a);
+  if (flare > .01) { blob(c, x, y, 190 * (1 + flare * .4), '90,140,255', .7 * flare); blob(c, x, y, 60, '255,255,255', .9 * flare) }
+}
+function stopPos(which, t) { const i = which === 'b' ? 4 : 5, M = which === 'b' ? MOLB : MOLV, u = uOf(M.y); return laneF(i, t)(u) }
+function sceneC2(t) {
+  const on = t > T(12.3) && t < T(19.45);
+  if (!on) { S($('c2'), 0); return }
+  const kin = E.outExpo(P(t, T(12.4), T(13))), kout = E.inCubic(P(t, T(19), T(19.4)));
+  const vy = spd(tt => -1500 * E.inCubic(P(tt, T(19), T(19.4))), t), f = setMB('mb2', 0, Math.min(40, vy / 70));
+  S($('c2'), P(t, T(12.4), T(12.6)) * (1 - P(t, T(19.3), T(19.4))), TR({ y: -1500 * kout, z: lerp(-380, 0, kin), rx: 12 + 6 * kout, ry: 2.5 * Math.sin(t * 1.3), rz: .6, s: lerp(1.12, 1, kin) }), (1 - kin) * 22, f);
+  words($('c2a'), t, T(12.6), 99); words($('c2b'), t, T(12.95), 99, { st: .1 });
+}
+function drawC2(c, t) {
+  if (t < T(11.9) || t > T(20.05)) return;
+  // lanes: warm colours run straight through, blue / violet stop at their molecule
+  LANE.forEach((rgb, i) => {
+    const f = laneF(i, t);
+    if (i < 4) { ribbon(c, f, 0, 1, .9, rgb, { tail: 0, gw: 140, white: .45 }); return }
+    const which = i === 4 ? 'b' : 'v', tb = which === 'b' ? T(13) : T(13.5), us = uOf((which === 'b' ? MOLB : MOLV).y);
+    ribbon(c, f, 0, t < tb ? 1 : us, 1, rgb, { tail: 0, gw: 150, white: .5, head: t < tb ? 0 : 1, hk: .8 });
+    if (t >= tb) ribbon(c, f, lerp(us, 1, E.inCubic(P(t, tb, tb + .35))), 1, 1 - P(t, tb + .25, tb + .35), rgb, { tail: 0, gw: 140, white: .45 });
+  });
+  // air molecules
+  MOLS.forEach(m => { const p = molPos(m, t); drawMol(c, p.x, p.y, m.a + t * m.w, .8) });
+  for (const which of ['b', 'v']) {
+    const p = stopPos(which, t), fl = SCAT.filter(e => e.m === which).reduce((s, e) => s + decay(t, e.t, .14) * (e.n > 12 ? 1.6 : 1), 0);
+    drawMol(c, p[0], p[1], (which === 'b' ? .4 : 1.9) + t * .5, 1, clamp(fl, 0, 1.6), '225,236,255');
+  }
+  // scattered blue: sparks fly out in every direction
+  for (const e of SCAT) {
+    const tau = t - e.t; if (tau < 0 || tau > 1.1) continue;
+    const p = stopPos(e.m, e.t), rgb = e.m === 'b' ? '70,130,255' : '150,96,255';
+    for (const s of e.sp) {
+      if (tau > s.L) continue;
+      const q = tau / s.L, d = s.v * s.L * E.outCubic(q) * .62, d0 = s.v * s.L * E.outCubic(Math.max(0, q - .09)) * .62;
+      const cx = Math.cos(s.a), sy = Math.sin(s.a);
+      spark(c, p[0] + cx * d0, p[1] + sy * d0, p[0] + cx * d, p[1] + sy * d, rgb, Math.pow(1 - q, 1.2), s.s);
+    }
+  }
+}
+
+// ---------- HOW 2: blue arrives from the whole sky ----------
+const OB2 = { x: 540, y: 1452 }, EA2 = { x: 540, y: 1460 + 2300, r: 2300 }, SUN2 = { x: 858, y: 430 };
+let SKY = []; { const r = rng(777); for (let i = 0; i < 150; i++) SKY.push({ x: 40 + r() * 1000, y: 210 + r() * 1180, vx: (r() - .5) * 24, vy: (r() - .5) * 18, ph: r() * 6.28, s: .6 + .7 * r() }) }
+const skyP = (p, t) => [p.x + p.vx * (t - T(20)), p.y + p.vy * (t - T(20))];
+const COMETS = []; { const r = rng(4040); for (let j = 0; j < 11; j++) for (let q = 0; q < 3; q++) { let i; do { i = Math.floor(r() * SKY.length) } while (Math.hypot(SKY[i].x - OB2.x, SKY[i].y - OB2.y) < 420); COMETS.push({ t: T(20.5 + .5 * j) + q * .05, i, d: .36 + .08 * r() }) } }
+function drawObserver(c, x, y, a, rgb = '170,200,255') {
+  if (a <= .01) return;
+  blob(c, x, y - 30, 130, rgb, .45 * a);
+  c.save(); c.globalAlpha = Math.min(1, a); c.fillStyle = '#f4f6ff';
+  c.beginPath(); c.arc(x, y - 52, 15, 0, 6.2832); c.fill();
+  c.beginPath(); c.moveTo(x - 24, y); c.quadraticCurveTo(x - 24, y - 33, x, y - 33); c.quadraticCurveTo(x + 24, y - 33, x + 24, y); c.closePath(); c.fill();
+  c.restore();
+}
+const flood2 = t => t < H24 ? 0 : 1 - .8 * E.inOutCubic(P(t, T(25.6), T(26.4)));
+function sceneC3(t) {
+  const on = t > T(20.55) && t < T(27);
+  if (!on) { S($('c3'), 0); return }
+  const kin = E.outExpo(P(t, T(20.6), T(21.05)));
+  const vx = spd(tt => -1150 * (1 - E.outExpo(P(tt, T(20.6), T(21.05)))), t), vy = spd(camY, t);
+  const f = setMB('mb3', Math.min(40, vx / 70), Math.min(40, vy / 70 * (t > T(26.4) ? 1 : 0)));
+  S($('c3'), P(t, T(20.6), T(20.68)), TR({ x: -1150 * (1 - kin), rx: 12, ry: lerp(-18, 0, kin) + 2.5 * Math.sin(t * 1.2), rz: -.7 }), 0, f);
+  words($('c3a'), t, T(20.95), 99); words($('c3b'), t, T(21.3), 99, { sc: .9, from: 50 });
+}
+function drawC3(c, t) {
+  if (t < T(19.95) || t > T(27)) return;
+  const fl = flood2(t), pu = pulse(t);
+  vgrad(c, [[0, '#060d2a'], [.45, '#0b1a4a'], [.76, '#16348c'], [1, '#1d47b8']], 1, 0, OB2.y);
+  vgrad(c, [[0, '#2f5bff'], [.55, '#4d7cff'], [.8, '#8db6ff'], [1, '#c5dcff']], fl, 0, OB2.y);
+  c.globalCompositeOperation = 'lighter';
+  blob(c, 540, 900, 1100, '47,91,255', (.25 + .15 * pu) * (1 - fl));
+  // scattered blue everywhere in the sky
+  SKY.forEach(p => { const [x, y] = skyP(p, t); dot(c, x, y, p.s * (1 + .5 * fl), fl > .3 ? '170,205,255' : '80,135,255', (.55 + .35 * Math.sin(t * 2.2 + p.ph)) * (1 + .6 * pu)) });
+  // the sun and its direct beam
+  drawSun(c, SUN2.x, SUN2.y, 52, 1, '255,180,80', '255,225,150', t * .3);
+  ribbon(c, u => [lerp(SUN2.x, OB2.x, u), lerp(SUN2.y, OB2.y - 52, u)], 0, E.inOutCubic(P(t, T(20.3), T(21))), .7, '255,240,200', { tail: 0, gw: 130, white: .6 });
+  // blue comets from every part of the sky into the observer's eye
+  for (const m of COMETS) {
+    const q = (t - m.t) / m.d; if (q < 0 || q > 1.15) continue;
+    const [sx, sy] = skyP(SKY[m.i], m.t), ex = OB2.x, ey = OB2.y - 52;
+    const k1 = E.inCubic(clamp(q)), k0 = E.inCubic(clamp(q - .22));
+    spark(c, lerp(sx, ex, k0), lerp(sy, ey, k0), lerp(sx, ex, k1), lerp(sy, ey, k1), '90,145,255', q > 1 ? (1.15 - q) / .15 : 1, 1.2);
+  }
+  c.globalCompositeOperation = 'source-over';
+  // the Earth: dark limb + glowing rim
+  c.fillStyle = '#07070b'; c.beginPath(); c.arc(EA2.x, EA2.y, EA2.r, 0, 6.2832); c.fill();
+  c.globalCompositeOperation = 'lighter';
+  softRing(c, EA2.x, EA2.y, EA2.r, 34, '100,160,255', .8 + .2 * fl);
+  softRing(c, EA2.x, EA2.y, EA2.r + 40, 120, '47,91,255', .3 + .3 * fl);
+  drawObserver(c, OB2.x, OB2.y, 1, '140,180,255');
+  blob(c, OB2.x, OB2.y - 52, 220, '120,170,255', .5 * COMETS.reduce((s, m) => s + decay(t, m.t + m.d, .12), 0) / 3);
+}
+
+// ---------- HOW 3: at sunset the path through the air is longer ----------
+const PL3 = { x: 540, y: 1905, r: 505 }, BAND = 265, OB3 = { x: 540, y: PL3.y - PL3.r };
+const sunsetK = t => E.inOutCubic(P(t, T(28.6), T(29.6)));
+function sun3(t) { const k = sunsetK(t), th = lerp(-Math.PI / 2, -Math.PI, k); return { x: 540 + 510 * Math.cos(th), y: OB3.y - 8 + 1060 * Math.sin(th) + 8 * k, r: lerp(60, 92, k), k } }
+const SSF = u => [lerp(64, OB3.x - 16, u), lerp(OB3.y - 14, OB3.y - 50, u) - 16 * Math.sin(Math.PI * u)];
+const SSCOL = [[0, '255,250,236'], [.35, '255,214,120'], [.7, '255,140,50'], [1, '255,82,36']];
+const PEEL = []; { const r = rng(9191); for (let j = 0; j < 30; j++) { const tt = T(29.7) + j * .067; PEEL.push({ t: tt, a: -Math.PI / 2 + (r() - .5) * 2.2, v: 380 + 380 * r(), L: .7 + .3 * r(), s: .8 + .5 * r() }) } }
+const PEELN = [{ t: T(28.15), y: 1230, a: -2.4 }, { t: T(28.35), y: 1310, a: -.7 }];
+const flood3 = t => t < H32 ? 0 : 1 - E.inOutCubic(P(t, T(33.2), T(34.4)));
+const fade3 = t => 1 - .88 * E.inOutCubic(P(t, T(33.6), T(34.8)));
+function sceneC4(t) {
+  const on = t > T(27.65) && t < T(34.6);
+  if (!on) { S($('c4'), 0); return }
+  const kin = E.outExpo(P(t, T(27.7), T(28.2)));
+  S($('c4'), P(t, T(27.7), T(27.85)) * (1 - E.inOutSine(P(t, T(34.05), T(34.55)))), TR({ z: lerp(-520, 0, kin), rx: 12, ry: 2.5 * Math.sin(t * 1.3), rz: .7 }), (1 - kin) * 24);
+  // typing in by words, then the erase (2x typing speed: 60 chars/s) leaves only the caret
+  const ea = T(33.5), e2 = 'света длиннее'.length / 60, e1 = 'На закате путь'.length / 60;
+  const nb = Math.max(0, 13 - Math.floor(Math.max(0, t - ea) * 60)), na = Math.max(0, 14 - Math.floor(Math.max(0, t - ea - e2) * 60));
+  const L1 = 'На закате путь', L2 = 'света длиннее';
+  if (t < ea) { $('c4at').textContent = L1; $('c4bt').innerHTML = 'света <b class="kO" style="font-weight:700">длиннее</b>' }
+  else {
+    const s1 = L1.slice(0, na), s2 = L2.slice(0, nb);
+    if ($('c4at').textContent !== s1) $('c4at').textContent = s1;
+    const h2 = s2.length > 6 ? 'света <b class="kO" style="font-weight:700">' + s2.slice(6) + '</b>' : s2;
+    if ($('c4bt')._h !== h2) { $('c4bt').innerHTML = h2; $('c4bt')._h = h2 }
+  }
+  words2($('c4a'), $('c4at'), t, T(27.95)); words2($('c4b'), $('c4bt'), t, T(28.25));
+  const blink = t2 => Math.floor(t2 * 4) % 2 === 0 ? 1 : .15;
+  $('car4b').style.opacity = t >= ea - .25 && t < ea + e2 + .02 ? blink(t - ea + .25) : 0;
+  $('car4a').style.opacity = t >= ea + e2 && t < T(34.4) ? 1 : 0;
+}
+// line-level "from blur" entrance for the erasable card lines (no word spans there)
+function words2(line, span, t, tin) { const k = E.outExpo(P(t, tin, tin + .45)); span.style.display = 'inline-block'; span.style.opacity = P(t, tin, tin + .12).toFixed(3); span.style.transform = `translateY(${((1 - k) * 40).toFixed(1)}px) scale(${lerp(.9, 1, k).toFixed(4)})`; const b = (1 - k) * 22; span.style.filter = b > .15 ? `blur(${b.toFixed(2)}px)` : 'none' }
+function drawC4(c, t) {
+  if (t < T(26.95) || t > T(35)) return;
+  const fd = fade3(t), fo = flood3(t), sn = sun3(t), pu = pulse(t);
+  c.globalAlpha = fd;
+  vgrad(c, [[0, '#0a0918'], [.6, '#141634'], [1, '#2a2a5a']], fd, 0, OB3.y);
+  vgrad(c, [[0, '#d8451c'], [.45, '#ff6a2a'], [.8, '#ffa04a'], [1, '#ffd27a']], fo * fd, 0, OB3.y);
+  c.globalAlpha = 1;
+  c.globalCompositeOperation = 'lighter';
+  // the sun: high at noon, then down to the left horizon
+  const sunA = fd * (1 + .2 * pu);
+  drawSun(c, sn.x, sn.y, sn.r, sunA, mixC('255,180,80', '255,90,31', sn.k), mixC('255,226,150', '255,150,60', sn.k), t * .25);
+  // atmosphere band around the planet (lit blue; orange glow where the low sun shines)
+  const g = c.createRadialGradient(PL3.x, PL3.y, PL3.r, PL3.x, PL3.y, PL3.r + BAND);
+  g.addColorStop(0, `rgba(90,150,255,${(.5 * fd).toFixed(3)})`); g.addColorStop(.35, `rgba(70,125,255,${(.26 * fd).toFixed(3)})`); g.addColorStop(1, 'rgba(47,91,255,0)');
+  c.fillStyle = g; c.beginPath(); c.arc(PL3.x, PL3.y, PL3.r + BAND, 0, 6.2832); c.fill();
+  blob(c, 160, OB3.y - 40, 700, '255,110,40', (.55 * sn.k + .5 * fo) * fd, .55);
+  c.globalCompositeOperation = 'source-over';
+  c.globalAlpha = fd; c.fillStyle = '#07060a'; c.beginPath(); c.arc(PL3.x, PL3.y, PL3.r, 0, 6.2832); c.fill(); c.globalAlpha = 1;
+  c.globalCompositeOperation = 'lighter';
+  softRing(c, PL3.x, PL3.y, PL3.r, 26, mixC('130,180,255', '255,160,90', clamp(sn.k + fo)), .8 * fd);
+  drawObserver(c, OB3.x, OB3.y, fd, mixC('150,185,255', '255,170,110', clamp(sn.k + fo)));
+  // noon: a short way through the band, almost nothing is lost
+  const nh = E.inOutCubic(P(t, T(27.7), T(28.1))), nt = E.inCubic(P(t, T(28.5), T(28.85)));
+  const noonF = u => [540, lerp(sun3(T(27.7)).y + 60, OB3.y - 52, u)];
+  ribbon(c, noonF, nt, nh, fd, '255,246,226', { head: nh < 1 ? 1 : 0, tail: nt > 0 ? .4 : 0, gw: 140 });
+  for (const p of PEELN) { const q = (t - p.t) / .7; if (q < 0 || q > 1) continue; const d = 300 * E.outCubic(q), d0 = 300 * E.outCubic(Math.max(0, q - .12)); spark(c, 540 + Math.cos(p.a) * d0, p.y + Math.sin(p.a) * d0, 540 + Math.cos(p.a) * d, p.y + Math.sin(p.a) * d, '80,135,255', (1 - q) * fd, 1) }
+  // sunset: a long way through the band; blue peels off on the way, orange / red arrive
+  const sh = E.inOutSine(P(t, T(29.6), T(31.6)));
+  if (sh > 0) {
+    ribbon(c, SSF, 0, sh, fd, '255,200,120', { cols: SSCOL.map(([p, col]) => [p, col]), head: 1 - P(t, T(31.6), T(32.2)), tail: sh < 1 ? .25 : 0, gw: 170, white: .35 });
+    for (const p of PEEL) {
+      const q = (t - p.t) / p.L; if (q < 0 || q > 1) continue;
+      const [x0, y0] = SSF(E.inOutSine(P(p.t, T(29.6), T(31.6)))), d = p.v * p.L * E.outCubic(q) * .7, d0 = p.v * p.L * E.outCubic(Math.max(0, q - .12)) * .7;
+      spark(c, x0 + Math.cos(p.a) * d0, y0 + Math.sin(p.a) * d0, x0 + Math.cos(p.a) * d, y0 + Math.sin(p.a) * d, '80,135,255', (1 - q) * fd, p.s);
+    }
+  }
+  blob(c, OB3.x, OB3.y - 52, 420, '255,120,50', (1.2 * decay(t, H32, .3) + .3 * fo) * fd);
+  c.globalCompositeOperation = 'source-over';
+}
+
+// ---------- BREATH: only the caret types ----------
+const TYPE = 'Всё дело в…', TY0 = T(34.6), TCPS = 30;
+function sceneType(t) {
+  const on = t > T(34.35) && t < GL1;
+  if (!S($('type'), on ? 1 : 0, TR({ y: -4 * P(t, T(34.4), T(36)) }), 0)) return;
+  const n = clamp(Math.floor((t - TY0) * TCPS), 0, TYPE.length), s = TYPE.slice(0, n), acc = Math.max(0, n - 4);
+  const cool = P(t, TY0 + TYPE.length / TCPS + .1, TY0 + TYPE.length / TCPS + .45);
+  const key = s + '|' + Math.round(cool * 20) + (t >= GL0 ? 'G' : '');
+  if ($('typet')._k !== key) {
+    const col = `rgb(${mixC('255,140,70', '255,255,255', cool)})`;
+    $('typet').innerHTML = s.slice(0, acc) + (s.length > acc ? `<span style="color:${col};text-shadow:0 0 ${(30 * (1 - cool)).toFixed(0)}px rgba(255,120,50,.8)">${s.slice(acc)}</span>` : '');
+    $('typet')._k = key;
+  }
+  const glitch = t >= GL0 && t < GL1;
+  $('type').style.textShadow = glitch ? '-22px 0 0 rgba(255,0,70,.95),22px 0 0 rgba(0,230,255,.95),0 0 0 #fff' : 'none';
+  $('type').style.transform = glitch ? 'translateX(-10px) skewX(-8deg)' : TR({ y: -4 * P(t, T(34.4), T(36)) });
+  $('cart').style.opacity = (t < TY0 + TYPE.length / TCPS + .05 ? 1 : (Math.floor((t - TY0) * 4) % 2 === 0 ? 1 : .2)).toFixed(2);
+}
+
+// ---------- ANSWER: «РАССЕЯНИЕ» assembles from the black ----------
+const ANS = 'РАССЕЯНИЕ';
+let AFS = 160, AX = [], AW = [], ABOX = [], ABASE = 880;
+const ORDER = [0, 1, 2, 3, 4, 3, 2, 1, 0];   // edges first, the middle letter last
+const ALAND = [A0 + .22, A0 + .42, A0 + .57, A0 + .70, H38];
+const landT = i => ALAND[ORDER[i]];
+function letterState(i, t) {
+  const g = ORDER[i], tl = landT(i);
+  if (g === 0) {   // edge letters: out of blur, slide in from outside
+    const k = E.outExpo(P(t, A0, tl)), side = i === 0 ? -1 : 1;
+    return { a: P(t, A0, A0 + .08), dx: side * 170 * (1 - k), dy: 0, s: lerp(1.3, 1, k), blur: (1 - k) * 18, v: 0 };
+  }
+  const fall = .28, u = P(t, tl - fall, tl), k = E.inOutSine(u);   // middle letters fall from the top
+  const v = spd(tt => E.inOutSine(P(tt, tl - fall, tl)), t) * 420;
+  return { a: P(t, tl - fall, tl - fall + .05), dx: 0, dy: -420 * (1 - k) - 22 * spring(t, tl, 28, 10), s: 1 + .07 * spring(t, tl, 30, 9) * (u >= 1 ? 1 : 0), blur: 0, v };
+}
+function ansColor(t) { return mixC('232,130,111', '255,255,255', E.inOutSine(P(t, H38 + .35, H38 + 1.05))) }
+function drawAnswer(c, t, cam) {
+  window.TEXTBOX = [];
+  if (t < A0 || t > T(41.3)) return;
+  const up = -1500 * E.inCubic(P(t, T(40.75), T(41.1)));   // vertical whoosh out (with echo copies)
+  const col = ansColor(t);
+  c.save(); c.setTransform(cam.k, 0, 0, cam.k, cam.bx, cam.by);
+  c.font = `800 ${AFS}px Onest`; c.textBaseline = 'alphabetic'; c.textAlign = 'left';
+  const echoes = up < -1 ? [[150, '232,130,111', .35], [300, '47,91,255', .22], [440, '63,224,200', .12]] : [];
+  for (const [off, ec, ea] of echoes) { c.fillStyle = `rgba(${ec},${ea})`; for (let i = 0; i < ANS.length; i++) c.fillText(ANS[i], AX[i], ABASE + up + off) }
+  for (let i = 0; i < ANS.length; i++) {
+    const st = letterState(i, t); if (st.a <= .01) continue;
+    const x = AX[i] + st.dx, y = ABASE + st.dy + up, cx = AX[i] + AW[i] / 2;
+    c.save(); c.translate(cx + st.dx, y); c.scale(st.s, st.s); c.translate(-cx - st.dx, -y);
+    if (st.v > 300) {   // vertical smear while falling
+      const n = 7, step = st.v / 120 / n;
+      for (let j = n; j >= 1; j--) { c.fillStyle = `rgba(${col},${(st.a * .5 * (1 - j / (n + 1))).toFixed(3)})`; c.fillText(ANS[i], x, y - j * step) }
+    }
+    c.filter = st.blur > .3 ? `blur(${st.blur.toFixed(1)}px)` : 'none';
+    c.fillStyle = `rgba(${col},${st.a.toFixed(3)})`; c.fillText(ANS[i], x, y);
+    c.filter = 'none'; c.restore();
+    if (st.a >= .5 && st.blur < 4 && st.v < 900 && up > -1) {
+      const b = ABOX[i], s = st.s, cx2 = cx + st.dx;
+      const bx0 = cx2 + (b.x0 + st.dx - cx2) * s, bx1 = cx2 + (b.x1 + st.dx - cx2) * s, by0 = y + (b.y0 - ABASE) * s, by1 = y + (b.y1 - ABASE) * s;
+      window.TEXTBOX.push({ x0: cam.k * bx0 + cam.bx, y0: cam.k * by0 + cam.by, x1: cam.k * bx1 + cam.bx, y1: cam.k * by1 + cam.by, text: ANS[i] });
+    }
+  }
+  // light sweep over the letters during the hold
+  const sw = P(t, T(39.4), T(40.3));
+  if (sw > 0 && sw < 1 && up > -1) {
+    c.globalCompositeOperation = 'source-atop';
+    const x = lerp(-300, 1380, E.inOutSine(sw)), g = c.createLinearGradient(x - 160, 0, x + 160, 0);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.5, 'rgba(255,255,255,.75)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g; c.fillRect(-200, ABASE - AFS * 1.2, W + 400, AFS * 1.6);
+  }
+  c.restore();
+}
+function sceneAns2(t) {
+  const on = t > T(38.4) && t < T(41.15);
+  const up = -1500 * E.inCubic(P(t, T(40.75), T(41.1))), vy = spd(tt => -1500 * E.inCubic(P(tt, T(40.75), T(41.1))), t);
+  if (!S($('ans2'), on ? 1 : 0, TR({ y: up }), 0, setMB('mb4', 0, Math.min(40, vy / 70)))) return;
+  words($('ans2'), t, T(38.5), 99, { st: .07 });
+}
+function drawAnsFX(c, t) {
+  if (t < A0 || t > T(41.3)) return;
+  const up = -1500 * E.inCubic(P(t, T(40.75), T(41.1))), cy = ABASE - AFS * .36 + up;
+  for (let i = 0; i < ANS.length; i++) { const st = letterState(i, t); if (st.a > .05) blob(c, AX[i] + AW[i] / 2 + st.dx, ABASE - AFS * .35 + st.dy + up, 150, '232,130,111', .32 * st.a * (1 - .6 * P(t, H38 + .4, H38 + 1.2))) }
+  blob(c, 540, cy, 900, '232,130,111', 1.2 * decay(t, H38, .3));
+  shock(c, t, H38, 540, cy, '255,190,170');
+  // confetti: 10 tiny star icons pop around the word in one frame
+  if (t >= H38 && t < H38 + .6) { const q = (t - H38) / .6; for (let j = 0; j < 10; j++) { const an = j / 10 * 6.2832 + .3, rx = 470 + 70 * q, ry = 230 + 40 * q; star4(c, 540 + Math.cos(an) * rx, cy + Math.sin(an) * ry, 26, 1 - q, an, j % 2 ? '255,190,170' : '63,224,200') } }
+  // sparks to the centre right before the climax (wind-up)
+  if (t > H38 - .2 && t < H38) { const q = P(t, H38 - .2, H38); for (let j = 0; j < 14; j++) { const an = j / 14 * 6.2832, r0 = 620 * (1 - E.inCubic(q)) + 40, r1 = r0 + 90; spark(c, 540 + Math.cos(an) * r1, cy + Math.sin(an) * r1 * .6, 540 + Math.cos(an) * r0, cy + Math.sin(an) * r0 * .6, '255,200,180', .8, .7) } }
+}
+
+// ---------- END: source + call to action on the channel plate, collapse into the channel dot ----------
+const DOT = { x: 540, y: 960 };
+function sceneEnd(t) {
+  const on = t > T(40.95) && t < T(44.9);
+  if (!on) { S($('endG'), 0); return }
+  const kin = E.outExpo(P(t, T(40.95), T(41.45))), cs = E.inExpo(P(t, T(44), T(44.8)));
+  const vy = spd(tt => 1500 * (1 - E.outExpo(P(tt, T(40.95), T(41.45)))), t);
+  S($('endG'), 1, TR({ y: 1500 * (1 - kin), rx: lerp(38, 9, kin) * (1 - cs), ry: 4.5 * Math.sin(t * 1.9), rz: -1.2 + .8 * Math.sin(t * 1.1) + 40 * cs, s: (1 - .985 * cs) }), 22 * cs, setMB('mbE', 0, Math.min(40, vy / 70)));
+  $('endp').querySelector('.gl').style.transform = `translateX(${lerp(-400, 1200, P(t, T(42.2), T(43.4))).toFixed(0)}px) skewX(-18deg)`;
+  words($('e0'), t, T(41.35), 99, { st: .07 }); words($('e1'), t, T(41.55), 99); words($('e2'), t, T(41.85), 99);
+}
+function drawEndFX(c, t) {
+  if (t > T(41.2) && t < T(44.2)) {   // star glint riding the plate corner
+        star4(c, 905 + 6 * Math.sin(t * 2), 800 + 5 * Math.cos(t * 1.7), 90 + 16 * Math.sin(t * 5), .9 * P(t, T(41.4), T(41.7)) * (1 - P(t, T(43.9), T(44.1))), t * .6, '63,224,200');
+  }
+  // collapse: sparks pulled into the dot
+  if (t > T(44) && t < T(45)) { const q = P(t, T(44), T(45)); for (let j = 0; j < 16; j++) { const an = j / 16 * 6.2832 + q * 2, r0 = 700 * (1 - E.inCubic(q)) + 30, r1 = r0 + 120 * (1 - q); spark(c, DOT.x + Math.cos(an) * r1, DOT.y + Math.sin(an) * r1, DOT.x + Math.cos(an) * r0, DOT.y + Math.sin(an) * r0, '63,224,200', 1 - q * .5, .8) } }
+  // the channel dot: blue, pulses on the beat, turquoise sparks orbit
+  const born = E.outBack(P(t, T(44.55), T(45)), 2.4), out = 1 - P(t, BLOOM0, BLOOM0 + 2 / 30);
+  if (born > 0 && out > 0 && t < LOOP0) {
+    const pu = decay(t, T(46), .2) + decay(t, T(47), .2), r = 34 * born * (1 + .25 * pu);
+    blob(c, DOT.x, DOT.y, r * 9, '47,91,255', .55 * out); blob(c, DOT.x, DOT.y, r * 3, '47,91,255', .95 * out); blob(c, DOT.x, DOT.y, r * 1.1, '230,238,255', out);
+    star4(c, DOT.x, DOT.y, r * 5.5, .8 * out * born, t * .5, '63,224,200');
+    for (let j = 0; j < 6; j++) { const an = t * 1.8 + j * 1.047, rr = r * 3.6; dot(c, DOT.x + Math.cos(an) * rr, DOT.y + Math.sin(an) * rr * .8, .9, '63,224,200', .9 * out * born) }
+  }
+}
+
+// ======================= background =======================
+function drawBG(t, cam) {
+  const c = bg; c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1; c.filter = 'none';
+  if (t >= GL1 && t < BLK1) { c.fillStyle = '#000'; c.fillRect(0, 0, W, H); return }
+  vgrad(c, [[0, '#0d0b12'], [.5, '#16121b'], [1, '#0b0a0f']]);
+  const pu = pulse(t), ox = ((-cam.bx * .5) % SP + SP) % SP, oy = ((-cam.by * .5) % SP + SP) % SP;
+  // coloured light spots that also light the LED grid
+  const spots = [];
+  if (t < H4 + .1) spots.push({ x: 540, y: 880, r: 900, rgb: '47,91,255', a: .55 + .35 * pu });
+  if (t >= H4 - .05 && t < T(12)) { const s = sunCtx(t); spots.push({ x: s.x, y: s.y, r: 760, rgb: '255,190,80', a: .45 + .3 * pu }, { x: 540, y: 1500, r: 800, rgb: '200,120,255', a: .3 * P(t, H8, H8 + .5) }) }
+  if (t >= T(12) && t < T(20)) spots.push({ x: 640, y: 1100, r: 950, rgb: '47,91,255', a: .5 + .35 * pu });
+  if (t >= T(34.3) && t < GL1) spots.push({ x: 540, y: 860, r: 760, rgb: mixC('255,110,50', '150,150,170', P(t, T(34.5), T(36))), a: .22 - .08 * P(t, T(34.5), T(36)) });
+  if (t >= BLK1 && t < T(41.2)) spots.push({ x: 540, y: 840, r: 1000, rgb: '47,91,255', a: .4 + .3 * pu + .6 * decay(t, H38, .35) });
+  if (t >= T(41) && t < BLOOM0) spots.push({ x: 540, y: 980, r: 900, rgb: '47,91,255', a: (.45 + .3 * pu) * (t > T(44.6) ? .6 : 1) });
+  ledLayer(c, ox, oy, .05, spots);
+  c.setTransform(cam.k, 0, 0, cam.k, cam.bx, cam.by);
+  c.globalCompositeOperation = 'lighter';
+  for (const s of spots) blob(c, s.x, s.y, s.r * .95, s.rgb, s.a * .55);
+  // card under-glow (cards float on a coloured light pool)
+  if (t < H4) blob(c, 540, 1200, 520, '47,91,255', .55 * P(t, .2, .5), .3);
+  if (t > T(5) && t < T(12)) blob(c, 540, C1.y + C1.h + 10, 420, '255,220,150', .45 * P(t, T(5.3), T(6)), .28);
+  drawC1(c, t);
+  c.globalCompositeOperation = 'lighter';
+  drawC2(c, t);
+  c.globalCompositeOperation = 'source-over';
+  drawC3(c, t);
+  c.globalCompositeOperation = 'source-over';
+  drawC4(c, t);
+  c.globalCompositeOperation = 'lighter';
+  if (t > T(12.3) && t < T(19.4)) blob(c, 540, 790, 520, '47,91,255', .4, .3);
+  if (t > T(20.6) && t < T(26.4)) blob(c, 540, 810, 520, '47,91,255', .35 + .3 * flood2(t), .3);
+  if (t > T(27.7) && t < T(34.4)) blob(c, 540, 790, 520, '255,110,40', .35 * fade3(t), .3);
+  c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1; c.filter = 'none';
+  // whole-layer motion blur on the big camera moves (fall / rise / crash zoom)
+  const vy = Math.abs(spd(camY, t)), zoom = (t > T(11.72) && t < T(12)) || (t > T(19.6) && t < T(20));
+  $('bg').style.filter = setMB('mbBG', zoom ? 6 : 0, Math.min(60, vy / 60) + (zoom ? 6 : 0)) || 'none';
+}
+
+// ======================= front effects =======================
+function drawFX(t, cam) {
+  const c = fx; c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'source-over'; c.filter = 'none'; c.clearRect(0, 0, W, H);
+  if (t >= GL1 && t < BLK1) return;
+  c.setTransform(cam.k, 0, 0, cam.k, cam.bx, cam.by); c.globalCompositeOperation = 'lighter';
+  // HOOK: star glint charges (shrinks, rays turn 18 deg), sparks to the centre, then the burst
+  if (t > T(2.9) && t < H4 + .45) {
+    const ch = P(t, T(3), T(3.45)), wu = E.inOutSine(P(t, T(3.55), H4));
+    const st = hookState(Math.min(t, H4 - .001)), s = st.s;
+    const px = lerp(540, 540 + (945 - 540) * s, 1), py = 870 + (575 - 870) * s;
+    if (t < H4) star4(c, px, py, (70 + 40 * ch) * (1 - .55 * wu), ch, .2 + wu * .314, '63,224,200');
+    if (t > T(3.6) && t < H4) { const q = P(t, T(3.6), H4); for (let j = 0; j < 12; j++) { const an = j / 12 * 6.2832 + .2, r0 = 560 * (1 - E.inCubic(q)) + 30, r1 = r0 + 110; spark(c, 540 + Math.cos(an) * r1, 870 + Math.sin(an) * r1, 540 + Math.cos(an) * r0, 870 + Math.sin(an) * r0, '160,190,255', .9 * q, .8) } }
+  }
+  shock(c, t, H4, 540, HCY, '255,226,170');
+  if (t > H4 && t < H4 + .5) blob(c, 540, HCY, 700, '255,214,140', .9 * decay(t, H4, .14));
+  // spectrum burst glint
+  if (t > H8 - .1 && t < H8 + .8) { star4(c, 540, EXITY, 260 * (1 - .4 * P(t, H8 - .1, H8)) + 120 * decay(t, H8, .2), clamp(P(t, H8 - .1, H8) * 1.2) * (1 - P(t, H8 + .4, H8 + .8)), .1 + 3 * P(t, H8 - .1, H8 + .8)); shock(c, t, H8, 540, EXITY, '255,240,200', .55) }
+  // HOW1 big scatter: rings from the blue molecule
+  if (t > H16 - .05 && t < H16 + .5) { const p = stopPos('b', H16); shock(c, t, H16, p[0], p[1], '120,160,255', .7) }
+  // fly-through: the molecule's light fills the frame, then reveals the sky
+  const fill = E.inCubic(P(t, T(19.7), T(20))) * (t < T(20) ? 1 : 0) + (t >= T(20) ? 1 - E.outCubic(P(t, T(20), T(20.8))) : 0);
+  if (fill > .002) { c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = `rgba(120,160,255,${(.85 * fill).toFixed(3)})`; c.fillRect(0, 0, W, H); blob(c, 540, 960, 1200, '255,255,255', .7 * fill); c.setTransform(cam.k, 0, 0, cam.k, cam.bx, cam.by) }
+  if (t > T(19.4) && t < T(20)) { blob(c, MOLB.x, MOLB.y, 260, '120,160,255', .9 * P(t, T(19.4), T(19.6))); blob(c, MOLB.x, MOLB.y, 70, '255,255,255', P(t, T(19.4), T(19.6))) }
+  // HOW2 / HOW3 floods: rings
+  shock(c, t, H24, OB2.x, OB2.y - 52, '200,220,255');
+  shock(c, t, H32, OB3.x, OB3.y - 52, '255,200,150');
+  // glitch: RGB-shifted slices for one frame
+  if (t >= GL0 && t < GL1) { const r = rng(36); c.setTransform(1, 0, 0, 1, 0, 0); for (let j = 0; j < 9; j++) { const y = 600 + r() * 600, h = 10 + r() * 50; c.fillStyle = j % 3 === 0 ? 'rgba(255,0,70,.5)' : j % 3 === 1 ? 'rgba(0,230,255,.5)' : 'rgba(255,255,255,.35)'; c.fillRect(0, y, W, h) } c.setTransform(cam.k, 0, 0, cam.k, cam.bx, cam.by) }
+  drawAnsFX(c, t);
+  drawEndFX(c, t);
+  c.globalCompositeOperation = 'source-over';
+}
+
+// ======================= flash: additive white, 100% for 2 frames, then straight into the next scene's colour ======
+const $flash = $('flash');
+const flashA = (t, tp) => t < tp - .05 ? 0 : t < tp ? E.inCubic(P(t, tp - .05, tp)) : t < tp + .067 ? 1 : decay(t, tp + .067, .045);
+const FLASHES = [[H4, '255,214,140'], [H24, '120,165,255'], [H32, '255,140,60'], [H38, '232,130,111']];
+function flash(t) {
+  let f = 0, tint = '255,255,255';
+  for (const [tp, col] of FLASHES) { const a = flashA(t, tp); if (a > f) { f = a; tint = col } }
+  if (f <= .003) { if ($flash._d !== 0) { $flash.style.display = 'none'; $flash._d = 0 } return }
+  if ($flash._d !== 1) { $flash.style.display = 'block'; $flash._d = 1 }
+  const q = f >= .999 ? 0 : 1 - f, c0 = mixC('255,255,255', tint, q).split(',').map(v => Math.round(v * f)).join(','), c1 = mixC('255,255,255', tint, Math.min(1, q * 1.6)).split(',').map(v => Math.round(v * f * f)).join(',');
+  $flash.style.opacity = '1';
+  $flash.style.background = `radial-gradient(ellipse at 50% 47%,rgb(${c0}) 0%,rgb(${c1}) 100%)`;
+}
+
+// ======================= cues (from beats, computed once) =======================
+const CUES = [];
+const cue = (t, type, dur) => CUES.push(dur ? { t: +t.toFixed(4), type, dur: +dur.toFixed(4) } : { t: +t.toFixed(4), type });
+cue(T(0), 'whoosh', .4);
+cue(T(1), 'tick'); cue(T(2), 'tick'); cue(T(3), 'tick');
+cue(T(3.5), 'riser', T(4) - T(3.5) - .03);
+cue(T(4), 'hit');
+cue(T(5), 'whoosh', .3); cue(T(5.5), 'whoosh', .25); cue(T(6), 'tick'); cue(T(6.5), 'tick'); cue(T(7), 'tick');
+cue(T(8), 'hit'); cue(T(9), 'tick'); cue(T(10), 'tick'); cue(T(11), 'tick');
+cue(T(11.5), 'whoosh', .25);
+cue(T(12.5), 'whoosh', .25); cue(T(13), 'tick'); cue(T(13.5), 'tick'); cue(T(14), 'tick'); cue(T(14.5), 'tick'); cue(T(15), 'tick'); cue(T(15.5), 'tick');
+cue(T(16), 'hit'); cue(T(17), 'tick'); cue(T(17.5), 'tick'); cue(T(18), 'tick'); cue(T(18.5), 'tick');
+cue(T(19), 'whoosh', .25); cue(T(19.5), 'whoosh', .4);
+cue(T(20.5), 'whoosh', .3); for (let j = 0; j < 7; j++) cue(T(21 + .5 * j), 'tick');
+cue(T(24), 'hit'); cue(T(25), 'tick'); cue(T(26), 'tick');
+cue(T(26.5), 'whoosh', .4); cue(T(27.5), 'whoosh', .3);
+cue(T(28), 'tick'); cue(T(28.5), 'whoosh', .4); cue(T(29.5), 'whoosh', .3); cue(T(30), 'tick'); cue(T(30.5), 'tick'); cue(T(31), 'tick'); cue(T(31.5), 'tick');
+cue(T(32), 'hit');
+cue(T(32.5), 'riser', T(34.5) - T(32.5));
+cue(T(33.5), 'tick'); cue(T(34), 'tick');
+cue(T(34.5), 'breath_on'); cue(T(35), 'tick'); cue(T(35.5), 'tick'); cue(T(36), 'breath_off');
+cue(T(36) - .12, 'gap', .12);
+cue(T(36), 'subdrop');
+cue(T(36.5), 'tick'); cue(T(37), 'tick'); cue(T(37.5), 'tick');
+cue(T(38), 'hit'); cue(T(39), 'tick'); cue(T(40), 'tick');
+cue(T(40.5), 'whoosh', .3); cue(T(41), 'tick'); cue(T(41.5), 'tick'); cue(T(42), 'tick'); cue(T(43), 'tick');
+cue(T(43.75), 'whoosh', .35); cue(T(45), 'tick'); cue(T(46), 'tick'); cue(T(47), 'tick');
+cue(BLOOM0 - .05, 'whoosh', .2);
+// windows where text may leave the zones (fast exits / zooms)
+cue(H4 - .17, 'free', .3); cue(T(11.6), 'free', T(12.3) - T(11.6)); cue(T(19), 'free', T(19.5) - T(19));
+cue(T(20.55), 'free', T(20.95) - T(20.55)); cue(T(26.35), 'free', T(27.2) - T(26.35));
+cue(T(40.7), 'free', T(41.6) - T(40.7)); cue(T(43.95), 'free', T(45.1) - T(43.95)); cue(BLOOM0, 'free', LOOP0 - BLOOM0);
+window.CUES = CUES.sort((a, b) => a.t - b.t);
+window.TEXTBOX = [];
+window.FONT_WEIGHTS = ['500', '600', '700', '800'];
+
+// ======================= seek =======================
+let C1B = [];
+window.seek = function (tn) {
+  tn = Math.max(0, Math.min(DUR, tn));
+  const t = tn >= LOOP0 ? 0 : tn;   // last frames: exactly frame 0 (same function, grain, camera)
+  const cam = camera(t);
+  $('cam').style.transform = `matrix(${cam.k.toFixed(5)},0,0,${cam.k.toFixed(5)},${cam.bx.toFixed(2)},${cam.by.toFixed(2)})`;
+  const black = t >= GL1 && t < BLK1;
+  $('root').style.background = black ? '#000' : '#0A0A0E';
+  drawBG(t, cam);
+  sceneHook(t); sceneC1(t); sceneC2(t); sceneC3(t); sceneC4(t); sceneType(t); sceneAns2(t); sceneEnd(t);
+  drawFX(t, cam);
+  tx.setTransform(1, 0, 0, 1, 0, 0); tx.globalCompositeOperation = 'source-over'; tx.clearRect(0, 0, W, H);
+  drawAnswer(tx, t, cam);
+  flash(t);
+  $('grain').style.display = black ? 'none' : 'block'; $('vig').style.display = black ? 'none' : 'block';
+  if (!black) drawGrain(t);
+  if (DEBUG) {
+    const b = BT(tn), k = Math.floor(b + 1e-6), on = tn - TB(k) < .1;
+    const d = $('dbg'); d.style.display = 'block'; d.textContent = `beat ${k - B0}  ${tn.toFixed(2)}s`;
+    d.style.background = on ? ((k - B0) % 4 === 0 ? '#ff5a1f' : '#ffffff') : 'rgba(255,255,255,.35)';
+    tx.fillStyle = on ? ((k - B0) % 4 === 0 ? '#ff5a1f' : '#fff') : 'rgba(0,0,0,0)'; tx.fillRect(1000, 30, 50, 50);
+  }
+};
+
+// ======================= boot: fonts first (no try/catch: a missing font must fail) =======================
+function build() {
+  // «все цвета» split into letters
+  const c1b = $('c1b'); c1b.innerHTML = [...'все цвета'].map(ch => `<span class="ch">${ch === ' ' ? '&nbsp;' : ch}</span>`).join(''); C1B = [...c1b.children];
+  // answer word: fit the width, measure every letter (box without glow)
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = `800 ${AFS}px Onest`; let tw = m.measureText(ANS).width;
+  AFS = Math.min(176, Math.floor(AFS * 800 / tw)); m.font = `800 ${AFS}px Onest`; tw = m.measureText(ANS).width;
+  const x0 = 540 - tw / 2;
+  AX = [...ANS].map((_, i) => x0 + m.measureText(ANS.slice(0, i)).width);
+  AW = [...ANS].map((ch, i) => (i < ANS.length - 1 ? AX[i + 1] : x0 + tw) - AX[i]);
+  ABOX = [...ANS].map((ch, i) => { const q = m.measureText(ch); return { x0: AX[i] - q.actualBoundingBoxLeft, x1: AX[i] + q.actualBoundingBoxRight, y0: ABASE - q.actualBoundingBoxAscent, y1: ABASE + q.actualBoundingBoxDescent } });
+}
+(async () => {
+  const STR = 'Почему небо синее, а закат оранжевый? Белый свет — все цвета Воздух рассеивает синий сильнее Синий летит к нам отовсюду На закате путь света длиннее Всё дело в… РАССЕЯНИЕ света в воздухе Источник: NASA Подпишись — будет ещё beat 0123456789.s';
+  for (const w of window.FONT_WEIGHTS) {
+    const r = await document.fonts.load(`${w} 120px Onest`, STR);
+    if (!r.length) throw new Error('Onest ' + w + ' did not load');
+  }
+  await document.fonts.ready;
+  for (const w of window.FONT_WEIGHTS) {
+    const face = [...document.fonts].some(f => /Onest/.test(f.family) && String(f.weight) === String(w) && f.status === 'loaded');
+    if (!face || !document.fonts.check(`${w} 120px Onest`, STR)) throw new Error('Onest ' + w + ' is not ready');
+  }
+  build();
+  window.seek(0);
+  window.READY = true;
+})();
+</script>
+</body></html>
