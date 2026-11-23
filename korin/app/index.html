@@ -815,7 +815,7 @@ const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9
 /* каждый посетитель получает номер; в таблицу пишем, что он сделал */
 const TRK = (() => {
   let vid = null; try { vid = localStorage.getItem('vid'); if (!vid) { vid = Math.random().toString(36).slice(2, 7).toUpperCase(); localStorage.setItem('vid', vid) } } catch (e) { vid = 'без номера' }
-  const src = (new URLSearchParams(location.search).get('utm_source') || (document.referrer && !document.referrer.includes(location.hostname) ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
+  const src = (new URLSearchParams(location.search).get('utm_source') || new URLSearchParams(location.search).get('src') || (document.referrer && !document.referrer.includes(location.hostname) ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
   const dev = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'телефон' : 'компьютер', t0 = Date.now();
   let deep = 0, left = false; addEventListener('scroll', () => { deep = Math.max(deep, Math.round((scrollY + innerHeight) / document.documentElement.scrollHeight * 100)) }, { passive: true });
   const track = (what, extra, beacon) => {

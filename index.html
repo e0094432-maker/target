@@ -571,7 +571,7 @@ $('#theme').addEventListener('click', () => {
 const savedTheme = store.get('theme'); if(savedTheme) document.documentElement.dataset.theme = savedTheme;
 
 /* откуда пришёл посетитель: метка из рекламной ссылки, иначе сайт-источник */
-const SOURCE = (new URLSearchParams(location.search).get('utm_source') || (document.referrer ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
+const SOURCE = (new URLSearchParams(location.search).get('utm_source') || new URLSearchParams(location.search).get('src') || (document.referrer ? new URL(document.referrer).hostname : 'прямой заход')).slice(0, 40);
 /* каждый посетитель получает номер; в таблицу пишем, что он сделал: зашёл, начал форму, нажал WhatsApp, ушёл */
 let VID = store.get('vid'); if (!VID) { VID = Math.random().toString(36).slice(2, 7).toUpperCase(); store.set('vid', VID) }
 const DEVICE = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'телефон' : 'компьютер', T0 = Date.now();
