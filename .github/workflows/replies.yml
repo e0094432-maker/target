@@ -18,18 +18,43 @@ jobs:
     env:
       API: https://korin-api.onrender.com
     steps:
+      # ids of comments the model chose not to answer: the free server sleeps between runs and forgets them,
+      # so they are kept here and handed back, and the same comment is not sent to the model every half hour
+      - name: Remember skipped comments
+        uses: actions/cache/restore@v4
+        with:
+          path: declined
+          key: declined-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: declined-
       - name: Answer new comments
         run: |
+          mkdir -p declined
+          [ -f declined/ids.json ] || echo '[]' > declined/ids.json
           curl -s -m 120 "$API/api/health" || true   # the free server sleeps: wake it first
           for BRAND in korin kenes; do
             OIDC=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=korin-api" | node -pe 'JSON.parse(require("fs").readFileSync(0)).value')
             echo "::add-mask::$OIDC"
-            OIDC="$OIDC" BRAND="$BRAND" node -e 'console.log(JSON.stringify({oidc:process.env.OIDC, brand:process.env.BRAND}))' > /tmp/ask.json
+            OIDC="$OIDC" BRAND="$BRAND" node -e '
+              let d = []; try { d = JSON.parse(require("fs").readFileSync("declined/ids.json")) } catch (e) {}
+              d = Array.isArray(d) ? d.filter(x => typeof x === "string").slice(-300) : [];
+              console.log(JSON.stringify({oidc: process.env.OIDC, brand: process.env.BRAND, declined: d}))' > /tmp/ask.json
             echo "--- $BRAND"
             for i in 1 2 3 4; do
               curl -sS -m 240 -X POST -H "Content-Type: application/json" -d @/tmp/ask.json "$API/api/marketer-replies" > /tmp/out.json || true
               node -e 'try{JSON.parse(require("fs").readFileSync("/tmp/out.json"))}catch(e){process.exit(1)}' && break
               echo "server is restarting, waiting"; sleep 30
             done
-            cat /tmp/out.json; echo
+            # keep the server's list for the next run; print the answer without it
+            node -e '
+              const fs = require("fs"), raw = fs.readFileSync("/tmp/out.json", "utf8");
+              let o; try { o = JSON.parse(raw) } catch (e) { console.log(raw); process.exit(0) }
+              if (o && Array.isArray(o.declined)) { fs.writeFileSync("declined/ids.json", JSON.stringify(o.declined.slice(-300))); delete o.declined }
+              console.log(JSON.stringify(o))' || cat /tmp/out.json
+            echo
           done
+      - name: Keep skipped comments for the next run
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: declined
+          key: declined-${{ github.run_id }}-${{ github.run_attempt }}

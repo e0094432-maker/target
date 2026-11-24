@@ -199,7 +199,8 @@ class ApiTest(unittest.TestCase):
 
         real, app.providers.gemini = app.providers.gemini, fake
         os.environ["GEMINI_API_KEY"] = "k"
-        app._ai.update(model=None, no_search_until=0, listed_at=app.time.time(), listed=["gemini-b", "gemini-c"])
+        # gemini-2.5-flash is tried only while Google still lists it, and then last
+        app._ai.update(model=None, no_search_until=0, listed_at=app.time.time(), listed=["gemini-2.5-flash", "gemini-9-flash-b", "gemini-9-flash-c"])
         try:
             first = app.ask("q")
             second = app.ask("q")
@@ -210,6 +211,9 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(first[0], "ок")
         self.assertEqual(calls[-1], (first[2], False))
         self.assertEqual(len(calls), 5)  # three tries with search, one without, then straight to no-search
+        self.assertEqual([m for m, s in calls[:3]], ["gemini-9-flash-b", "gemini-9-flash-c", "gemini-2.5-flash"])
+        # an answer without search says so
+        self.assertEqual((first.engine, first.search, second.search), ("gemini", False, False))
         self.assertTrue(app.out_of_quota("HTTP 429: quota"))
 
     def test_name_typed_as_one_word_is_still_found(self):

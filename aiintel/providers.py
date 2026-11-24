@@ -17,6 +17,20 @@ class ProviderError(Exception):
     pass
 
 
+class Answer(tuple):
+    """(text, urls, model) as before, so `text, urls, model = ...` keeps working, plus how it was made:
+    .engine ("gemini", "openai", ...) and .search — True only when the engine really searched the web
+    for this answer. Without a search the text is the model's memory, not what a person sees in the app."""
+
+    def __new__(cls, text, urls, model, engine="", search=False):
+        self = super().__new__(cls, (text, urls, model))
+        self.engine, self.search = engine, bool(search)
+        return self
+
+    def __getnewargs__(self):  # copy, deepcopy and pickle call __new__ with these
+        return (*self, self.engine, self.search)
+
+
 def _post(url, headers, payload, timeout=180, retries=3):
     body = json.dumps(payload).encode()
     for attempt in range(retries + 1):
@@ -61,7 +75,8 @@ def openai(prompt, system=None):
     )
     msg = data["choices"][0]["message"]
     urls = [a["url_citation"]["url"] for a in msg.get("annotations") or [] if a.get("type") == "url_citation"]
-    return msg.get("content") or "", urls, data.get("model", model)
+    # chat/completions with gpt-4o does not search the web; only links it cites prove a search happened
+    return Answer(msg.get("content") or "", urls, data.get("model", model), engine="openai", search=bool(urls))
 
 
 def perplexity(prompt, system=None):
@@ -73,11 +88,13 @@ def perplexity(prompt, system=None):
     )
     urls = list(data.get("citations") or [])
     urls += [r["url"] for r in data.get("search_results") or [] if r.get("url") and r["url"] not in urls]
-    return data["choices"][0]["message"].get("content") or "", urls, data.get("model", model)
+    return Answer(data["choices"][0]["message"].get("content") or "", urls, data.get("model", model), engine="perplexity", search=bool(urls))
 
 
 def gemini(prompt, system=None, search=None, model=None, retries=3, timeout=180):
-    model = model or os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    # gemini-2.5-flash is reported to be switched off for this API on 2026-12-01; Google's moving flash-lite name
+    # follows the cheap line the server prefers. The server always passes its own model; this default is for the CLI.
+    model = model or os.environ.get("GEMINI_MODEL", "").strip() or "gemini-flash-lite-latest"
     payload = {"contents": [{"role": "user", "parts": [{"text": prompt}]}]}
     if system:
         payload["systemInstruction"] = {"parts": [{"text": system}]}
@@ -92,7 +109,10 @@ def gemini(prompt, system=None, search=None, model=None, retries=3, timeout=180)
     )
     cand = (data.get("candidates") or [{}])[0]
     text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
-    chunks = cand.get("groundingMetadata", {}).get("groundingChunks") or []
+    grounding = cand.get("groundingMetadata") or {}
+    chunks = grounding.get("groundingChunks") or []
+    # with the google_search tool the model itself decides whether to search; it did only if Google says so
+    searched = bool(payload.get("tools") and (grounding.get("webSearchQueries") or chunks))
     # search results come as redirect links; the real site name is in the title
     urls = []
     for c in chunks:
@@ -102,7 +122,67 @@ def gemini(prompt, system=None, search=None, model=None, retries=3, timeout=180)
             urls.append("https://" + title)
         elif web.get("uri"):
             urls.append(web["uri"])
-    return text, urls, data.get("modelVersion", model)
+    return Answer(text, urls, data.get("modelVersion", model), engine="gemini", search=searched)
+
+
+# ---------- writers: texts only, never a measurement ----------
+# These are not the engines we measure, so they are not in get() below. Model names change often:
+# the defaults are what was there when this was written, check them in each console.
+_UA = "KorinServer/1.0"
+
+
+def _content(data, where):
+    try:
+        return data["choices"][0]["message"].get("content") or ""
+    except (KeyError, IndexError, TypeError, AttributeError):
+        raise ProviderError(f"{where}: ответ в неверном виде") from None
+
+
+def groq(prompt, system=None, timeout=45):
+    """Groq, OpenAI-compatible chat completions. One try: the router moves on instead of retrying."""
+    # Llama was reported gone from Groq's free plan in August 2026; gpt-oss-120b was listed as free. Check in console.groq.com
+    model = os.environ.get("GROQ_MODEL", "").strip() or "openai/gpt-oss-120b"
+    data = _post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {"Authorization": "Bearer " + _key("GROQ_API_KEY"), "User-Agent": _UA},
+        {"model": model, "messages": _messages(system, prompt)},
+        timeout=timeout,
+        retries=0,
+    )
+    text = _content(data, "groq")
+    if not text.strip():
+        raise ProviderError("groq: пустой ответ")
+    return Answer(text, [], data.get("model", model), engine="groq", search=False)
+
+
+def cloudflare(prompt, system=None, timeout=60):
+    """Cloudflare Workers AI REST: POST /accounts/{id}/ai/run/{model}. One try, like groq()."""
+    account = "".join((os.environ.get("CLOUDFLARE_ACCOUNT_ID") or "").split()).strip("\"'")
+    if not re.fullmatch(r"[\w-]{8,64}", account):
+        raise ProviderError("не задан CLOUDFLARE_ACCOUNT_ID")
+    model = os.environ.get("CLOUDFLARE_MODEL", "").strip() or "@cf/meta/llama-3.3-70b-instruct-fp8-fast"  # check in the Cloudflare dashboard
+    if not re.fullmatch(r"@?[\w.-]+(/[\w.-]+)*", model):
+        raise ProviderError("CLOUDFLARE_MODEL: неверное имя модели")
+    try:
+        max_tokens = max(64, min(8192, int(os.environ.get("CLOUDFLARE_MAX_TOKENS", "2048"))))
+    except ValueError:
+        max_tokens = 2048
+    data = _post(
+        f"https://api.cloudflare.com/client/v4/accounts/{account}/ai/run/{model}",
+        {"Authorization": "Bearer " + _key("CLOUDFLARE_API_TOKEN"), "User-Agent": _UA},
+        # without max_tokens many models stop after a few hundred tokens
+        {"messages": _messages(system, prompt), "max_tokens": max_tokens},
+        timeout=timeout,
+        retries=0,
+    )
+    result = data.get("result") if isinstance(data, dict) else None
+    text = result.get("response") if isinstance(result, dict) else None
+    if not isinstance(text, str):
+        text = _content(result, "cloudflare") if isinstance(result, dict) and "choices" in result else ""
+    if not (isinstance(data, dict) and data.get("success", True)) or not text.strip():
+        errors = json.dumps(data.get("errors") if isinstance(data, dict) else data, ensure_ascii=False)[:300]
+        raise ProviderError(f"cloudflare: пустой ответ {errors}")
+    return Answer(text, [], model, engine="cloudflare", search=False)
 
 
 _DEMO_SOURCES = ["krisha.kz", "kn.kz", "korter.kz", "forbes.kz", "kapital.kz", "2gis.kz", "inbusiness.kz"]

@@ -1,6 +1,29 @@
 """Körin backend: real site audit, real AI-visibility check and AI agents.
 
 Standard library only. Run:  python3 -m server.app   (PORT, GEMINI_API_KEY or OPENAI_API_KEY, KORIN_ORIGINS)
+
+Gemini model: GEMINI_MODEL wins; then GEMINI_FALLBACKS; then GEMINI_PREFER (comma list, default
+gemini-3.5-flash-lite) as far as the key's own model list (ListModels, read once an hour) has them; then other
+flash / flash-lite models from that list, newest first (other families such as gemini-4-hydrogen only through
+GEMINI_PREFER: they cost more); gemini-2.5-flash keeps a place while Google still lists it. At most 5 are tried.
+
+Measurement (/api/quick, /api/check-one, /api/check) always asks the engine it measures. An answer made without a
+real web search comes back with "search": false and is kept for an hour only, not the 72 hours of a normal answer.
+
+Texts (our Threads posts and replies, agents, breakdowns, social texts) go through write(), optional providers:
+  GROQ_API_KEY (+ GROQ_MODEL, default openai/gpt-oss-120b — check in console.groq.com) — only our own public
+    posts and replies, never client data;
+  CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN (+ CLOUDFLARE_MODEL, default @cf/meta/llama-3.3-70b-instruct-fp8-fast,
+    CLOUDFLARE_MAX_TOKENS 2048 — check in the Cloudflare dashboard);
+  "main" — the Gemini/OpenAI path above.
+  KORIN_WRITE_ORDER (default groq,cloudflare,main), KORIN_WRITE_ORDER_CLIENT (for client data; groq is always dropped),
+  KORIN_WRITE_BUDGET like "groq=300,cloudflare=60,main=100" (calls a UTC day; main has no limit unless set),
+  KORIN_WRITE_COOLDOWN seconds after a 429 (default 900). Budgets and pauses live in memory: a restart resets them.
+  With neither GROQ nor CLOUDFLARE keys set, write() is ask() exactly as before. When they are set and a text
+  falls through to "main", it is written without Google Search: search is for measurement.
+KORIN_REPLY_MAX_AGE_HOURS: when set, comments older than this are not sent to the model (default: no limit).
+/api/marketer-replies takes and returns "declined" (ids of comments the model chose not to answer) when the caller
+sends it: the free server sleeps between runs and forgets, so replies.yml keeps the list in the Actions cache.
 """
 import ipaddress
 import json
@@ -159,49 +182,101 @@ def provider_name():
 
 _ai = {"model": None, "no_search_until": 0}
 
+# The cheapest name from Google's migration advice. Tried only if the key's own model list has it (when the list
+# cannot be read, as it is), so a wrong or retired name costs nothing. Override: GEMINI_PREFER. gemini-4-hydrogen,
+# the other advised name, costs ~3-5x more: add it there only after a live test shows search works and it is needed.
+GEMINI_PREFER = "gemini-3.5-flash-lite"
+GEMINI_ALIASES = ["gemini-flash-lite-latest", "gemini-flash-latest"]  # Google's moving names, tried blind only when the list is unreadable
+GEMINI_LAST = "gemini-2.5-flash"  # reported to be switched off for the Gemini API on 2026-12-01; last while it is listed
+_NOT_TEXT = ("tts", "image", "live", "embedding", "audio", "vision", "robotics", "computer", "exp", "pro", "ultra")  # and pro/ultra cost far more
+
+
+def _gemini_list(page):
+    """One page of Google's ListModels for our key."""
+    key = "".join(os.environ.get("GEMINI_API_KEY", "").split())
+    url = "https://generativelanguage.googleapis.com/v1beta/models?pageSize=200" + ("&pageToken=" + urllib.parse.quote(page) if page else "")
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"x-goog-api-key": key}), timeout=15) as r:
+        return json.loads(r.read())
+
 
 def _listed_models():
-    """Text models this key can really call, asked from Google once an hour: old names disappear without warning."""
+    """Text models this key can really call, asked from Google once an hour: old names disappear without warning.
+    Any Gemini text model is listed, so a GEMINI_PREFER name without «flash» (gemini-4-hydrogen) is found;
+    gemini_models() picks only flash ones by itself."""
     if time.time() - _ai.get("listed_at", 0) > 3600:
         _ai["listed_at"] = time.time()
         try:
-            key = "".join(os.environ.get("GEMINI_API_KEY", "").split())
-            req = urllib.request.Request("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", headers={"x-goog-api-key": key})
-            with urllib.request.urlopen(req, timeout=15) as r:
-                found = [m["name"].split("/")[-1] for m in json.loads(r.read()).get("models", []) if "generateContent" in m.get("supportedGenerationMethods", [])]
-            skip = ("tts", "image", "live", "embedding", "audio", "vision", "robotics", "computer", "exp")
-            _ai["listed"] = sorted([m for m in found if "flash" in m and not any(x in m for x in skip)], reverse=True)[:6]
-        except (urllib.error.URLError, TimeoutError, ValueError, KeyError) as e:
-            print(f"could not list gemini models: {e}", flush=True)
+            found, page = [], ""
+            for _ in range(5):
+                data = _gemini_list(page)
+                found += [m["name"].split("/")[-1] for m in data.get("models", []) if "generateContent" in m.get("supportedGenerationMethods", [])]
+                page = data.get("nextPageToken") or ""
+                if not page:
+                    break
+            _ai["listed"] = [m for m in dict.fromkeys(found) if m.startswith("gemini-") and not any(x in m for x in _NOT_TEXT)]
+        except Exception as e:  # any failure (reset, half-read page, 403, odd JSON) must not fail the visitor's request
+            _ai["listed_at"] = time.time() - 3300  # ask again in 5 minutes, keep the last good list meanwhile
+            print(f"could not list gemini models: {type(e).__name__}: {e}", flush=True)
     return _ai.get("listed", [])
 
 
+def _version(name):
+    m = re.match(r"gemini-(\d+(?:\.\d+)?)-", name + "-")
+    return float(m.group(1)) if m else None
+
+
+def _newest_first(names):
+    """Newer version first; in one version the cheap kinds first (lite, flash, other); stable before preview."""
+    return sorted(names, key=lambda m: (-(_version(m) or 0), 0 if "lite" in m else 1 if "flash" in m else 2, "preview" in m, m))
+
+
 def gemini_models():
-    first = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-    rest = [m.strip() for m in os.environ.get("GEMINI_FALLBACKS", "").split(",") if m.strip()] + _listed_models()
+    listed = _listed_models()
+    pinned = [os.environ.get("GEMINI_MODEL", "").strip()] + [m.strip() for m in os.environ.get("GEMINI_FALLBACKS", "").split(",")]
+    prefer = [m.strip() for m in os.environ.get("GEMINI_PREFER", GEMINI_PREFER).split(",") if m.strip() and m.strip() != GEMINI_LAST]
+    if listed:
+        # beyond GEMINI_PREFER only flash / flash-lite are picked by themselves: other families (hydrogen, argon,
+        # carbon, neon...) may cost several times more or be paid-only
+        others = [m for m in listed if m not in prefer and m != GEMINI_LAST and "flash" in m]
+        newer = [m for m in others if _version(m) is None or _version(m) > _version(GEMINI_LAST)]
+        keep_last = GEMINI_LAST in listed
+        auto = [m for m in prefer if m in listed] + _newest_first(newer) + [GEMINI_LAST] * keep_last + _newest_first([m for m in others if m not in newer])
+    else:  # the list could not be read: try the names as they are, the old model last
+        auto, keep_last = prefer + GEMINI_ALIASES + [GEMINI_LAST], True
     order = []
-    for m in [first, *rest]:
-        if m not in order:
+    for m in pinned + auto:
+        if m and m not in order:
             order.append(m)
-    order = order[:5]
-    if _ai["model"] in order:  # the one that answered last time goes first
+    # gemini-2.5-flash keeps the last of the 5 places while it may exist: it is the one known to search on our key
+    order = order[:5] if not keep_last or GEMINI_LAST in order[:5] else order[:4] + [GEMINI_LAST]
+    if _ai["model"] in order and time.time() - _ai.get("model_at", time.time()) < 3600:
+        # the one that last answered with search goes first, for an hour: one busy moment must not move us for good
         order.remove(_ai["model"])
         order.insert(0, _ai["model"])
     return order
 
 
-def ask(prompt, system=None):
+def ask(prompt, system=None, web=True):
     """One answer, quickly. A person is waiting on the page, so no long retries:
-    try with web search, then without it, on each model in turn; remember what worked."""
+    try with web search, then without it, on each model in turn; remember what worked.
+    web=False (texts from the router) never asks for Google Search, so texts neither spend the search quota
+    measurement needs nor switch measurement off search for 15 minutes when their search fails.
+    The answer is (text, urls, model) with .engine and .search: search is True only when the web was really searched."""
     name = provider_name()
     if not name:
         raise providers.ProviderError("не задан ключ нейросети")
     if name != "gemini":
-        return providers.openai(prompt, system)
-    with_search = time.time() > _ai["no_search_until"]
-    last = None
+        out = providers.openai(prompt, system)
+        return providers.Answer(*out[:3], engine="openai", search=getattr(out, "search", False))
+    with_search = web and time.time() > _ai["no_search_until"]
+    last, ungrounded = None, None
     for search in ([True, False] if with_search else [False]):
-        for model in gemini_models():
+        if not search and ungrounded is not None:
+            break  # a model already answered, only without searching: a plain no-search round adds nothing
+        models, i = gemini_models(), 0
+        while i < len(models):
+            model = models[i]
+            i += 1
             try:
                 # one quick second try covers a busy moment at Google
                 out = providers.gemini(prompt, system, search=search, model=model, retries=1, timeout=60)
@@ -211,11 +286,33 @@ def ask(prompt, system=None):
                 last = e
                 print(f"gemini {model} search={search} failed: {str(e)[:700]}", flush=True)
                 continue
-            _ai["model"] = model
+            searched = search and getattr(out, "search", True)
+            if search and not searched:
+                # the model was given Google Search but answered from memory. Keep this answer and try ONE more
+                # model, the old flash first while it is in the list (it is the one known to search on our key),
+                # so a new model that skips search does not quietly make measurement worse than before.
+                if ungrounded is not None:
+                    break
+                ungrounded = out
+                rest = models[i:]
+                nxt = GEMINI_LAST if GEMINI_LAST in rest else (rest[0] if rest else None)
+                models = models[:i] + ([nxt] if nxt else [])
+                continue
+            # only a model that really searched (or any, while search is off for measurement) jumps the queue;
+            # a text written without search says nothing about search, so it leaves the queue alone
+            if searched or (web and not with_search):
+                _ai["model"], _ai["model_at"] = model, time.time()
             if with_search and not search:
                 _ai["no_search_until"] = time.time() + 900  # this key cannot search right now; stop asking for a while
-            return out
+            return providers.Answer(*out[:3], engine="gemini", search=searched)
+    if ungrounded is not None:
+        return providers.Answer(*ungrounded[:3], engine="gemini", search=False)
     raise last
+
+
+def _how(ans):
+    """Which engine answered and whether it really searched the web; None when unknown (a stand-in in tests)."""
+    return {"engine": getattr(ans, "engine", None) or provider_name() or None, "search": getattr(ans, "search", None)}
 
 
 def no_ai(error):
@@ -224,6 +321,104 @@ def no_ai(error):
 
 def out_of_quota(error):
     return any(k in str(error) for k in ("HTTP 429", "RESOURCE_EXHAUSTED", "quota"))
+
+
+# ---------- writing: our posts and replies, texts for clients ----------
+# Only texts come here. A measurement never does: it must be the answer of the engine we measure (ask above).
+WRITE_ORDER = "groq,cloudflare,main"  # "main" is the Gemini/OpenAI path of ask()
+CLIENT_OK = ("cloudflare", "main")  # a client's data goes only where it is not used to train models; never Groq
+WRITE_BUDGET = {"groq": 300, "cloudflare": 60}  # calls a UTC day, a guess under the free tiers: check in each console
+_writers = {"day": "", "used": {}, "cool": {}}  # in memory: a restart or a sleep of the free server resets it
+_wlock = threading.Lock()
+
+
+def _writer_ready(name):
+    if name == "groq":
+        return bool(os.environ.get("GROQ_API_KEY", "").strip())
+    if name == "cloudflare":
+        return bool(os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip() and os.environ.get("CLOUDFLARE_API_TOKEN", "").strip())
+    return name == "main" and bool(provider_name())
+
+
+def writer_chain(kind):
+    """Writers to try for a kind of text, in order: "own" — our public posts and replies, anything else — a client's data."""
+    client = kind != "own"
+    raw = (os.environ.get("KORIN_WRITE_ORDER_CLIENT", "") if client else "") or os.environ.get("KORIN_WRITE_ORDER", "") or WRITE_ORDER
+    chain = []
+    for n in raw.lower().split(","):
+        n = {"gemini": "main", "openai": "main"}.get(n.strip(), n.strip())
+        if n in ("groq", "cloudflare", "main") and n not in chain and (not client or n in CLIENT_OK) and _writer_ready(n):
+            chain.append(n)
+    return chain or ["main"]  # nothing usable listed: the old path, which also says clearly when no key is set
+
+
+def _budget(name):
+    """Calls a day for a writer; None means no limit (the main path has none unless KORIN_WRITE_BUDGET sets one)."""
+    got = dict(re.findall(r"(\w+)\s*=\s*(\d+)", os.environ.get("KORIN_WRITE_BUDGET", "")))
+    return int(got[name]) if name in got else WRITE_BUDGET.get(name)
+
+
+def _take(name):
+    """True and one call counted, unless the writer is over today's budget or still cooling down after an error."""
+    with _wlock:
+        today = time.strftime("%Y-%m-%d", time.gmtime(time.time()))
+        if _writers["day"] != today:
+            _writers.update(day=today, used={})
+        if _writers["cool"].get(name, 0) > time.time():
+            return False
+        limit = _budget(name)
+        if limit is not None and _writers["used"].get(name, 0) >= limit:
+            return False
+        _writers["used"][name] = _writers["used"].get(name, 0) + 1
+        return True
+
+
+def _cool_seconds(error):
+    """How long to leave a writer alone after this error. Asking again at once only burns quota."""
+    s = str(error)
+    until_tomorrow = max(600, 86400 - int(time.time()) % 86400)
+    if re.search(r"(?i)neurons|\"code\":\s*4006\b", s):
+        return until_tomorrow  # Cloudflare's daily free allocation, whatever HTTP status it comes with
+    if re.match(r"HTTP 4\d\d\b|groq:|cloudflare:", s) and re.search(r"(?i)decommission|model_not_found|no such model|model\W.{0,80}does not exist", s):
+        return 3600  # a retired or wrong model name: asking again on every call only burns time
+    if out_of_quota(error):
+        if re.search(r"(?i)per ?day|daily|\bRPD\b|\bTPD\b|insufficient_quota", s):
+            return until_tomorrow  # a daily limit: until the next UTC day
+        try:
+            return int(os.environ.get("KORIN_WRITE_COOLDOWN", "900"))
+        except ValueError:
+            return 900
+    if re.match(r"HTTP (401|403|404)\b", s) or "не задан" in s:
+        return 3600  # a wrong key or model name will not fix itself in a minute
+    if re.match(r"HTTP 5\d\d|network", s):
+        return 120
+    return 0
+
+
+def write(prompt, system=None, kind="client"):
+    """A text for a person to read: kind "own" — our public posts and replies, "client" — texts made from a client's data.
+    Each writer in writer_chain() is tried once; one over its daily budget or cooling down is skipped.
+    With no GROQ or CLOUDFLARE keys this is ask() itself, exactly as before."""
+    chain = writer_chain(kind)
+    if chain == ["main"] and _budget("main") is None:
+        return ask(prompt, system)
+    last = None
+    for name in chain:
+        if not _take(name):
+            continue
+        try:
+            # a text on the main path is written without Google Search: search is for measurement only
+            return ask(prompt, system, web=False) if name == "main" else getattr(providers, name)(prompt, system)
+        except Exception as e:  # a failing writer must never stop the post: the next one writes it
+            if name == "main" and not isinstance(e, providers.ProviderError):
+                raise
+            last = e if isinstance(e, providers.ProviderError) else providers.ProviderError(f"{name}: {type(e).__name__}")
+            pause = _cool_seconds(last)
+            if pause:
+                with _wlock:
+                    _writers["cool"][name] = time.time() + pause
+            print(f"writer {name} ({kind}) failed, pause {pause} s: {str(last)[:300]}", flush=True)
+    raise last or providers.ProviderError("HTTP 429: quota: у всех нейросетей для текстов на сегодня кончился лимит или идёт пауза после ошибки")
 
 
 # ---------- who was named ----------
@@ -253,31 +448,35 @@ def run_check(body):
     names = [company, *rivals]
     companies = [{"id": i, "name": n, "aliases": []} for i, n in enumerate(names)]
     system = f"Пользователь находится в городе {str(body.get('city', 'Алматы'))[:40]}, Казахстан."
-    grid, answers, sources, errors, used = [], [], {}, 0, None
+    grid, answers, sources, errors, used, searched, engine = [], [], {}, 0, None, [], None
     for q in questions:
         try:
-            text, urls, model = ask(q, system)
+            ans = ask(q, system)  # measurement: the engine itself, never write()
         except providers.ProviderError as e:
             if no_ai(e):
                 raise
             errors += 1
             grid.append(None)
             answers.append(None)
+            searched.append(None)
             continue
+        text, urls, model = ans
         mentioned = named_ids(text, companies)
         grid.append([i in mentioned for i in range(len(names))])
         answers.append(text[:4000])
-        used = model
+        used, engine = model, _how(ans)["engine"]
+        searched.append(_how(ans)["search"])
         for c in detect.find_citations(text, urls):
             sources[c["domain"]] = sources.get(c["domain"], 0) + 1
     top = sorted(sources.items(), key=lambda kv: -kv[1])[:8]
-    return {"names": names, "questions": questions, "grid": grid, "answers": answers, "sources": top, "errors": errors, "model": used}
+    return {"names": names, "questions": questions, "grid": grid, "answers": answers, "sources": top, "errors": errors, "model": used, "engine": engine, "search": searched}
 
 
 # ---------- free check on the landing page ----------
 # The model's answer depends on the question and the city, not on who asks.
 # So one paid call serves every company in the same niche for three days.
 QUICK_TTL = 72 * 3600
+QUICK_NOSEARCH_TTL = 3600  # an answer made without web search is the model's memory: kept an hour only, marked
 QUICK_PER_DAY = int(os.environ.get("KORIN_QUICK_PER_DAY", "400"))  # real model calls a day, cache hits are free
 _quick = {"day": "", "n": 0}
 _qcache, _qlocks, _qguard = {}, {}, threading.Lock()
@@ -288,14 +487,16 @@ def quick_questions(niche, city):
 
 
 def cached_answer(question, city):
-    """(text, urls, model, from_cache). Two visitors asking the same thing at once share one call."""
+    """(text, urls, model, from_cache, how), how = {"engine", "search"}. Two visitors asking the same thing at once share one call.
+    An answer made with a real web search is kept 72 hours. One without it is the model's memory: it is kept an hour only
+    (a visitor retrying the same niche and city does not spend the daily quota again) and always comes back "search": false."""
     key = (question.lower(), city.lower())
     with _qguard:
         lock = _qlocks.setdefault(key, threading.Lock())
     with lock:
         hit = _qcache.get(key)
         if hit and hit[0] > time.time():
-            return (*hit[1:], True)
+            return hit[1], hit[2], hit[3], True, dict(hit[4])
         today = time.strftime("%Y-%m-%d")
         with _qguard:
             if _quick["day"] != today:
@@ -303,15 +504,21 @@ def cached_answer(question, city):
             if _quick["n"] >= QUICK_PER_DAY:
                 raise BadRequest("На сегодня бесплатные проверки закончились. Оставьте заявку, и мы сделаем замер вручную.")
             _quick["n"] += 1
-        text, urls, model = ask(question, f"Пользователь находится в городе {city}, Казахстан. Называй конкретные компании.")
+        ans = ask(question, f"Пользователь находится в городе {city}, Казахстан. Называй конкретные компании.")  # never write()
+        text, urls, model = ans
+        how = _how(ans)
+        ttl = QUICK_TTL
+        if how["search"] is False:
+            ttl = QUICK_NOSEARCH_TTL
+            print(f"measurement answer without web search ({how['engine']} {model}): returned with search=false, kept {ttl // 60} min, not 72 h", flush=True)
         with _qguard:
             if len(_qcache) > 3000:
                 now = time.time()
                 for k in [k for k, v in _qcache.items() if v[0] <= now] or list(_qcache)[:500]:
                     _qcache.pop(k, None)
                     _qlocks.pop(k, None)
-            _qcache[key] = (time.time() + QUICK_TTL, text, urls, model)
-        return text, urls, model, False
+            _qcache[key] = (time.time() + ttl, text, urls, model, how)
+        return text, urls, model, False, dict(how)
 
 
 def quick_check(body):
@@ -323,8 +530,8 @@ def quick_check(body):
     me = [{"id": 0, "name": company, "aliases": []}]
 
     def one(q):
-        text, urls, model, cached = cached_answer(q, city)
-        return {"question": q, "answer": text[:3000], "named": bool(named_ids(text, me)), "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)})[:6], "model": model, "cached": cached}
+        text, urls, model, cached, how = cached_answer(q, city)
+        return {"question": q, "answer": text[:3000], "named": bool(named_ids(text, me)), "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)})[:6], "model": model, "cached": cached, **how}
 
     if body.get("i") is not None:
         if body["i"] not in (0, 1, 2):
@@ -380,9 +587,9 @@ def check_one(body):
         raise BadRequest("Нужны компания, конкуренты и вопрос.")
     names = [company, *rivals]
     companies = [{"id": i, "name": n, "aliases": []} for i, n in enumerate(names)]
-    text, urls, model, cached = cached_answer(question, city)
+    text, urls, model, cached, how = cached_answer(question, city)
     mentioned = named_ids(text, companies)
-    return {"row": [i in mentioned for i in range(len(names))], "answer": text[:4000], "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)}), "model": model, "cached": cached}
+    return {"row": [i in mentioned for i in range(len(names))], "answer": text[:4000], "sources": sorted({c["domain"] for c in detect.find_citations(text, urls)}), "model": model, "cached": cached, **how}
 
 
 # ---------- breakdown: why them and not you ----------
@@ -446,7 +653,7 @@ def analyze(body):
  "reasons": [{{"rival": "название конкурента", "why": "за что его называет нейросеть", "quote": "короткая дословная цитата из ответа"}}],
  "gaps": [{{"title": "что сделать, начиная с глагола", "why": "что есть у конкурентов и чего нет у клиента", "how": "первый шаг на сегодня", "effort": "час" }}]}}
 В reasons от 2 до 4 пунктов, в gaps от 3 до 5, самые сильные первыми. effort — одно из: "час", "день", "неделя"."""
-    text, _, model = ask(prompt, "Ты опытный маркетолог. Отвечаешь только валидным JSON на русском языке.")
+    text, _, model = write(prompt, "Ты опытный маркетолог. Отвечаешь только валидным JSON на русском языке.", kind="client")
     obj = parse_json(text)
     if obj:
         obj = {"verdict": str(obj.get("verdict", ""))[:300],
@@ -475,7 +682,7 @@ def social_plan(body):
 Верни ТОЛЬКО JSON:
 {{"posts": [{{"kind": "вопрос", "hook": "фраза для картинки, до 55 знаков, без точки в конце", "threads": "текст для Threads, до 450 знаков", "x": "текст для X, до 260 знаков", "day": "пн"}}]}}
 kind — одно из: "вопрос", "совет", "наблюдение", "цифра", "история". day — пн, вт, ср, чт, пт, сб, вс по порядку."""
-    text, _, model = ask(prompt, "Ты редактор соцсетей для малого бизнеса. Пишешь живо и просто. Отвечаешь только валидным JSON на русском языке.")
+    text, _, model = write(prompt, "Ты редактор соцсетей для малого бизнеса. Пишешь живо и просто. Отвечаешь только валидным JSON на русском языке.", kind="client")
     obj = parse_json(text) or {}
     posts = [{"kind": str(x.get("kind", "совет"))[:20], "hook": str(x.get("hook", ""))[:90], "threads": str(x.get("threads", ""))[:500], "x": str(x.get("x", ""))[:280], "day": str(x.get("day", ""))[:4]} for x in obj.get("posts", []) if isinstance(x, dict) and x.get("threads")][:7]
     if not posts:
@@ -497,7 +704,7 @@ def social_reply(body):
 Реши, стоит ли бренду отвечать. Подходит, если ветка про малый бизнес, продвижение, клиентов, рекламу, нейросети или близкую тему, и можно сказать что-то полезное. Не подходит, если тема личная, политическая, трагическая, спорная или не связана с делом бренда.
 Если подходит — напиши ответ: по смыслу ветки, с пользой для автора, как человек, а не как реклама. Без ссылок. Бренд не называй, если это не отвечает прямо на вопрос автора. До 260 знаков, простыми словами.
 Верни ТОЛЬКО JSON: {{"fit": true, "why": "почему подходит или нет, одной фразой", "reply": "текст ответа или пустая строка"}}"""
-    text, _, model = ask(prompt, "Ты ведёшь соцсети бренда. Отвечаешь только валидным JSON на русском языке.")
+    text, _, model = write(prompt, "Ты ведёшь соцсети бренда. Отвечаешь только валидным JSON на русском языке.", kind="client")
     obj = parse_json(text)
     if not obj:
         raise providers.ProviderError("нейросеть вернула ответ в неверном виде")
@@ -744,7 +951,7 @@ def marketer_plan(body):
  "slides": [
   {{"tag": "одно слово-рубрика", "title": "крупная фраза для картинки, до 45 знаков, без точки"}}{', {"tag": "одно слово", "title": "заголовок второй картинки, до 30 знаков", "points": ["пункт до 55 знаков", "пункт до 55 знаков", "пункт до 55 знаков"]}' if fmt == 'carousel' else ''}
  ]}}"""
-    text, _, model = ask(prompt, "Ты маркетолог, пишешь по-русски живо и просто. Отвечаешь только валидным JSON.")
+    text, _, model = write(prompt, "Ты маркетолог, пишешь по-русски живо и просто. Отвечаешь только валидным JSON.", kind="own")
     obj = parse_json(text) or {}
     slides = [{"tag": str(x.get("tag", ""))[:18], "title": str(x.get("title", ""))[:70], "points": [str(q)[:80] for q in x.get("points", []) if str(q).strip()][:3]} for x in obj.get("slides", []) if isinstance(x, dict) and x.get("title")][:2 if fmt == "carousel" else 1]
     post = str(obj.get("text", "")).strip()[:400]
@@ -778,11 +985,39 @@ def marketer_publish(body):
     return {"ok": True, "link": link}
 
 
+_declined = {}  # comment id -> when the model said not to answer it; that comment is not sent to the model again
+DECLINED_KEEP = 5000  # bounded; in memory, so a restart or a sleep of the free server forgets it
+DECLINED_CARRY = 300  # the newest ids handed to and taken back from replies.yml, which keeps them between runs
+
+
+def _decline(comment_id):
+    with _wlock:
+        _declined.pop(comment_id, None)
+        _declined[comment_id] = time.time()
+        while len(_declined) > DECLINED_KEEP:
+            _declined.pop(next(iter(_declined)))
+
+
+def _too_old(comment):
+    """Opt-in (KORIN_REPLY_MAX_AGE_HOURS): an old comment is not worth a model call. Unreadable time counts as new."""
+    try:
+        hours = float(os.environ.get("KORIN_REPLY_MAX_AGE_HOURS", "") or 0)
+    except ValueError:
+        hours = 0
+    when = _stamp(comment.get("timestamp")) if hours > 0 else None
+    return when is not None and when < time.time() - hours * 3600
+
+
 def marketer_replies(body):
     """Answer new comments under our own recent posts. People who wrote to us get a reply; nobody else is touched."""
     token = _admin(body)
     key = str(body.get("brand", "korin")) if str(body.get("brand", "korin")) in BRANDS else "korin"
     brand = BRANDS[key]
+    # the free server sleeps between runs and forgets: the caller may bring back the list it was given last time
+    carried = body.get("declined") if isinstance(body.get("declined"), list) else []
+    for cid in carried[-DECLINED_CARRY:]:
+        if isinstance(cid, str) and re.fullmatch(r"[\w-]{1,40}", cid) and cid not in _declined:
+            _decline(cid)
     me = _threads("GET", "/me", {"fields": "username", "access_token": token}).get("username", "")
     posts = _threads("GET", "/me/threads", {"fields": "id,text,timestamp", "limit": "8", "access_token": token}).get("data", [])
     done, skipped, limit = [], 0, 4
@@ -807,6 +1042,12 @@ def marketer_replies(body):
             parent = (c.get("replied_to") or {}).get("id")
             if parent and parent != post.get("id") and parent not in {x.get("id") for x in talk if x.get("username") == me}:
                 continue
+            if c.get("id") in _declined:  # the model already said no: asking every half hour changes nothing
+                skipped += 1
+                answered.add(c.get("id"))
+                continue
+            if _too_old(c):
+                continue
             prompt = f"""Ты ведёшь Threads «{brand['name']}». {brand['about']}
 
 Наш пост: «{str(post.get('text', ''))[:500]}»
@@ -815,11 +1056,13 @@ def marketer_replies(body):
 Реши, отвечать ли. Не отвечай, если комментарий — оскорбление, спам, реклама чужого, политика, религия, личная беда или просто набор символов.
 Если отвечать: сначала согласись с тем, в чём человек прав, потом одной фразой спокойно поверни к нашей мысли. Если он задал вопрос — ответь прямо. Пиши как живой человек: просто, коротко, с уважением, можно с лёгкой иронией, но без колкостей и без спора. Без ссылок, без хэштегов, без обещаний и выдуманных цифр. Не говори, что мы можем «научить» или «заставить» нейросеть называть компанию: мы только проверяем и подсказываем, что сделать. Не обращайся через @. До 230 знаков.
 Верни ТОЛЬКО JSON: {{"answer": true, "reply": "текст ответа"}} или {{"answer": false, "reply": ""}}"""
-            obj = parse_json(ask(prompt, "Ты вежливый и остроумный представитель бренда. Отвечаешь только валидным JSON на русском языке.")[0]) or {}
+            obj = parse_json(write(prompt, "Ты вежливый и остроумный представитель бренда. Отвечаешь только валидным JSON на русском языке.", kind="own")[0]) or {}
             reply = str(obj.get("reply", "")).strip()[:300]
             if not obj.get("answer") or len(reply) < 3:
                 skipped += 1
                 answered.add(c.get("id"))
+                if obj and not obj.get("answer") and c.get("id"):  # a clear "no"; an unreadable answer is asked again next time
+                    _decline(c.get("id"))
                 continue
             made = _threads("POST", "/me/threads", {"media_type": "TEXT", "text": reply, "reply_to_id": c.get("id", ""), "access_token": token})
             time.sleep(2)
@@ -828,7 +1071,11 @@ def marketer_replies(body):
             told[c.get("username")] = told.get(c.get("username"), 0) + 1
             done.append({"to": c.get("username", ""), "comment": text[:140], "reply": reply})
             print(f"marketer replied to @{c.get('username', '')} ({key}): {reply[:120]}", flush=True)
-    return {"ok": True, "brand": key, "replied": done, "skipped": skipped}
+    out = {"ok": True, "brand": key, "replied": done, "skipped": skipped}
+    if "declined" in body:  # only for a caller that keeps the list; the old answer stays as it was for everyone else
+        with _wlock:
+            out["declined"] = list(_declined)[-DECLINED_CARRY:]
+    return out
 
 
 def threads_search(body):
@@ -887,7 +1134,7 @@ def run_agent(body):
     question = str(body.get("question", ""))[:1000]
     pages = "\n\n".join(material)[:9000]
     prompt = f"Данные кабинета (JSON):\n{context}\n\n{'Прочитанные страницы:' + chr(10) + pages + chr(10) + chr(10) if pages else ''}Запрос пользователя: {question or 'выполни свою задачу'}\n\nОтвечай по-русски, коротко и по делу."
-    text, _, model = ask(prompt, AGENTS[task])
+    text, _, model = write(prompt, AGENTS[task], kind="client")
     steps.append({"text": f"Текст написала нейросеть {model}", "ok": True})
     return {"text": text, "model": model, "steps": steps}
 
@@ -930,7 +1177,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/api/health":
-            return self._send(200, {"ok": True, "ai": bool(provider_name()), "provider": provider_name(), "threads": bool(os.environ.get("THREADS_TOKEN") and os.environ.get("KORIN_ADMIN_KEY")), "marketer": [k for k, v in BRANDS.items() if os.environ.get(v["env"])]})
+            return self._send(200, {"ok": True, "ai": bool(provider_name()), "provider": provider_name(), "threads": bool(os.environ.get("THREADS_TOKEN") and os.environ.get("KORIN_ADMIN_KEY")), "marketer": [k for k, v in BRANDS.items() if os.environ.get(v["env"])],
+                                    "writers": {"own": writer_chain("own"), "client": writer_chain("client")}, "gemini_model": _ai.get("model")})
         self._send(404, {"error": "Не найдено."})
 
     def do_POST(self):
