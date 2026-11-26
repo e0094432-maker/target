@@ -1,6 +1,8 @@
-// Browser test for korin/ai/index.html (Körin AI prototype).
+// Browser test for korin/ai/index.html — the one Körin cabinet (chat, dark by default).
 // Serves the repo with python3 -m http.server on a free port, stubs every Körin API call with page.route
-// (nothing real is sent), walks the main flows at 390x664 and 1280x800 and fails on any console error.
+// (nothing real is sent: Telegram and WordPress are never contacted, any request to them fails the test),
+// walks the main flows at 390x664 and 1280x800, the old korin/app redirect, the Telegram and WordPress
+// connectors with approval before publishing, and fails on any console error.
 // Run:  node tests/korin_ai_e2e.js [screenshot-dir]
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
@@ -15,6 +17,7 @@ if (OUT) fs.mkdirSync(OUT, { recursive: true });
 const freePort = () => new Promise(res => { const s = net.createServer(); s.listen(0, () => { const p = s.address().port; s.close(() => res(p)) }) });
 const assert = (ok, msg) => { if (!ok) throw new Error('FAIL: ' + msg); console.log('ok -', msg) };
 
+const TOKEN = '123456789:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsawA', WP_PASS = 'abcd EFGH ijkl MNOP qrst uvwx';
 const QS = ['курсы английского в городе Алматы: кого посоветуешь?', 'курсы английского с хорошими отзывами, Алматы — назови конкретные компании', 'Алматы қаласында курсы английского: қай компанияны ұсынасың?'];
 const ANS = [
   'В Алматы стоит присмотреться к «Lingva Test» и «Speak Test»: у них много отзывов на 2ГИС, понятные программы для детей и взрослых и пробный урок. Перед оплатой сравните размер групп.',
@@ -25,6 +28,8 @@ const ANS = [
 async function stub(page, opts = {}) {
   const calls = [];
   await page.route(/fonts\.(googleapis|gstatic)\.com/, r => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+  // the browser must never talk to Telegram, WordPress or the lead sheet itself: only through the Körin server
+  await page.route(/api\.telegram\.org|akku-test\.kz|script\.google\.com/, r => { calls.push({ path: 'DIRECT ' + r.request().url(), body: null }); return r.abort() });
   await page.route('https://korin-api.onrender.com/**', async route => {
     const req = route.request(), url = new URL(req.url()), body = req.postDataJSON ? (() => { try { return req.postDataJSON() } catch (e) { return null } })() : null;
     calls.push({ path: url.pathname, body });
@@ -34,6 +39,14 @@ async function stub(page, opts = {}) {
     if (url.pathname === '/api/quick') { const i = body.i; return json(200, { company: body.company, result: { question: QS[i], answer: ANS[i], named: i === 1, sources: i === 0 ? ['2gis.kz', 'instagram.com'] : ['2gis.kz'], model: 'gemini-2.5-flash', cached: i === 2, engine: 'gemini', search: true } }) }
     if (url.pathname === '/api/site-audit') return json(200, { url: 'https://akku-test.kz/', robots: 'read', bots: [['OAI-SearchBot', 'поиск в ChatGPT', true], ['GPTBot', 'обучение моделей OpenAI', false], ['ChatGPT-User', 'когда человек просит ChatGPT открыть страницу', true], ['PerplexityBot', 'Perplexity', true], ['Google-Extended', 'Gemini', true], ['ClaudeBot', 'Claude', true], ['bingbot', 'поиск Bing', true]].map(([bot, what, allowed]) => ({ bot, what, allowed })), checks: [
       { id: 'robots', label: 'Файл robots.txt найден', ok: true, detail: 'код ответа 200' }, { id: 'open', label: 'Главная страница открывается без входа', ok: true, detail: 'код ответа 200' }, { id: 'text', label: 'Текст виден без JavaScript', ok: false, detail: '120 знаков текста в коде страницы' }, { id: 'title', label: 'Есть заголовок и описание страницы', ok: true, detail: 'теги title и meta description' }, { id: 'price', label: 'На странице упомянуты цены', ok: false, detail: 'слова о цене или знак ₸' }, { id: 'contact', label: 'Есть телефон или адрес', ok: true, detail: 'телефон или адрес в тексте' }, { id: 'schema', label: 'Есть разметка данных о компании', ok: false, detail: 'блок JSON-LD' }, { id: 'speed', label: 'Страница отвечает быстрее трёх секунд', ok: true, detail: '0.84 с' }, { id: 'sitemap', label: 'Есть карта сайта для Bing и других поисковиков', ok: true, detail: 'sitemap.xml найден' }] });
+    if (url.pathname === '/api/connect/telegram/test') {
+      if (body.token !== TOKEN) return json(400, { error: 'Telegram не принял токен бота. Скопируйте его в @BotFather заново (команда /mybots → API Token).' });
+      return json(200, { ok: true, bot: '@akku_bot', title: 'Аққу English', chat: '@akku_channel', type: 'channel', can_post: true });
+    }
+    if (url.pathname === '/api/publish/telegram') return json(200, { ok: true, message_id: 77, link: 'https://t.me/akku_channel/77', title: 'Аққу English' });
+    if (url.pathname === '/api/connect/wordpress/test') return json(200, { ok: true, site: 'https://akku-test.kz', name: 'Айгерим', can_publish: true });
+    if (url.pathname === '/api/publish/wordpress') return json(200, { ok: true, id: 15, status: body.status, link: 'https://akku-test.kz/?page_id=15', edit_link: 'https://akku-test.kz/wp-admin/post.php?post=15&action=edit' });
+    if (url.pathname === '/api/agent' && body.task === 'tgpost') return json(200, { text: 'Набор в летние группы открыт!\n\nЗанимаемся по 90 минут, в группе до 8 человек. Первый урок — пробный.\n\nЗапись — в личных сообщениях канала.', model: 'gemini-2.5-flash', steps: [{ text: 'Сайт: прочитал 2400 знаков', ok: true }, { text: 'Текст написала нейросеть gemini-2.5-flash', ok: true }] });
     if (url.pathname === '/api/agent') return json(200, { text: '## Вопросы и ответы\n\n**С какого возраста вы берёте детей?**\nМы занимаемся с детьми от [что вписать] лет.\n\n**Сколько человек в группе?**\nВ группе до [что вписать] учеников.', model: 'gemini-2.5-flash', steps: [{ text: 'Сайт: прочитал 2400 знаков', ok: true }, { text: 'Взял из замера вопросы, где компанию не назвали: 2', ok: true }, { text: 'Текст написала нейросеть gemini-2.5-flash', ok: true }] });
     if (url.pathname === '/api/analyze') return json(200, { model: 'gemini-2.5-flash', text: '', steps: [{ text: 'Перечитал ответы нейросети: 3', ok: true }, { text: 'Прочитал ваш сайт: 2400 знаков', ok: true }, { text: 'Разбор написала нейросеть gemini-2.5-flash', ok: true }], analysis: { verdict: 'Конкурентов называют за отзывы на 2ГИС и подробные страницы программ.', reasons: [{ rival: 'Lingva Test', why: 'много свежих отзывов', quote: 'у них много отзывов на 2ГИС' }], gaps: [{ title: 'Соберите 10 отзывов на 2ГИС', why: 'у конкурентов их больше', how: 'отправьте просьбу пяти клиентам', effort: 'день' }] } });
     return json(404, { error: 'Не найдено.' });
@@ -41,8 +54,9 @@ async function stub(page, opts = {}) {
   return calls;
 }
 
+let expect400 = 0;  // a stubbed «bad token» answer is logged by Chrome as a failed resource: allowed only where expected
 function watch(page, errors) {
-  page.on('console', m => { if (m.type() === 'error') errors.push(m.text()) });
+  page.on('console', m => { if (m.type() !== 'error') return; if (expect400 && /status of 400/.test(m.text())) { expect400--; return } errors.push(m.text()) });
   page.on('pageerror', e => errors.push(String(e)));
 }
 
@@ -79,7 +93,14 @@ async function measure(page) {
     await page.waitForSelector('text=Что сделать для вашего бизнеса?');
     await page.waitForSelector('text=Сервер на связи');
     assert(!(await page.content()).match(/₸\s*\d|\d\s*₸|тенге\/мес|тариф/i), 'no prices on the page');
+    const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    assert(await bg() === 'rgb(0, 0, 0)' && await page.getAttribute('html', 'data-theme') === 'dark', 'dark (black) design by default, like the landing');
     await shot(page, 'desktop-1-start.png');
+    await page.click('[data-act="theme"]');
+    assert(await bg() === 'rgb(255, 255, 255)' && await page.evaluate(() => localStorage.getItem('korin-theme-v4')) === 'light', 'theme toggle switches to light and remembers it');
+    await shot(page, 'desktop-1b-start-light.png');
+    await page.click('[data-act="theme"]');
+    assert(await bg() === 'rgb(0, 0, 0)', 'and back to dark');
 
     await measure(page);
     await page.waitForSelector('.panel .stat', { state: 'visible', timeout: 3000 }).catch(() => {});
@@ -107,16 +128,80 @@ async function measure(page) {
     await page.waitForSelector('#draft');
     const ag = calls.find(c => c.path === '/api/agent');
     assert(ag.body.task === 'faq' && ag.body.context.links['Сайт'] === 'akku-test.kz' && ag.body.context.not_named_on.length === 2, '/api/agent faq gets site link and not_named_on');
-    const pub = page.locator('.panel button:has-text("Одобрить и опубликовать")');
-    assert(await pub.isDisabled() && (await pub.textContent()).includes('скоро'), 'publish is disabled and marked «скоро»');
+    assert(await page.isVisible('.panel [data-act="cn-wp"]') && !(await page.isVisible('.panel [data-act="pub"]')), 'draft offers «Подключить WordPress» before anything can be published');
     await shot(page, 'desktop-4-draft.png');
 
+    /* WordPress: connect from the draft, then preview, then approve */
+    await page.click('.panel [data-act="cn-wp"]');
+    await page.waitForSelector('#cnForm');
+    assert((await page.textContent('#cnForm')).includes('Пароли приложений') && (await page.textContent('#cnForm')).includes('только в вашем браузере'), 'WordPress form: steps + «ключ хранится только в вашем браузере»');
+    await page.fill('#cnForm [name=site]', 'https://akku-test.kz'); await page.fill('#cnForm [name=user]', 'admin'); await page.fill('#cnForm [name=app_password]', WP_PASS);
+    await page.click('#cnGo');
+    await page.waitForSelector('#pubForm');  // connecting from a draft goes straight on to the preview
+    const wpTest = calls.find(c => c.path === '/api/connect/wordpress/test');
+    assert(wpTest && wpTest.body.app_password === WP_PASS && wpTest.body.site === 'https://akku-test.kz', '/api/connect/wordpress/test gets site, user, application password');
+    assert(JSON.parse(await page.evaluate(() => localStorage.getItem('korin-conn-v1'))).wp.app_password === WP_PASS, 'WordPress key is kept in this browser only (localStorage)');
+    assert(await page.isDisabled('#pubGo') && (await page.textContent('#pubForm .warnbox')).includes('[что вписать]'), 'placeholders [что вписать] block publishing');
+    assert(!calls.some(c => c.path === '/api/publish/wordpress'), 'nothing is published without approval');
+    await page.click('#pubForm [data-act="dlg-close"]');
+    await page.fill('#draft', 'Вопросы и ответы\n\nС какого возраста вы берёте детей?\nС 6 лет.\n\nСколько человек в группе?\nДо 8 учеников.');
+    await page.click('.panel [data-act="pub"]');
+    await page.waitForSelector('#pubForm');
+    assert(!(await page.isDisabled('#pubGo')) && (await page.textContent('#pv')).includes('До 8 учеников') && await page.isChecked('#pubForm [name=status][value=draft]'), 'preview shows the edited text, draft status is the default');
+    await shot(page, 'desktop-6-publish-preview-wp.png');
+    await page.click('#pubGo');
+    await page.waitForSelector('.d-ok');
+    const wpPub = calls.filter(c => c.path === '/api/publish/wordpress');
+    assert(wpPub.length === 1 && wpPub[0].body.status === 'draft' && wpPub[0].body.title === 'Вопросы и ответы' && wpPub[0].body.content.includes('С 6 лет.'), '/api/publish/wordpress once, as a draft, with the approved text');
+    assert((await page.textContent('.d-ok')).includes('Черновик страницы создан') && await page.getAttribute('#dlg a.btn', 'href') === 'https://akku-test.kz/wp-admin/post.php?post=15&action=edit', 'result links to the page in WordPress');
+    await page.click('#dlg [data-act="dlg-close"]');
+    assert((await page.textContent('#conv')).includes('Создал в WordPress черновик страницы'), 'the chat keeps a record of what was published');
+
+    /* Telegram: connectors screen, bad token, good token, post with approval, disconnect */
     await page.click('[data-act="conn"]');
     await page.waitForSelector('.cn-grid');
-    const cards = await page.$$eval('.cn-card', els => els.map(e => e.textContent));
-    for (const n of ['Telegram', 'WordPress', 'Instagram', 'Threads', 'Google Analytics', 'Битрикс24', 'amoCRM', 'Google Карты', 'WhatsApp', '2ГИС', 'Kaspi', 'Tilda']) assert(cards.some(c => c.includes(n)), `connector ${n} listed`);
-    assert(cards.every(c => c.includes('скоро')) && !(await page.textContent('.cn')).match(/подключено/i), 'every connector is «скоро», none «подключено»');
+    const cards = await page.$$eval('.cn-card', els => els.map(e => [e.dataset.cn, e.textContent]));
+    for (const n of ['Telegram', 'WordPress', 'Instagram', 'Threads', 'Google Analytics', 'Битрикс24', 'amoCRM', 'Google Карты', 'WhatsApp', '2ГИС', 'Kaspi', 'Tilda']) assert(cards.some(c => c[1].includes(n)), `connector ${n} listed`);
+    assert(cards.filter(c => !['tg', 'wp'].includes(c[0])).every(c => c[1].includes('скоро')), 'all but Telegram and WordPress are honestly «скоро»');
+    assert(cards.find(c => c[0] === 'wp')[1].includes('подключено') && await page.isVisible('[data-act="cn-tg"]'), 'WordPress shows «подключено», Telegram offers «Подключить»');
     await shot(page, 'desktop-5-connectors.png');
+    await page.click('[data-act="cn-tg"]');
+    await page.waitForSelector('#cnForm');
+    assert((await page.textContent('#cnForm')).includes('@BotFather') && (await page.textContent('#cnForm')).includes('Публикация сообщений') && (await page.textContent('#cnForm')).includes('только в вашем браузере'), 'Telegram form: BotFather steps, admin right, browser-only note');
+    await page.fill('#cnForm [name=token]', '123456789:wrongwrongwrongwrongwrongwrongwrong'); await page.fill('#cnForm [name=chat]', '@akku_channel');
+    expect400 = 1;
+    await page.click('#cnGo');
+    await page.waitForSelector('#cnErr:not(:empty)');
+    assert((await page.textContent('#cnErr')).includes('не принял токен') && !(await page.evaluate(() => localStorage.getItem('korin-conn-v1'))).includes('wrongwrong'), 'bad token: error shown, nothing saved');
+    await page.fill('#cnForm [name=token]', TOKEN);
+    await shot(page, 'desktop-7-telegram-connect.png');
+    await page.click('#cnGo');
+    await page.waitForSelector('.cn-card[data-cn="tg"] .tag.ok');
+    assert((await page.textContent('.cn-card[data-cn="tg"]')).includes('Аққу English'), 'Telegram connected: channel title from the server');
+
+    await page.click('.item[data-chat]');
+    await page.click('.next .chip[data-intent="tgpost"]');
+    await page.waitForSelector('.panel [data-act="pub"]');
+    assert(calls.find(c => c.path === '/api/agent' && c.body.task === 'tgpost'), '/api/agent writes the Telegram post (task tgpost)');
+    await page.click('.panel [data-act="pub"]');
+    await page.waitForSelector('#pubForm .pv.tgp');
+    assert((await page.textContent('#pubForm .where')).includes('Аққу English') && !calls.some(c => c.path === '/api/publish/telegram'), 'Telegram preview names the channel; nothing sent yet');
+    await shot(page, 'desktop-8-publish-preview-tg.png');
+    await page.click('#pubGo');
+    await page.waitForSelector('.d-ok');
+    const tgPub = calls.filter(c => c.path === '/api/publish/telegram');
+    assert(tgPub.length === 1 && tgPub[0].body.token === TOKEN && tgPub[0].body.chat === '@akku_channel' && tgPub[0].body.text.startsWith('Набор в летние группы'), '/api/publish/telegram once with token, channel and the approved text');
+    assert(await page.getAttribute('#dlg a.btn', 'href') === 'https://t.me/akku_channel/77', 'result links to the post');
+    await page.click('#dlg [data-act="dlg-close"]');
+    await shot(page, 'desktop-9-published.png');
+
+    await page.click('[data-act="conn"]');
+    await page.click('[data-act="off-tg"]');
+    const left = JSON.parse(await page.evaluate(() => localStorage.getItem('korin-conn-v1')));
+    assert(!left.tg && left.wp, '«Отключить» deletes the Telegram key from the browser');
+    await page.click('[data-act="off-wp"]');
+    assert(await page.evaluate(() => localStorage.getItem('korin-conn-v1')) === null, 'and the WordPress one: nothing left');
+    assert(!calls.some(c => c.path.startsWith('DIRECT')), 'the browser never called Telegram or WordPress directly');
 
     await page.click('[data-lang="kk"]');
     await page.click('[data-act="new"]');
@@ -141,13 +226,28 @@ async function measure(page) {
     await measure(page).catch(() => {});
     await page.waitForSelector('.err');
     assert((await page.textContent('.err')).includes('ничего не придумываю') && !(await page.isVisible('.art-card')), 'server down: says so, shows no result');
-    await shot(page, 'desktop-6-server-down.png');
+    await shot(page, 'desktop-10-server-down.png');
     down = false;
     await page.click('[data-retry]');
     await page.waitForSelector('.art-card');
     assert(true, 'retry works once the server is back');
     assert(downErrors.every(e => /Failed to load resource|ERR_CONNECTION_REFUSED|ERR_FAILED/.test(e)), 'only network errors from the stubbed outage');
     await ctx.close();
+
+    /* ---------- old cabinet address redirects to the new one, keeping ?src= and ?company= ---------- */
+    ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+    page = await ctx.newPage(); watch(page, errors);
+    await stub(page);
+    await page.goto(`http://127.0.0.1:${port}/korin/app/index.html?src=threads&company=${encodeURIComponent('Hello Kids')}`);
+    await page.waitForURL(/\/korin\/ai\//);
+    const u = new URL(page.url());
+    assert(u.pathname === '/korin/ai/' && u.searchParams.get('src') === 'threads' && u.searchParams.get('company') === 'Hello Kids', 'korin/app → korin/ai with the query string');
+    await page.waitForSelector('.item:has-text("Hello Kids")');
+    assert(await page.evaluate(() => sessionStorage.getItem('korin-src')) === 'threads', '?src= label is kept for the visit');
+    await ctx.close();
+    const old = fs.readFileSync(path.join(ROOT, 'korin/app/index.html'), 'utf8'), land = fs.readFileSync(path.join(ROOT, 'korin/index.html'), 'utf8');
+    assert(/<noscript>[^]*href="\.\.\/ai\/"/.test(old) && old.length < 2000, 'korin/app is a tiny redirect with a <noscript> link');
+    assert(!/app\/index\.html/.test(land) && (land.match(/href="ai\/"/g) || []).length >= 2 && land.includes(`a[href^="ai/"]`), 'every cabinet link on the landing points to ai/ (with withSrc)');
 
     /* ---------- mobile 390x664 ---------- */
     ctx = await browser.newContext({ viewport: { width: 390, height: 664 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
@@ -172,6 +272,28 @@ async function measure(page) {
     await page.waitForSelector('.cn-grid');
     await noHScroll(page, 'mobile connectors');
     await shot(page, 'mobile-5-connectors.png');
+    await page.click('[data-act="cn-tg"]');
+    await page.waitForSelector('#cnForm');
+    await page.fill('#cnForm [name=token]', TOKEN); await page.fill('#cnForm [name=chat]', 'https://t.me/akku_channel');
+    await shot(page, 'mobile-6-telegram-connect.png');
+    await page.click('#cnGo');
+    await page.waitForSelector('.cn-card[data-cn="tg"] .tag.ok');
+    await page.click('.top [data-act="menu"]');
+    await page.waitForTimeout(300);
+    await page.click('.item[data-chat]');
+    await page.fill('#inp', 'напиши пост для телеграм-канала'); await page.press('#inp', 'Enter');
+    await page.waitForSelector('.art-card >> nth=1');
+    await page.locator('.art-card').last().click();
+    await page.waitForSelector('.panel [data-act="pub"]');
+    await page.waitForTimeout(350);
+    await noHScroll(page, 'mobile draft');
+    await page.click('.panel [data-act="pub"]');
+    await page.waitForSelector('#pubForm');
+    await page.waitForTimeout(200);
+    await shot(page, 'mobile-7-publish-preview.png');
+    await page.click('#pubGo');
+    await page.waitForSelector('.d-ok');
+    await shot(page, 'mobile-8-published.png');
     await ctx.close();
 
     assert(errors.length === 0, 'no console errors' + (errors.length ? ': ' + errors.join(' | ') : ''));

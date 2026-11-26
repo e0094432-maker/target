@@ -179,6 +179,245 @@ def connect(body):
     return {"ok": page["status"] == 200, "url": page["url"], "status": page["status"], "title": page["title"], "chars": len(page["text"])}
 
 
+# ---------- client connectors: the client's own Telegram channel and WordPress site ----------
+# Stateless pass-through: the browser sends the bot token / application password with every call, the server
+# uses it for that one call and forgets it. Nothing is stored or logged; error texts are masked before they leave.
+TG_API = "https://api.telegram.org"
+TG_TOKEN_RE = re.compile(r"^\d{5,12}:[A-Za-z0-9_-]{30,50}$")
+TG_CHAT_RE = re.compile(r"^(@[A-Za-z][A-Za-z0-9_]{3,31}|-100\d{5,15})$")
+TG_TEXT_MAX = 4096  # Telegram's own limit for one message
+WP_PASS_RE = re.compile(r"^[A-Za-z0-9]{24}$")  # WordPress application passwords: 24 letters and digits, shown in groups of 4
+WP_TITLE_MAX, WP_CONTENT_MAX = 200, 20_000
+SECRET_KEYS = ("token", "app_password", "password", "key")
+_SECRET_LIKE = re.compile(r"\d{5,12}:[A-Za-z0-9_-]{30,50}|(?i:basic)\s+[A-Za-z0-9+/=]{8,}")
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Connector calls carry credentials: never follow a redirect (urllib would resend Authorization to the new host)."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+_conn_opener = urllib.request.build_opener(_NoRedirect)
+_resolve = socket.getaddrinfo
+
+
+def mask(text, *secrets):
+    """Remove every secret (and anything shaped like a bot token or a Basic header) from a text meant for a log or a reply."""
+    text = str(text)
+    for s in secrets:
+        s = str(s or "")
+        if len(s) >= 4:
+            text = text.replace(s, "***")
+            if " " in s:
+                text = text.replace(s.replace(" ", ""), "***")
+    return _SECRET_LIKE.sub("***", text)
+
+
+def _secrets_of(body):
+    return [body.get(k) for k in SECRET_KEYS if isinstance(body, dict) and body.get(k)]
+
+
+def _public_host(host):
+    """The host must be a public internet address: no localhost, private, link-local or reserved ranges (SSRF)."""
+    host = (host or "").strip().lower().rstrip(".")
+    if not host or host == "localhost" or host.endswith((".localhost", ".local", ".internal")):
+        raise BadRequest("Этот адрес нельзя подключить: нужен публичный сайт.")
+    try:
+        literal = ipaddress.ip_address(host.strip("[]"))
+    except ValueError:
+        literal = None
+    if literal is not None:
+        if not literal.is_global:
+            raise BadRequest("Этот адрес нельзя подключить: нужен публичный сайт.")
+        return
+    try:
+        infos = _resolve(host, 443)
+    except (socket.gaierror, UnicodeError):
+        raise BadRequest("Сайт не найден: проверьте адрес.") from None
+    for info in infos:
+        if not ipaddress.ip_address(info[4][0]).is_global:
+            raise BadRequest("Этот адрес нельзя подключить: нужен публичный сайт.")
+
+
+def _tg_args(body, need_text=False):
+    token = str(body.get("token", "")).strip()
+    if len(token) > 80 or not TG_TOKEN_RE.match(token):
+        raise BadRequest("Это не похоже на токен бота. Он выглядит так: 123456789:AAH… — скопируйте его из @BotFather целиком.")
+    chat = str(body.get("chat", "")).strip()[:120]
+    chat = re.sub(r"^(?:https?://)?(?:www\.)?(?:t\.me|telegram\.me)/", "", chat).strip("/")
+    if chat and not chat.startswith(("@", "-")):
+        chat = "@" + chat
+    if not TG_CHAT_RE.match(chat):
+        raise BadRequest("Укажите канал так: @имя_канала (публичное имя из ссылки t.me/имя_канала).")
+    text = ""
+    if need_text:
+        text = str(body.get("text", "")).strip()
+        if len(text) < 3:
+            raise BadRequest("Пустой текст: публиковать нечего.")
+        if len(text) > TG_TEXT_MAX:
+            raise BadRequest(f"Текст длиннее {TG_TEXT_MAX} знаков — Telegram не примет его одним постом. Сократите черновик.")
+    return token, chat, text
+
+
+def _tg(token, method, params):
+    req = urllib.request.Request(f"{TG_API}/bot{token}/{method}", data=urllib.parse.urlencode(params).encode(), method="POST")
+    try:
+        with _conn_opener.open(req, timeout=20) as r:
+            data = json.loads(r.read(200_000) or b"{}")
+    except urllib.error.HTTPError as e:
+        try:
+            data = json.loads(e.read(20_000) or b"{}")
+        except ValueError:
+            data = {}
+        data = {"ok": False, "error_code": e.code, "description": str(data.get("description", ""))}
+    except (urllib.error.URLError, TimeoutError, ConnectionError, ValueError):
+        raise BadRequest("Telegram не ответил. Попробуйте ещё раз через минуту.") from None
+    if not isinstance(data, dict) or not data.get("ok"):
+        code = data.get("error_code") if isinstance(data, dict) else None
+        desc = mask(str((data or {}).get("description", "")), token)[:200].lower() if isinstance(data, dict) else ""
+        if code == 401 or "unauthorized" in desc:
+            raise BadRequest("Telegram не принял токен бота. Скопируйте его в @BotFather заново (команда /mybots → API Token).")
+        if "chat not found" in desc:
+            raise BadRequest("Канал не найден. Проверьте @имя канала и что бот добавлен в канал администратором.")
+        if "not enough rights" in desc or "not a member" in desc or "administrator" in desc or code == 403:
+            raise BadRequest("Бот не может писать в канал. Откройте канал → Администраторы → добавьте бота с правом «Публикация сообщений».")
+        if code == 429:
+            raise BadRequest("Telegram просит подождать: слишком много сообщений подряд. Попробуйте через минуту.")
+        raise BadRequest(f"Telegram отказал: {desc or 'код ' + str(code)}")
+    return data.get("result") or {}
+
+
+def _tg_channel(token, chat):
+    """getMe + getChat + getChatMember: the token works, the channel exists and the bot may post there."""
+    me = _tg(token, "getMe", {})
+    info = _tg(token, "getChat", {"chat_id": chat})
+    member = _tg(token, "getChatMember", {"chat_id": chat, "user_id": me.get("id", "")})
+    can_post = member.get("status") == "creator" or (member.get("status") == "administrator" and (info.get("type") != "channel" or member.get("can_post_messages") is not False))
+    if not can_post:
+        raise BadRequest("Бот найден в Telegram, но не может публиковать в канале. Откройте канал → Администраторы → добавьте бота с правом «Публикация сообщений».")
+    return me, info
+
+
+def telegram_test(body):
+    token, chat, _ = _tg_args(body)
+    me, info = _tg_channel(token, chat)
+    username = info.get("username") or ""
+    return {"ok": True, "bot": "@" + str(me.get("username", "")), "title": str(info.get("title", ""))[:120], "chat": "@" + username if username else chat, "type": info.get("type", ""), "can_post": True}
+
+
+def telegram_publish(body):
+    """One call — one post, sent only after the person approved the preview in the cabinet."""
+    token, chat, text = _tg_args(body, need_text=True)
+    sent = _tg(token, "sendMessage", {"chat_id": chat, "text": text, "disable_web_page_preview": "true"})
+    username = (sent.get("chat") or {}).get("username") or (chat[1:] if chat.startswith("@") else "")
+    mid = sent.get("message_id")
+    return {"ok": True, "message_id": mid, "link": f"https://t.me/{username}/{mid}" if username and mid else "", "title": str((sent.get("chat") or {}).get("title", ""))[:120]}
+
+
+def _wp_args(body):
+    raw = str(body.get("site", "")).strip()
+    if not raw or len(raw) > 200:
+        raise BadRequest("Укажите адрес сайта на WordPress, например https://example.kz")
+    if "://" not in raw:
+        raw = "https://" + raw
+    u = urllib.parse.urlsplit(raw)
+    if u.scheme != "https":
+        raise BadRequest("Нужен адрес с https://. По http пароль ушёл бы открытым текстом — так подключать нельзя.")
+    if not u.hostname or u.username or u.password or u.query or u.fragment or u.port not in (None, 443):
+        raise BadRequest("Нужен обычный адрес сайта, например https://example.kz")
+    _public_host(u.hostname)
+    path = re.sub(r"/(wp-admin|wp-login\.php|wp-json)(/.*)?$", "", u.path).rstrip("/")
+    site = f"https://{u.hostname}{path}"
+    user = str(body.get("user", "")).strip()
+    if not user or len(user) > 60 or ":" in user or any(ord(c) < 32 for c in user):
+        raise BadRequest("Укажите имя пользователя WordPress (логин, под которым вы входите в админку).")
+    password = re.sub(r"\s+", "", str(body.get("app_password", "")))
+    if not WP_PASS_RE.match(password):
+        raise BadRequest("Это не пароль приложения. Создайте его в WordPress: Пользователи → Профиль → Пароли приложений; он выглядит как «abcd efgh ijkl mnop qrst uvwx».")
+    return site, user, password
+
+
+def _wp(site, user, password, method, route, payload=None, query=None):
+    auth = "Basic " + base64.b64encode(f"{user}:{password}".encode()).decode()
+    headers = {"Authorization": auth, "Accept": "application/json", "User-Agent": "Korin/1.0 (+https://kenesai.asia/korin/)"}
+    data = None
+    if payload is not None:
+        data, headers["Content-Type"] = json.dumps(payload, ensure_ascii=False).encode(), "application/json; charset=utf-8"
+    qs = urllib.parse.urlencode(query or {})
+    for url in (f"{site}/wp-json{route}" + (f"?{qs}" if qs else ""), f"{site}/?rest_route={urllib.parse.quote(route)}" + (f"&{qs}" if qs else "")):  # the second works without pretty links
+        req = urllib.request.Request(url, data=data, headers=headers, method=method)
+        try:
+            with _conn_opener.open(req, timeout=25) as r:
+                return json.loads(r.read(500_000) or b"{}")
+        except urllib.error.HTTPError as e:
+            if e.code in (301, 302, 303, 307, 308):
+                to = urllib.parse.urlsplit(e.headers.get("Location", "") or "")
+                hint = f" Укажите адрес https://{to.hostname}" if to.hostname else ""
+                raise BadRequest(f"Сайт перенаправляет на другой адрес.{hint} — именно его, без перенаправлений.") from None
+            try:
+                err = json.loads(e.read(20_000) or b"{}")
+            except ValueError:
+                err = {}
+            wp_code = str(err.get("code", "")) if isinstance(err, dict) else ""
+            if e.code == 404 and "/wp-json/" in url and wp_code in ("", "rest_no_route"):
+                continue  # /wp-json/ is not served: try ?rest_route=
+            if e.code == 401 or wp_code in ("incorrect_password", "invalid_username", "invalid_email", "rest_not_logged_in"):
+                raise BadRequest("WordPress не принял логин или пароль приложения. Проверьте имя пользователя и создайте пароль приложения заново (Пользователи → Профиль → Пароли приложений). Если всё верно — хостинг может срезать заголовок Authorization.") from None
+            if e.code == 403:
+                raise BadRequest("WordPress принял вход, но у этого пользователя нет права создавать страницы. Нужна роль «Редактор» или «Администратор».") from None
+            if e.code == 404:
+                raise BadRequest("На этом адресе не найден WordPress REST API. Проверьте адрес сайта.") from None
+            raise BadRequest(f"WordPress ответил ошибкой: код {e.code}. {mask(str(err.get('message', '')) if isinstance(err, dict) else '', password, auth)[:160]}".strip()) from None
+        except (urllib.error.URLError, TimeoutError, ConnectionError, ValueError):
+            raise BadRequest("Сайт не ответил. Проверьте адрес и попробуйте ещё раз.") from None
+    raise BadRequest("На этом адресе не найден WordPress REST API. Проверьте адрес сайта.")
+
+
+def wordpress_test(body):
+    site, user, password = _wp_args(body)
+    me = _wp(site, user, password, "GET", "/wp/v2/users/me", query={"context": "edit"})
+    if not isinstance(me, dict) or not me.get("id"):
+        raise BadRequest("WordPress ответил, но не вернул пользователя. Проверьте логин и пароль приложения.")
+    caps = me.get("capabilities") if isinstance(me.get("capabilities"), dict) else {}
+    return {"ok": True, "site": site, "name": str(me.get("name", ""))[:80], "can_publish": bool(caps.get("publish_pages")) if caps else None}
+
+
+def _wp_html(text):
+    """Plain draft text → simple HTML: blank line = new paragraph, a short line before a paragraph = a heading."""
+    from html import escape
+    out = []
+    for block in re.split(r"\n\s*\n", text.strip()):
+        lines = [x.strip() for x in block.split("\n") if x.strip()]
+        if not lines:
+            continue
+        if len(lines) > 1 and len(lines[0]) <= 140 and lines[0].endswith("?"):
+            out.append(f"<h3>{escape(lines[0])}</h3>")
+            lines = lines[1:]
+        out.append("<p>" + "<br>".join(escape(x) for x in lines) + "</p>")
+    return "\n".join(out)
+
+
+def wordpress_publish(body):
+    """Creates a page. Default status is draft: the client reviews it in WordPress and presses «Опубликовать» there."""
+    site, user, password = _wp_args(body)
+    title = str(body.get("title", "")).strip()[:WP_TITLE_MAX + 1]
+    content = str(body.get("content", "")).strip()
+    if not title or len(title) > WP_TITLE_MAX:
+        raise BadRequest(f"Нужен заголовок страницы до {WP_TITLE_MAX} знаков.")
+    if len(content) < 3 or len(content) > WP_CONTENT_MAX:
+        raise BadRequest(f"Текст страницы должен быть от 3 до {WP_CONTENT_MAX} знаков.")
+    status = body.get("status") or "draft"
+    if status not in ("draft", "publish"):
+        raise BadRequest("Статус страницы: draft (черновик) или publish.")
+    page = _wp(site, user, password, "POST", "/wp/v2/pages", {"title": title, "content": _wp_html(content), "status": status})
+    pid = page.get("id") if isinstance(page, dict) else None
+    if not pid:
+        raise BadRequest("WordPress не вернул номер новой страницы. Проверьте раздел «Страницы» в админке.")
+    return {"ok": True, "id": pid, "status": page.get("status", status), "link": str(page.get("link", ""))[:300], "edit_link": f"{site}/wp-admin/post.php?post={int(pid)}&action=edit"}
+
+
 # ---------- AI ----------
 def provider_name():
     return "gemini" if os.environ.get("GEMINI_API_KEY") else "openai" if os.environ.get("OPENAI_API_KEY") else ""
@@ -1105,6 +1344,7 @@ AGENTS = {
     "faq": "Ты редактор сайта. Напиши для компании страницу «Вопросы и ответы» из 6 вопросов: вопрос в заголовке, полный ответ в первом предложении. Там, где нужны факты, которых нет в данных, поставь [что вписать].",
     "review": "Ты менеджер по отзывам. Напиши два коротких сообщения клиенту с просьбой оставить отзыв на площадке из данных: для WhatsApp и для Instagram. Без давления и без обещаний скидок за отзыв.",
     "bio": "Ты SMM-специалист. Предложи три варианта описания профиля Instagram до 150 знаков: ниша и город словами, одно отличие, способ связи. Неизвестное отметь как [что вписать].",
+    "tgpost": "Ты ведёшь Telegram-канал компании. Напиши один пост для канала: первая строка цепляет, дальше 3–5 коротких абзацев о пользе для клиента в нише и городе компании, в конце — как записаться или связаться. До 900 знаков, без хэштегов и без разметки, максимум два эмодзи. Факты, которых нет в данных (цены, адрес, телефон, акции), отметь как [что вписать] — не выдумывай.",
     "compare": "Ты маркетолог. Составь план страницы сравнения компании с конкурентом-лидером из данных: только проверяемые критерии, без оценок конкурента. Факты, которых нет, отметь как [что вписать].",
     "pitch": "Ты специалист по связям с изданиями. Напиши короткое вежливое письмо автору подборки или каталога с предложением добавить компанию. Факты, которых нет в данных, отметь как [что вписать]. Без преувеличений.",
     "chat": "Ты ассистент Körin для владельца бизнеса и маркетолога в Казахстане. Помогаешь сделать так, чтобы нейросети чаще называли компанию: тексты, письма, планы, разбор сайта и отзывов. Опирайся на данные кабинета и прочитанные страницы. Не выдумывай фактов о компании: чего нет в данных, отметь как [что вписать].",
@@ -1175,7 +1415,8 @@ def bucket_of(path):
     return "ai" if path in AI_ROUTES else "cheap"
 
 
-ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply, "/api/threads-post": threads_post, "/api/threads-search": threads_search, "/api/threads-me": threads_me, "/api/marketer-plan": marketer_plan, "/api/marketer-publish": marketer_publish, "/api/marketer-replies": marketer_replies}
+ROUTES = {"/api/connect/telegram/test": telegram_test, "/api/publish/telegram": telegram_publish, "/api/connect/wordpress/test": wordpress_test, "/api/publish/wordpress": wordpress_publish,
+          "/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply, "/api/threads-post": threads_post, "/api/threads-search": threads_search, "/api/threads-me": threads_me, "/api/marketer-plan": marketer_plan, "/api/marketer-publish": marketer_publish, "/api/marketer-replies": marketer_replies}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -1210,21 +1451,22 @@ class Handler(BaseHTTPRequestHandler):
         bucket = bucket_of(self.path)
         if not allowed((self.headers.get("X-Forwarded-For") or self.client_address[0]).split(",")[0].strip(), bucket=bucket):
             return self._send(429, {"error": "Слишком много вопросов к нейросети с вашего адреса за час. Попробуйте позже — остальной кабинет работает." if bucket == "ai" else "Слишком много запросов. Попробуйте через час."})
+        body = {}
         try:
             length = int(self.headers.get("Content-Length", "0"))
-            if length > 20_000:
+            if length > (60_000 if self.path.startswith("/api/publish/") else 20_000):  # a page for WordPress may be long
                 raise BadRequest("Слишком большой запрос.")
             body = json.loads(self.rfile.read(length) or b"{}")
             if not isinstance(body, dict):
                 raise BadRequest("Ожидается объект JSON.")
             self._send(200, route(body))
         except BadRequest as e:
-            self._send(400, {"error": str(e)})
+            self._send(400, {"error": mask(e, *_secrets_of(body))})
         except json.JSONDecodeError:
             self._send(400, {"error": "Запрос не в формате JSON."})
         except Exception as e:  # never drop the connection: the page must get an answer it can show
             if not isinstance(e, providers.ProviderError):
-                print(f"unexpected error on {self.path}: {type(e).__name__}: {e}", flush=True)
+                print(f"unexpected error on {self.path}: {type(e).__name__}: {mask(e, *_secrets_of(body))}", flush=True)
                 return self._send(500, {"error": "На сервере ошибка. Мы её уже видим в журнале."})
             print(f"provider error on {self.path}: {e}", flush=True)
             msg = "ИИ не подключён: на сервере нет ключа или закончился баланс." if no_ai(e) else "Бесплатный лимит нейросети исчерпан. Подождите минуту и попробуйте снова; если не помогает — лимит на сегодня закончился." if out_of_quota(e) else "Нейросеть не ответила. Попробуйте позже."

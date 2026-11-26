@@ -1,127 +1,155 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Körin — помощник маркетолога</title>
 <meta name="description" content="Körin: чат, который проверяет, называют ли нейросети ваш бизнес, читает сайт и пишет тексты для маркетинга.">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#000000">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("korin-theme-v4")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* Тёмный, как korin/index.html: чёрный фон, панели #0b0b0c, линии #1f1f22, текст #edf2f5, белая главная кнопка,
+   мягкий голубой акцент #8b9cff, шрифт Onest. Светлая тема — по кнопке, ключ тот же, что у сайта (korin-theme-v4). */
 :root{
-  --bg:#ffffff;--side:#f7f7f8;--card:#ffffff;--sub:#f4f4f6;--hover:#efeff2;--line:#ececef;--line2:#dfdfe4;
+  --bg:#000;--side:#060607;--card:#0b0b0c;--sub:#141416;--hover:#18181b;--on:#1d1d20;--line:#1f1f22;--line2:#2c2c30;
+  --ink:#f3f6f8;--text:#d4d7dc;--muted:#9a9ca3;--dim:#6c6e75;
+  --acc:#8b9cff;--acc-bg:rgba(139,156,255,.12);--acc-line:rgba(139,156,255,.32);--acc-ink:#c9d1ff;
+  --pri:#fff;--pri-ink:#111113;--pri-h:#e4e7ea;--off:#232326;--off-ink:#5d5f66;
+  --ok:#7ee0a8;--ok-bg:rgba(60,200,130,.13);--bad:#ff9d93;--bad-bg:rgba(255,107,94,.11);--bad-line:rgba(255,107,94,.3);--bad-ink:#ffc9c3;
+  --warn:#f2cc7a;--warn-bg:rgba(242,190,80,.1);--warn-line:rgba(242,190,80,.28);--warn-ink:#f3dcab;
+  --ring:rgba(139,156,255,.16);--scrim:rgba(0,0,0,.62);--sh:0 0 0 1px rgba(255,255,255,.02);--pop:0 30px 80px -20px rgba(0,0,0,.9);
+  --glow:radial-gradient(48% 42% at 78% 0,rgba(139,156,255,.10),transparent 70%);
+  --sans:"Onest","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --side-w:264px;--panel-w:min(500px,40vw);color-scheme:dark
+}
+[data-theme=light]{
+  --bg:#fff;--side:#f7f7f8;--card:#fff;--sub:#f4f4f6;--hover:#efeff2;--on:#e9e9ee;--line:#ececef;--line2:#dfdfe4;
   --ink:#14161b;--text:#2b2f36;--muted:#6b7079;--dim:#9a9ea6;
-  --acc:#2f5bff;--acc-h:#2249e6;--acc-bg:#eef2ff;--acc-line:#d6defe;
-  --ok:#15803d;--ok-bg:#ecfdf3;--bad:#c2410c;--bad-bg:#fff4ed;--warn:#a16207;--warn-bg:#fefce8;
-  --sh:0 1px 2px rgba(16,24,40,.04),0 6px 24px rgba(16,24,40,.06);
-  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --side-w:264px;--panel-w:min(500px,40vw);
+  --acc:#2563eb;--acc-bg:#eef2ff;--acc-line:#d6defe;--acc-ink:#1d4ed8;
+  --pri:#2563eb;--pri-ink:#fff;--pri-h:#1d4ed8;--off:#e4e6eb;--off-ink:#a3a7b0;
+  --ok:#15803d;--ok-bg:#ecfdf3;--bad:#c2410c;--bad-bg:#fff4ed;--bad-line:#fed7aa;--bad-ink:#7c2d12;
+  --warn:#a16207;--warn-bg:#fefce8;--warn-line:#fde68a;--warn-ink:#713f12;
+  --ring:rgba(37,99,235,.1);--scrim:rgba(20,22,27,.35);--sh:0 1px 2px rgba(16,24,40,.04),0 6px 24px rgba(16,24,40,.06);--pop:0 20px 60px rgba(16,24,40,.18);
+  --glow:none;color-scheme:light
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.55 var(--sans);-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01";overflow:hidden}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.55 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
 h1,h2,h3,h4,p{margin:0}
 h1,h2,h3,h4{color:var(--ink)}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0;padding:0}
 button:disabled{cursor:not-allowed}
 a{color:var(--acc)}
+::selection{background:var(--acc-bg);color:var(--ink)}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:8px}
 svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:3px solid var(--bg)}::-webkit-scrollbar-track{background:transparent}
 
 /* ---------- layout ---------- */
 .app{display:grid;grid-template-columns:var(--side-w) minmax(0,1fr) 0;height:100dvh;transition:grid-template-columns .25s ease}
 .app.panel-open{grid-template-columns:var(--side-w) minmax(0,1fr) var(--panel-w)}
 .side{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
-.main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
-.panel{border-left:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative;background:var(--glow),var(--bg)}
+.panel{border-left:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
 
 /* ---------- sidebar ---------- */
-.brand{display:flex;align-items:center;gap:9px;padding:16px 16px 10px;font-weight:650;font-size:17px;letter-spacing:-.02em;color:var(--ink)}
-.mark{width:24px;height:24px;border-radius:7px;background:var(--acc);display:grid;place-items:center;flex:none}
-.mark i{width:8px;height:8px;border-radius:50%;background:#fff;display:block;box-shadow:5px -5px 0 -1px rgba(255,255,255,.55)}
-.brand small{font-weight:500;font-size:11px;color:var(--acc);background:var(--acc-bg);border-radius:6px;padding:1px 6px;letter-spacing:0;margin-left:2px}
-.side-new{margin:6px 12px 8px;display:flex;align-items:center;gap:9px;height:38px;padding:0 12px;border-radius:10px;background:var(--card);border:1px solid var(--line2);font-weight:550;font-size:14px;color:var(--ink)}
-.side-new:hover{border-color:var(--dim)}
+.brand{display:flex;align-items:center;gap:10px;padding:16px 16px 10px;font-weight:600;font-size:17px;letter-spacing:-.02em;color:var(--ink)}
+.brand a{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none}
+.mark{width:24px;height:24px;border-radius:50%;background:var(--ink);display:grid;place-items:center;flex:none}
+.mark i{width:8px;height:8px;border-radius:50%;background:var(--bg);display:block}
+[data-theme=light] .mark{background:var(--acc)}[data-theme=light] .mark i{background:#fff}
+.brand small{font-weight:500;font-size:11px;color:var(--muted);border:1px solid var(--line2);border-radius:999px;padding:0 7px;letter-spacing:0;margin-left:-2px;line-height:18px}
+.side-new{margin:6px 12px 8px;display:flex;align-items:center;gap:9px;height:38px;padding:0 14px;border-radius:999px;background:var(--card);border:1px solid var(--line2);font-weight:500;font-size:14px;color:var(--ink);transition:border-color .15s,background .15s}
+.side-new:hover{border-color:var(--dim);background:var(--sub)}
 .side-scroll{flex:1;overflow:auto;padding:4px 8px 8px}
-.sec{display:flex;align-items:center;justify-content:space-between;padding:14px 8px 4px;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--dim)}
+.sec{display:flex;align-items:center;justify-content:space-between;padding:16px 9px 5px;font:400 11.5px var(--mono);letter-spacing:.02em;color:var(--dim)}
 .sec button{color:var(--muted);width:22px;height:22px;border-radius:6px;display:grid;place-items:center}
 .sec button:hover{background:var(--hover);color:var(--ink)}
-.item{width:100%;display:flex;align-items:center;gap:9px;text-align:left;padding:7px 9px;border-radius:8px;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item{width:100%;display:flex;align-items:center;gap:9px;text-align:left;padding:7px 9px;border-radius:9px;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background .12s,color .12s}
 .item span{overflow:hidden;text-overflow:ellipsis;min-width:0}
-.item:hover{background:var(--hover)}
-.item.on{background:#e9e9ee;color:var(--ink);font-weight:550}
-.co-dot{width:22px;height:22px;border-radius:6px;background:var(--acc-bg);color:var(--acc);display:grid;place-items:center;font-size:11.5px;font-weight:650;flex:none}
-.empty-note{font-size:13px;color:var(--dim);padding:4px 9px 6px}
-.side-foot{border-top:1px solid var(--line);padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
-.lang{display:inline-flex;background:var(--hover);border-radius:8px;padding:2px;align-self:flex-start}
-.lang button{font-size:12.5px;font-weight:550;padding:3px 10px;border-radius:6px;color:var(--muted)}
-.lang button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.item:hover{background:var(--hover);color:var(--ink)}
+.item.on{background:var(--on);color:var(--ink);font-weight:500}
+.item .cnt{margin-left:auto;font-size:11px;color:var(--ok);flex:none}
+.co-dot{width:22px;height:22px;border-radius:7px;background:var(--sub);border:1px solid var(--line2);color:var(--ink);display:grid;place-items:center;font-size:11px;font-weight:600;flex:none}
+.empty-note{font-size:13px;color:var(--dim);padding:4px 9px 6px;line-height:1.45}
+.side-foot{border-top:1px solid var(--line);padding:10px 12px 12px;display:flex;flex-direction:column;gap:9px}
+.foot-row{display:flex;align-items:center;gap:8px}
+.lang{display:inline-flex;background:var(--sub);border:1px solid var(--line);border-radius:999px;padding:2px}
+.lang button{font-size:12.5px;font-weight:500;padding:3px 11px;border-radius:999px;color:var(--muted)}
+.lang button.on{background:var(--on);color:var(--ink)}
+[data-theme=light] .lang button.on{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.theme{margin-left:auto;width:30px;height:30px;border-radius:999px;border:1px solid var(--line2);display:grid;place-items:center;color:var(--muted)}
+.theme:hover{color:var(--ink);border-color:var(--dim)}
+.theme svg.i{width:15px;height:15px}
 .srv{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
 .srv button{color:var(--acc);font-size:12.5px}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex:none}
-.dot.ok{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
-.dot.down{background:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.15)}
+.dot.ok{background:#3ddc84;box-shadow:0 0 0 3px rgba(61,220,132,.14)}
+.dot.down{background:#ff8a5c;box-shadow:0 0 0 3px rgba(255,138,92,.15)}
 .dot.wait{background:var(--acc);animation:pulse 1.2s infinite}
 @keyframes pulse{50%{opacity:.35}}
 
 /* ---------- top bar (mobile) / header ---------- */
-.top{display:none;align-items:center;gap:6px;height:52px;padding:0 8px;border-bottom:1px solid var(--line);flex:none}
-.top .ttl{flex:1;text-align:center;font-weight:600;font-size:15px;color:var(--ink);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.ib{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--text);flex:none}
-.ib:hover{background:var(--hover)}
-.head{display:flex;align-items:center;gap:10px;height:52px;padding:0 20px;flex:none}
-.head .ttl{font-weight:550;font-size:14.5px;color:var(--ink);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.top{display:none;align-items:center;gap:6px;height:52px;padding:0 8px;border-bottom:1px solid var(--line);flex:none;background:var(--bg)}
+.top .ttl{flex:1;text-align:center;font-weight:500;font-size:15px;color:var(--ink);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ib{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--muted);flex:none}
+.ib:hover{background:var(--hover);color:var(--ink)}
+.head{display:flex;align-items:center;gap:10px;height:52px;padding:0 20px;flex:none;border-bottom:1px solid transparent}
+.head .ttl{font-weight:500;font-size:14.5px;color:var(--ink);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 
 /* ---------- start screen ---------- */
 .view{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column}
 .start{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px 40px}
 .start-in{width:100%;max-width:680px}
-.hello{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:26px;text-align:center}
-.hello .mark{width:30px;height:30px;border-radius:9px}
+.hello{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:28px;text-align:center}
+.hello .mark{width:30px;height:30px}
 .hello .mark i{width:10px;height:10px}
-.hello h1{font-size:30px;font-weight:600;letter-spacing:-.035em;line-height:1.15}
+.hello h1{font-size:32px;font-weight:500;letter-spacing:-.035em;line-height:1.15}
 .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
-.chip{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);font-size:13.5px;color:var(--text);font-weight:500;white-space:nowrap}
-.chip:hover{border-color:var(--acc-line);background:var(--acc-bg);color:var(--acc)}
-.chip svg.i{width:16px;height:16px;color:var(--muted)}
-.chip:hover svg.i{color:var(--acc)}
-.foot-note{margin-top:22px;text-align:center;font-size:12.5px;color:var(--dim);line-height:1.6}
+.chip{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:var(--card);font-size:13.5px;color:var(--text);font-weight:500;white-space:nowrap;transition:border-color .15s,background .15s,color .15s}
+.chip:hover{border-color:var(--dim);background:var(--sub);color:var(--ink)}
+.chip svg.i{width:16px;height:16px;color:var(--dim)}
+.chip:hover svg.i{color:var(--ink)}
+.foot-note{margin-top:24px;text-align:center;font-size:12.5px;color:var(--dim);line-height:1.6}
 .foot-note button{color:var(--muted);text-decoration:underline;text-decoration-color:var(--line2);text-underline-offset:3px;font-size:12.5px}
-.foot-note button:hover{color:var(--acc)}
+.foot-note button:hover{color:var(--ink)}
 
 /* ---------- composer ---------- */
 .composer{background:var(--card);border:1px solid var(--line2);border-radius:20px;box-shadow:var(--sh);padding:12px 12px 10px 16px;transition:border-color .15s,box-shadow .15s}
-.composer:focus-within{border-color:#c9cff0;box-shadow:0 0 0 4px rgba(47,91,255,.07),var(--sh)}
+.composer:focus-within{border-color:var(--dim);box-shadow:0 0 0 4px var(--ring)}
 .composer textarea{width:100%;border:0;outline:0;resize:none;background:transparent;font-size:15.5px;line-height:1.5;min-height:26px;max-height:200px;padding:2px 0;color:var(--ink)}
 .composer textarea::placeholder{color:var(--dim)}
 .c-row{display:flex;align-items:center;gap:8px;margin-top:6px}
 .c-ctx{flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
-.ctx{display:inline-flex;align-items:center;gap:6px;max-width:100%;height:28px;padding:0 10px;border-radius:8px;background:var(--sub);font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ctx:hover{background:var(--hover);color:var(--ink)}
+.ctx{display:inline-flex;align-items:center;gap:6px;max-width:100%;height:28px;padding:0 11px;border-radius:999px;background:var(--sub);border:1px solid var(--line);font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctx:hover{color:var(--ink);border-color:var(--line2)}
 .ctx svg.i{width:14px;height:14px}
-.send{width:34px;height:34px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;flex:none;transition:background .15s,opacity .15s}
-.send:hover{background:var(--acc-h)}
-.send:disabled{background:#c8cdd8;opacity:.9}
+.send{width:34px;height:34px;border-radius:50%;background:var(--pri);color:var(--pri-ink);display:grid;place-items:center;flex:none;transition:background .15s,opacity .15s}
+.send:hover{background:var(--pri-h)}
+.send:disabled{background:var(--off);color:var(--off-ink)}
 .send svg.i{width:17px;height:17px;stroke-width:2.1}
-.dock{flex:none;padding:8px 20px 14px;background:linear-gradient(to bottom,rgba(255,255,255,0),var(--bg) 18px)}
+.dock{flex:none;padding:8px 20px 14px;background:linear-gradient(to bottom,transparent,var(--bg) 18px)}
 .dock-in{max-width:740px;margin:0 auto}
 .disclaimer{text-align:center;font-size:11.5px;color:var(--dim);margin-top:7px}
 
 /* ---------- conversation ---------- */
-.conv{max-width:740px;width:100%;margin:0 auto;padding:18px 20px 10px;display:flex;flex-direction:column;gap:22px}
-.msg-u{align-self:flex-end;max-width:82%;background:var(--sub);border-radius:18px 18px 6px 18px;padding:10px 15px;color:var(--ink);white-space:pre-wrap;word-wrap:break-word}
+.conv{max-width:740px;width:100%;margin:0 auto;padding:18px 20px 10px;display:flex;flex-direction:column;gap:24px}
+.msg-u{align-self:flex-end;max-width:82%;background:var(--on);border-radius:18px 18px 5px 18px;padding:10px 15px;color:var(--ink);white-space:pre-wrap;word-wrap:break-word}
 .msg-a{display:flex;gap:12px;align-items:flex-start}
-.msg-a>.mark{margin-top:2px;width:26px;height:26px;border-radius:8px}
+.msg-a>.mark{margin-top:3px;width:22px;height:22px}
+.msg-a>.mark i{width:7px;height:7px}
 .msg-a .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
 .prose{color:var(--text);word-wrap:break-word}
 .prose p+p{margin-top:8px}
 .prose b,.prose strong{color:var(--ink);font-weight:600}
-.steps{border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
+.prose a{color:var(--acc-ink)}
+.steps{border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden}
 .steps summary{list-style:none;display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13.5px;color:var(--muted);cursor:pointer;user-select:none}
 .steps summary::-webkit-details-marker{display:none}
 .steps summary .chev{margin-left:auto;transition:transform .2s}
@@ -131,29 +159,32 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .st-ic{width:18px;height:18px;flex:none;display:grid;place-items:center;margin-top:1px}
 .st-ic svg.i{width:15px;height:15px;stroke-width:2.2}
 .st-ok{color:var(--ok)}.st-no{color:var(--bad)}
-.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--acc-line);border-top-color:var(--acc);animation:sp .8s linear infinite}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--acc);animation:sp .8s linear infinite;flex:none}
 @keyframes sp{to{transform:rotate(360deg)}}
-.label{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:12px;color:var(--muted);background:var(--sub);border-radius:7px;padding:3px 9px}
-.label .dot{width:6px;height:6px}
-.label.warn{background:var(--warn-bg);color:var(--warn)}
-.art-card{display:flex;align-items:center;gap:12px;text-align:left;width:100%;max-width:440px;border:1px solid var(--line2);border-radius:14px;background:var(--card);padding:12px 14px;transition:border-color .15s,box-shadow .15s}
-.art-card:hover{border-color:var(--acc-line);box-shadow:var(--sh)}
-.art-card .ai{width:38px;height:38px;border-radius:10px;background:var(--acc-bg);color:var(--acc);display:grid;place-items:center;flex:none}
-.art-card .at{font-weight:600;color:var(--ink);font-size:14px;line-height:1.3}
+.label{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;font:400 11.5px/1.4 var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:3px 10px}
+.label .dot{width:6px;height:6px;box-shadow:none}
+.label.warn{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.art-card{display:flex;align-items:center;gap:12px;text-align:left;width:100%;max-width:440px;border:1px solid var(--line2);border-radius:16px;background:var(--card);padding:12px 14px;transition:border-color .15s,background .15s}
+.art-card:hover{border-color:var(--dim);background:var(--sub)}
+.art-card .ai{width:38px;height:38px;border-radius:11px;background:var(--sub);border:1px solid var(--line2);color:var(--ink);display:grid;place-items:center;flex:none}
+.art-card .at{font-weight:500;color:var(--ink);font-size:14px;line-height:1.3}
 .art-card .as{font-size:12.5px;color:var(--muted);margin-top:2px}
 .art-card .go{margin-left:auto;color:var(--dim)}
 .next{display:flex;flex-wrap:wrap;gap:7px}
 .next .chip{height:32px;font-size:13px;padding:0 12px}
-.err{border:1px solid #fed7aa;background:var(--bad-bg);border-radius:12px;padding:11px 14px;font-size:14px;color:#7c2d12}
+.err{border:1px solid var(--bad-line);background:var(--bad-bg);border-radius:14px;padding:11px 14px;font-size:14px;color:var(--bad-ink)}
 .err .row{display:flex;gap:8px;margin-top:9px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font-weight:550;font-size:13.5px;white-space:nowrap}
-.btn:hover:not(:disabled){background:var(--sub)}
-.btn-p{background:var(--acc);border-color:var(--acc);color:#fff}
-.btn-p:hover:not(:disabled){background:var(--acc-h)}
-.btn:disabled{color:var(--dim);background:var(--sub);border-color:var(--line)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 15px;border-radius:999px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font-weight:500;font-size:13.5px;white-space:nowrap;text-decoration:none;transition:background .15s,border-color .15s}
+.btn:hover:not(:disabled){background:var(--sub);border-color:var(--dim)}
+.btn-p{background:var(--pri);border-color:var(--pri);color:var(--pri-ink)}
+.btn-p:hover:not(:disabled){background:var(--pri-h);border-color:var(--pri-h)}
+.btn:disabled{color:var(--off-ink);background:transparent;border-color:var(--line)}
+.btn-p:disabled{background:var(--off);border-color:var(--off)}
 .btn svg.i{width:16px;height:16px}
-.soon{font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--acc);background:var(--acc-bg);border-radius:5px;padding:1px 6px}
-.ex{display:inline-flex;font-size:10.5px;font-weight:650;letter-spacing:.04em;text-transform:uppercase;color:var(--warn);background:var(--warn-bg);border:1px solid #fde68a;border-radius:5px;padding:0 6px}
+.btn-q{border-color:transparent;background:transparent;color:var(--muted)}
+.btn-q:hover:not(:disabled){color:var(--bad);background:var(--bad-bg);border-color:transparent}
+.soon{font-size:10.5px;font-weight:500;letter-spacing:.02em;color:var(--muted);border:1px solid var(--line2);border-radius:999px;padding:0 7px;line-height:17px;white-space:nowrap}
+.ex{display:inline-flex;font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:6px;padding:0 6px}
 .typing{display:inline-flex;gap:4px;padding:8px 0}
 .typing i{width:6px;height:6px;border-radius:50%;background:var(--dim);animation:pulse 1s infinite}
 .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
@@ -161,30 +192,32 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 /* ---------- artifact panel ---------- */
 .p-head{display:flex;align-items:center;gap:10px;height:56px;padding:0 10px 0 20px;border-bottom:1px solid var(--line);flex:none}
 .p-head .pt{flex:1;min-width:0}
-.p-head h2{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-head h2{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-head .ps{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-body{flex:1;overflow:auto;padding:20px}
-.p-foot{flex:none;border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg)}
+.p-foot{flex:none;border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--card)}
 .p-foot .acts{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0}
 .p-foot .acts::-webkit-scrollbar{display:none}
 .p-foot .acts .btn{flex:none}
-.p-foot .hint{flex-basis:100%;font-size:12px;color:var(--dim)}
-.stat{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-bottom:4px}
-.stat b{white-space:nowrap;font-size:40px;font-weight:650;letter-spacing:-.04em;color:var(--ink);line-height:1}
+.p-foot .hint{flex-basis:100%;font-size:12px;color:var(--dim);line-height:1.5}
+.p-foot .hint a{color:var(--acc-ink)}
+.stat{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-bottom:4px}
+.stat b{white-space:nowrap;font-size:44px;font-weight:500;letter-spacing:-.045em;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
 .stat span{color:var(--muted);font-size:14px}
-.bar{height:6px;background:var(--sub);border-radius:99px;overflow:hidden;margin:12px 0 6px}
+.bar{height:5px;background:var(--on);border-radius:99px;overflow:hidden;margin:14px 0 6px}
 .bar i{display:block;height:100%;background:var(--acc);border-radius:99px}
-.p-sec{margin-top:22px}
-.p-sec>h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:10px}
-.qa{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card)}
+.p-sec{margin-top:24px}
+.p-sec>h3{font:400 11.5px var(--mono);letter-spacing:.02em;color:var(--dim);margin-bottom:10px}
+.qa{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--bg)}
+[data-theme=light] .qa{background:var(--card)}
 .qa+.qa{margin-top:10px}
 .qa .q{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
-.qa .q b{font-weight:600;color:var(--ink);font-size:14px;line-height:1.4}
-.qa .a{margin-top:8px;font-size:13.5px;color:var(--text);line-height:1.55;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.qa .q b{font-weight:500;color:var(--ink);font-size:14px;line-height:1.4}
+.qa .a{margin-top:8px;font-size:13.5px;color:var(--muted);line-height:1.6;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .qa.full .a{display:block}
 .qa .more{margin-top:6px;font-size:12.5px;color:var(--acc)}
 .qa .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:550;border-radius:6px;padding:2px 8px;white-space:nowrap;background:var(--sub);color:var(--muted)}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;border-radius:999px;padding:2px 9px;white-space:nowrap;background:var(--sub);color:var(--muted)}
 .tag.ok{background:var(--ok-bg);color:var(--ok)}.tag.no{background:var(--bad-bg);color:var(--bad)}.tag.unk{background:var(--warn-bg);color:var(--warn)}
 .chk{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
 .chk:last-child{border-bottom:0}
@@ -193,76 +226,125 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .chk .ci svg.i{width:13px;height:13px;stroke-width:2.6}
 .chk .cl{font-size:14px;color:var(--ink);font-weight:500;line-height:1.4}
 .chk .cd{font-size:12.5px;color:var(--muted);margin-top:1px}
-.draft{width:100%;min-height:280px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14.5px;line-height:1.6;resize:vertical;outline:0;background:var(--card);color:var(--ink)}
-.draft:focus{border-color:#c9cff0;box-shadow:0 0 0 4px rgba(47,91,255,.07)}
-.note{font-size:12.5px;color:var(--muted);background:var(--sub);border-radius:10px;padding:10px 12px;margin-top:12px;line-height:1.5}
-.verdict{font-size:17px;font-weight:600;color:var(--ink);letter-spacing:-.01em;line-height:1.4}
-.gap{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.draft{width:100%;min-height:280px;border:1px solid var(--line2);border-radius:14px;padding:14px 16px;font-size:14.5px;line-height:1.65;resize:vertical;outline:0;background:var(--bg);color:var(--ink)}
+[data-theme=light] .draft{background:var(--card)}
+.draft:focus{border-color:var(--dim);box-shadow:0 0 0 4px var(--ring)}
+.note{font-size:12.5px;color:var(--muted);background:var(--sub);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:12px;line-height:1.55}
+.verdict{font-size:18px;font-weight:500;color:var(--ink);letter-spacing:-.015em;line-height:1.4}
+.gap{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--bg)}
+[data-theme=light] .gap{background:var(--card)}
 .gap+.gap{margin-top:10px}
-.gap b{color:var(--ink);font-weight:600;font-size:14px}
-.gap p{font-size:13.5px;color:var(--text);margin-top:4px}
+.gap b{color:var(--ink);font-weight:500;font-size:14px}
+.gap p{font-size:13.5px;color:var(--muted);margin-top:4px}
 .gap q{display:block;font-size:13px;color:var(--muted);border-left:2px solid var(--line2);padding-left:10px;margin-top:8px;quotes:none}
-.ex-banner{display:flex;gap:10px;align-items:flex-start;background:var(--warn-bg);border:1px solid #fde68a;border-radius:12px;padding:10px 12px;font-size:13px;color:#713f12;margin-bottom:16px}
+.ex-banner{display:flex;gap:10px;align-items:flex-start;background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--warn-ink);margin-bottom:16px}
+.pubd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:12px}
 
 /* ---------- connectors ---------- */
-.cn{max-width:960px;width:100%;margin:0 auto;padding:28px 24px 40px}
-.cn h1{font-size:26px;font-weight:600;letter-spacing:-.03em}
-.cn .lead{color:var(--muted);margin-top:6px;max-width:620px}
-.cn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:22px}
-.cn-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--card);display:flex;flex-direction:column;gap:10px}
+.cn{max-width:980px;width:100%;margin:0 auto;padding:32px 24px 48px}
+.cn h1{font-size:28px;font-weight:500;letter-spacing:-.03em}
+.cn .lead{color:var(--muted);margin-top:8px;max-width:640px}
+.cn-h{font:400 11.5px var(--mono);color:var(--dim);margin:30px 0 12px;letter-spacing:.02em}
+.cn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.cn-grid.live{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.cn-card{border:1px solid var(--line);border-radius:18px;padding:16px;background:var(--card);display:flex;flex-direction:column;gap:10px}
+.cn-card.soon-card{border-style:dashed;background:transparent}
+.cn-card.soon-card .lg{filter:grayscale(1);opacity:.45}
+.cn-card.soon-card p{color:var(--muted)}
+.cn-card.is-on{border-color:var(--line2)}
 .cn-top{display:flex;align-items:center;gap:11px}
-.lg{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none;letter-spacing:-.02em}
-.cn-top b{font-weight:600;color:var(--ink);font-size:15px}
-.cn-top .soon{margin-left:auto}
+.lg{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none;letter-spacing:-.02em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.cn-top b{font-weight:500;color:var(--ink);font-size:15px}
+.cn-top .soon,.cn-top .tag{margin-left:auto}
 .cn-card p{font-size:13.5px;color:var(--text);line-height:1.5;flex:1}
-.honest{display:flex;gap:10px;align-items:flex-start;margin-top:18px;background:var(--acc-bg);border-radius:12px;padding:12px 14px;font-size:13.5px;color:#1e3a8a;max-width:720px}
+.cn-who{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:7px;min-width:0}
+.cn-who b{color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cn-acts{display:flex;gap:8px;flex-wrap:wrap}
+.honest{display:flex;gap:10px;align-items:flex-start;margin-top:18px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;font-size:13.5px;color:var(--muted);max-width:720px}
 .honest svg.i{color:var(--acc);margin-top:1px}
 
 /* ---------- dialog ---------- */
-dialog{border:0;border-radius:18px;padding:0;width:min(440px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(16,24,40,.18);color:var(--text)}
-dialog::backdrop{background:rgba(20,22,27,.35)}
-.dlg{padding:20px}
-.dlg h2{font-size:17px;font-weight:600;margin-bottom:14px}
+dialog{border:1px solid var(--line2);border-radius:20px;padding:0;width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;box-shadow:var(--pop);color:var(--text);background:var(--card)}
+dialog.wide{width:min(560px,calc(100vw - 32px))}
+dialog::backdrop{background:var(--scrim);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.dlg{padding:22px}
+.dlg h2{font-size:18px;font-weight:500;letter-spacing:-.02em;margin-bottom:6px}
+.dlg .sub{font-size:13.5px;color:var(--muted);margin-bottom:16px}
 .fld{display:block;margin-bottom:12px}
-.fld span{display:block;font-size:12.5px;color:var(--muted);margin-bottom:4px;font-weight:500}
-.fld input{width:100%;height:40px;border:1px solid var(--line2);border-radius:10px;padding:0 12px;font-size:14.5px;outline:0;background:var(--card)}
-.fld input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(47,91,255,.1)}
-.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.fld span{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px;font-weight:500}
+.fld input,.fld select{width:100%;height:42px;border:1px solid var(--line2);border-radius:12px;padding:0 13px;font-size:14.5px;outline:0;background:var(--bg);color:var(--ink)}
+[data-theme=light] .fld input{background:var(--card)}
+.fld input::placeholder{color:var(--dim)}
+.fld input:focus{border-color:var(--dim);box-shadow:0 0 0 4px var(--ring)}
+.fld small{display:block;font-size:12px;color:var(--dim);margin-top:4px}
+.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+.how{list-style:none;counter-reset:s;margin:0 0 16px;padding:0;display:grid;gap:10px}
+.how li{counter-increment:s;display:grid;grid-template-columns:24px 1fr;gap:10px;font-size:13.5px;line-height:1.5;color:var(--text)}
+.how li::before{content:counter(s);width:24px;height:24px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.how b{color:var(--ink);font-weight:500}
+.how code,.dlg code{font:400 12.5px var(--mono);background:var(--sub);border:1px solid var(--line);border-radius:6px;padding:0 5px;color:var(--ink)}
+.lock{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.5;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:4px 0 6px}
+.lock svg.i{width:16px;height:16px;color:var(--ok);margin-top:1px}
+.d-err{font-size:13.5px;color:var(--bad);min-height:0;margin:8px 0 0}
+.d-err:empty{display:none}
+.d-ok{display:grid;justify-items:center;text-align:center;gap:10px;padding:10px 0 4px}
+.d-ok .big{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--ok-bg);color:var(--ok)}
+.d-ok .big svg.i{width:22px;height:22px;stroke-width:2.2}
+.where{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:13.5px;color:var(--muted)}
+.where b{color:var(--ink);font-weight:500}
+.where .lg{width:28px;height:28px;border-radius:8px;font-size:11px}
+.pv{border:1px solid var(--line);border-radius:14px;background:var(--bg);padding:14px 16px;font-size:14px;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-wrap:break-word;max-height:300px;overflow:auto}
+[data-theme=light] .pv{background:var(--sub)}
+.pv.tgp{border-radius:16px 16px 16px 5px;background:#17212b;border-color:#1f2c39;color:#e9eef3}
+[data-theme=light] .pv.tgp{background:#fff;border-color:#dbe3ea;color:#111}
+.pv h3{font-size:15px;font-weight:600;margin:10px 0 2px}.pv h3:first-child{margin-top:0}
+.pv p{margin:0 0 8px;white-space:normal}
+.pv-meta{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--dim);margin-top:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.45;cursor:pointer;color:var(--text)}
+.opt+.opt{margin-top:8px}
+.opt:has(input:checked){border-color:var(--dim);background:var(--sub)}
+.opt input{margin:3px 0 0;accent-color:var(--acc)}
+.opt small{display:block;color:var(--muted);font-size:12.5px}
+.warnbox{font-size:13px;color:var(--warn-ink);background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:12px;padding:9px 12px;margin-top:10px;line-height:1.5}
 
 .scrim{display:none}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13.5px;border-radius:10px;padding:9px 14px;opacity:0;pointer-events:none;transition:.2s;z-index:90}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);font-size:13.5px;font-weight:500;border-radius:999px;padding:9px 16px;opacity:0;pointer-events:none;transition:.2s;z-index:90;max-width:calc(100vw - 32px);text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%)}
 
 /* ---------- mobile ---------- */
 @media (max-width:900px){
   .app,.app.panel-open{grid-template-columns:minmax(0,1fr)}
   .side{position:fixed;inset:0 auto 0 0;width:min(300px,84vw);z-index:60;transform:translateX(-102%);transition:transform .25s ease;box-shadow:none}
-  .app.menu .side{transform:none;box-shadow:0 10px 40px rgba(0,0,0,.18)}
-  .scrim{display:block;position:fixed;inset:0;background:rgba(20,22,27,.32);z-index:55;opacity:0;pointer-events:none;transition:opacity .2s}
+  .app.menu .side{transform:none;box-shadow:0 10px 60px rgba(0,0,0,.5)}
+  .scrim{display:block;position:fixed;inset:0;background:var(--scrim);z-index:55;opacity:0;pointer-events:none;transition:opacity .2s}
   .app.menu .scrim{opacity:1;pointer-events:auto}
   .top{display:flex}
   .head{display:none}
+  .main{background:var(--bg)}
   .panel{position:fixed;inset:0;z-index:70;border:0;transform:translateY(100%);transition:transform .28s ease;visibility:hidden}
   .app.panel-open .panel{transform:none;visibility:visible}
   .p-body{padding:16px}
-  .start{justify-content:flex-start;padding:7vh 16px 20px}
-  .hello{flex-direction:column;gap:12px;margin-bottom:20px}
-  .hello h1{font-size:24px}
+  .start{justify-content:flex-start;padding:8vh 16px 20px;background:var(--glow)}
+  .hello{flex-direction:column;gap:14px;margin-bottom:22px}
+  .hello h1{font-size:25px}
   .start .chips{display:grid;grid-auto-flow:column;grid-template-rows:auto auto;justify-content:start;overflow-x:auto;scrollbar-width:none;margin:14px -16px 0;padding:0 16px 2px;gap:8px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16px,#000 calc(100% - 28px),transparent)}
   .start .chips::-webkit-scrollbar{display:none}
-  .stat b{font-size:34px}
-  .chip{height:34px;font-size:13px;padding:0 11px}
-  .conv{padding:14px 16px 6px;gap:18px}
+  .stat b{font-size:36px}
+  .chip{height:34px;font-size:13px;padding:0 12px}
+  .conv{padding:14px 16px 6px;gap:20px}
   .dock{padding:6px 12px calc(10px + env(safe-area-inset-bottom))}
   .msg-a>.mark{display:none}
   .msg-u{max-width:88%}
-  .cn{padding:20px 16px 32px}
-  .cn h1{font-size:22px}
-  .cn-grid{grid-template-columns:1fr;gap:10px}
+  .cn{padding:22px 16px 32px}
+  .cn h1{font-size:23px}
+  .cn-grid,.cn-grid.live{grid-template-columns:1fr;gap:10px}
   .cn .lead{font-size:14px}
-  .cn-card{padding:14px;gap:8px}
+  .cn-card{padding:14px;gap:9px}
   .lg{width:32px;height:32px;border-radius:9px}
   .p-foot .acts{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+  dialog,dialog.wide{width:100vw;max-width:100vw;max-height:92dvh;margin:auto 0 0;border-radius:20px 20px 0 0;border-bottom:0}
+  .dlg{padding:20px 16px calc(18px + env(safe-area-inset-bottom))}
+  .dlg .row .btn{flex:1}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -286,9 +368,14 @@ dialog::backdrop{background:rgba(20,22,27,.35)}
      POST /api/site-audit  — проверка сайта: robots.txt для ботов нейросетей, главная страница, карта сайта ({url})
      POST /api/agent       — тексты: task faq | review | bio | chat ({task,question,context})
      POST /api/analyze     — разбор «почему называют конкурентов» по ответам замера
+     POST /api/connect/telegram/test, /api/publish/telegram    — канал клиента: проверка бота и публикация поста
+     POST /api/connect/wordpress/test, /api/publish/wordpress  — сайт клиента: проверка входа и страница-черновик
+   Ключи подключений (токен бота, пароль приложения WordPress) живут только в localStorage этого браузера (CONN_KEY)
+   и уходят на сервер лишь в момент проверки или публикации; сервер их не хранит. Публикация — только после
+   предпросмотра и нажатия «Одобрить и опубликовать».
    Если сервер спит или ответил ошибкой, говорим об этом прямо и предлагаем повторить. Результаты не придумываются. */
 
-const API = 'https://korin-api.onrender.com';  // тот же сервер, что у korin/app/index.html
+const API = 'https://korin-api.onrender.com';  // сервер server/app.py на Render
 // Чаты и компании пока живут в localStorage этого браузера. TODO: перенести в серверные аккаунты.
 const KEY = 'korin-ai-v1';
 
@@ -307,7 +394,10 @@ const P = {
   copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>', send: '<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',
   chev: '<path d="M6 9l6 6 6-6"/>', right: '<path d="M9 6l6 6-6 6"/>', edit: '<path d="M4 20h4L19 9l-4-4L4 16v4z"/>', report: '<path d="M4 4h16v16H4z"/><path d="M8 15v-3M12 15V9M16 15v-5"/>',
   list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.1"/>', refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',
-  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>', moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  tg: '<path d="M21 4L3 11l6 2.5M21 4l-3 16-9-6.5M21 4L9 13.5V19l3-3.5"/>'
 };
 const ic = (n, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n] || ''}</svg>`;
 const markEl = '<span class="mark" aria-hidden="true"><i></i></span>';
@@ -318,15 +408,18 @@ const T = {
     hello: 'Что сделать для вашего бизнеса?', ph: 'Напишите задачу для Körin…', phReply: 'Ответьте Körin…', send: 'Отправить',
     newChat: 'Новый чат', companies: 'Компании', history: 'История', connections: 'Подключения', addCo: 'Добавить компанию',
     noCo: 'Компании появятся, когда вы назовёте свою в чате.', noChats: 'Здесь будут ваши чаты.', menu: 'Меню', close: 'Закрыть',
-    chips: [['measure', 'eye', 'Называют ли нас нейросети?'], ['audit', 'globe', 'Проверить мой сайт'], ['faq', 'file', 'Страница вопросов для сайта'], ['review', 'star', 'Попросить отзыв'], ['bio', 'cam', 'Описание для Instagram'], ['why', 'why', 'Почему называют конкурентов?']],
+    chips: [['measure', 'eye', 'Называют ли нас нейросети?'], ['audit', 'globe', 'Проверить мой сайт'], ['faq', 'file', 'Страница вопросов для сайта'], ['review', 'star', 'Попросить отзыв'], ['bio', 'cam', 'Описание для Instagram'], ['tgpost', 'tg', 'Пост для Telegram-канала'], ['why', 'why', 'Почему называют конкурентов?']],
     note: 'Körin задаёт вопросы настоящим нейросетям и читает ваш сайт. Если чего-то не знает — так и говорит.', sample: 'Посмотреть пример отчёта',
     disclaimer: 'Körin проверяет сайт и спрашивает нейросети через сервер. Тексты — черновики: прочитайте перед публикацией.',
     srvWait: 'Связываюсь с сервером…', srvOk: 'Сервер на связи', srvDown: 'Сервер не отвечает', srvNoAi: 'Сервер на связи, нейросеть не подключена', retry: 'Повторить',
     copy: 'Скопировать', copied: 'Скопировано', publish: 'Одобрить и опубликовать', soon: 'скоро', example: 'пример', open: 'Открыть',
     steps: n => `Шаги: ${n}`, working: 'Работаю…', edit: 'Изменить', save: 'Сохранить', cancel: 'Отмена', del: 'Удалить чат',
     fName: 'Название компании', fNiche: 'Чем занимаетесь', fCity: 'Город', fSite: 'Сайт', coTitle: 'Данные компании',
-    cnTitle: 'Подключения', cnLead: 'Через подключения Körin будет сам публиковать то, что вы одобрили, и приносить цифры. Сейчас ни одно подключение не работает — честно отмечаем каждое как «скоро».',
-    cnHonest: 'Что работает уже сейчас: в чате дайте адрес сайта — Körin откроет его и проверит. Публикации, отзывы и аналитика появятся вместе с подключениями.',
+    cnTitle: 'Подключения', cnLead: 'Körin публикует в ваш Telegram-канал и на сайт WordPress то, что вы одобрили. Без вашего нажатия «Одобрить и опубликовать» ничего не уходит.',
+    cnHonest: 'Ключи хранятся только в вашем браузере. Сервер Körin их не сохраняет: передаёт в Telegram или WordPress на время одной проверки или публикации.',
+    cnWorks: 'Работают сейчас', cnSoon: 'Скоро', connect: 'Подключить', disconnect: 'Отключить', recheck: 'Проверить', connected: 'подключено',
+    lockNote: 'Ключ хранится только в вашем браузере. Сервер Körin его не сохраняет и не записывает в журналы — передаёт в {svc} на время проверки или публикации. «Отключить» удаляет его из браузера.',
+    pubTo: 'Опубликовать в {svc}', approve: 'Одобрить и опубликовать', publishing: 'Публикую…', checking: 'Проверяю…', checkConnect: 'Проверить и подключить',
     ask: { name: 'Как называется ваша компания?', niche: 'Чем занимается компания? Например: стоматология, курсы английского, доставка цветов.', city: 'В каком городе ваши клиенты?', site: 'Какой адрес у вашего сайта? Например: example.kz' },
     askHint: { name: 'Название нужно, чтобы понять, называют ли вас нейросети.', niche: 'По нише я составлю вопросы, которые задают покупатели.', city: '', site: '' },
     badSite: 'Это не похоже на адрес сайта. Напишите, например, example.kz',
@@ -339,15 +432,17 @@ const T = {
     hello: 'Бизнесіңіз үшін не істейік?', ph: 'Körin-ге тапсырма жазыңыз…', phReply: 'Körin-ге жауап беріңіз…', send: 'Жіберу',
     newChat: 'Жаңа чат', companies: 'Компаниялар', history: 'Тарих', connections: 'Қосылымдар', addCo: 'Компания қосу',
     noCo: 'Чатта компанияңызды атасаңыз, осында пайда болады.', noChats: 'Мұнда сіздің чаттарыңыз болады.', menu: 'Мәзір', close: 'Жабу',
-    chips: [['measure', 'eye', 'Нейросеттер бізді атай ма?'], ['audit', 'globe', 'Сайтымды тексеру'], ['faq', 'file', 'Сайтқа сұрақ-жауап беті'], ['review', 'star', 'Пікір сұрау'], ['bio', 'cam', 'Instagram сипаттамасы'], ['why', 'why', 'Неге бәсекелестерді атайды?']],
+    chips: [['measure', 'eye', 'Нейросеттер бізді атай ма?'], ['audit', 'globe', 'Сайтымды тексеру'], ['faq', 'file', 'Сайтқа сұрақ-жауап беті'], ['review', 'star', 'Пікір сұрау'], ['bio', 'cam', 'Instagram сипаттамасы'], ['tgpost', 'tg', 'Telegram-арнаға пост'], ['why', 'why', 'Неге бәсекелестерді атайды?']],
     note: 'Körin нағыз нейросеттерге сұрақ қояды және сайтыңызды оқиды. Білмесе — солай дейді.', sample: 'Есеп мысалын көру',
     disclaimer: 'Körin сайтты тексереді және сервер арқылы нейросеттерден сұрайды. Мәтіндер — жоба: жарияламас бұрын оқыңыз.',
     srvWait: 'Сервермен байланысып жатыр…', srvOk: 'Сервер байланыста', srvDown: 'Сервер жауап бермейді', srvNoAi: 'Сервер байланыста, нейросеть қосылмаған', retry: 'Қайталау',
     copy: 'Көшіру', copied: 'Көшірілді', publish: 'Мақұлдап, жариялау', soon: 'жақында', example: 'мысал', open: 'Ашу',
     steps: n => `Қадамдар: ${n}`, working: 'Жұмыс істеп жатырмын…', edit: 'Өзгерту', save: 'Сақтау', cancel: 'Бас тарту', del: 'Чатты өшіру',
     fName: 'Компания атауы', fNiche: 'Немен айналысасыз', fCity: 'Қала', fSite: 'Сайт', coTitle: 'Компания деректері',
-    cnTitle: 'Қосылымдар', cnLead: 'Қосылымдар арқылы Körin сіз мақұлдаған нәрсені өзі жариялайды және сандарды әкеледі. Қазір бірде-бір қосылым жұмыс істемейді — әрқайсысын адал «жақында» деп белгілейміз.',
-    cnHonest: 'Қазір не жұмыс істейді: чатта сайт мекенжайын жазыңыз — Körin оны ашып, тексереді. Жарияланымдар, пікірлер және аналитика қосылымдармен бірге келеді.',
+    cnTitle: 'Қосылымдар', cnLead: 'Körin сіз мақұлдаған мәтінді Telegram-арнаңызға және WordPress сайтыңызға жариялайды. «Мақұлдап, жариялау» баспайынша ештеңе кетпейді.',
+    cnHonest: 'Кілттер тек сіздің браузеріңізде сақталады. Körin сервері оларды сақтамайды: бір тексеру не жариялау уақытына ғана Telegram не WordPress-ке жібереді.',
+    cnWorks: 'Қазір жұмыс істейді', cnSoon: 'Жақында', connect: 'Қосу', disconnect: 'Ажырату', recheck: 'Тексеру', connected: 'қосылған',
+    approve: 'Мақұлдап, жариялау', publishing: 'Жариялап жатырмын…', checking: 'Тексеріп жатырмын…', checkConnect: 'Тексеріп, қосу',
     ask: { name: 'Компанияңыз қалай аталады?', niche: 'Компания немен айналысады? Мысалы: стоматология, ағылшын тілі курстары, гүл жеткізу.', city: 'Клиенттеріңіз қай қалада?', site: 'Сайтыңыздың мекенжайы қандай? Мысалы: example.kz' },
     askHint: { name: 'Нейросеттер сізді атай ма, соны білу үшін атауы керек.', niche: 'Сала бойынша сатып алушылардың сұрақтарын құрастырамын.', city: '', site: '' },
     badSite: 'Бұл сайт мекенжайына ұқсамайды. Мысалы: example.kz деп жазыңыз',
@@ -368,6 +463,13 @@ function load(){
   return { lang: s.lang === 'kk' ? 'kk' : 'ru', companies: Array.isArray(s.companies) ? s.companies : [], chats: Array.isArray(s.chats) ? s.chats : [], co: s.co || null, chat: s.chat || null };
 }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)) } catch (e) {} }
+
+/* ---------- ключи подключений: только этот браузер, отдельный ключ, «Отключить» стирает его ---------- */
+const CONN_KEY = 'korin-conn-v1';
+function loadConn(){ try { const c = JSON.parse(localStorage.getItem(CONN_KEY)); return c && typeof c === 'object' ? c : {} } catch (e) { return {} } }
+let CN = loadConn();
+function saveConn(){ try { if (Object.keys(CN).length) localStorage.setItem(CONN_KEY, JSON.stringify(CN)); else localStorage.removeItem(CONN_KEY) } catch (e) {} }
+const SVC = { tg: 'Telegram', wp: 'WordPress' };
 
 /* ---------- состояние экрана ---------- */
 const UI = { view: 'chat', art: null, menu: false, srv: 'wait', provider: '', ai: true, busy: false, openSteps: new Set() };
@@ -401,6 +503,7 @@ const CITIES = ['Алматы', 'Астана', 'Шымкент', 'Карага�
 const URL_RE = /\b((?:https?:\/\/)?(?:[a-z0-9Ѐ-ӿ-]+\.)+(?:kz|қаз|com|ru|net|org|shop|site|store|online|io|me|info|biz|pro|app|asia|uz|kg)(?:\/[^\s]*)?)/i;
 function intentOf(text){
   const s = text.toLowerCase();
+  if (/telegram|телеграм|пост (для|в) канал|арнаға/.test(s)) return 'tgpost';
   if (/конкурент|бәсекелес|почему (их|не нас|называют)|неге/.test(s)) return 'why';
   if (/faq|вопрос[а-я]* и ответ|страниц[а-я]* вопрос|сұрақ/.test(s)) return 'faq';
   if (/отзыв|пікір/.test(s)) return 'review';
@@ -409,7 +512,7 @@ function intentOf(text){
   if (/сайт|robots|аудит|seo|сео/.test(s) || URL_RE.test(s)) return 'audit';
   return 'chat';
 }
-const NEEDS = { measure: ['name', 'niche', 'city'], audit: ['site'], faq: ['name', 'niche', 'city'], review: ['name', 'niche', 'city'], bio: ['name', 'niche', 'city'], why: ['name', 'niche', 'city'], chat: [] };
+const NEEDS = { measure: ['name', 'niche', 'city'], audit: ['site'], faq: ['name', 'niche', 'city'], review: ['name', 'niche', 'city'], bio: ['name', 'niche', 'city'], tgpost: ['name', 'niche', 'city'], why: ['name', 'niche', 'city'], chat: [] };
 // данные компании: либо сохранённая компания, либо черновик чата (пока компанию не назвали)
 const facts = c => co() || (c.draft ||= {});
 function absorb(c, text){
@@ -536,7 +639,8 @@ async function doAudit(c, m, step, done){
   m.next = ['faq', 'measure'];
 }
 
-const AGENT = { faq: ['faq', 'Страница «Вопросы и ответы»', 'file', 'Опубликовать на сайте (WordPress, Tilda)'], review: ['review', 'Просьба оставить отзыв', 'star', 'Отправить клиентам в WhatsApp'], bio: ['bio', 'Описание профиля Instagram', 'cam', 'Обновить профиль Instagram'], chat: ['chat', 'Ответ Körin', 'chat', ''] };
+// [задача сервера, заголовок, иконка, куда публиковать: 'wp' | 'tg' — работает; строка — честное «скоро»]
+const AGENT = { faq: ['faq', 'Страница «Вопросы и ответы»', 'file', 'wp'], tgpost: ['tgpost', 'Пост для Telegram-канала', 'tg', 'tg'], review: ['review', 'Просьба оставить отзыв', 'star', 'Отправить клиентам в WhatsApp'], bio: ['bio', 'Описание профиля Instagram', 'cam', 'Обновить профиль Instagram'], chat: ['chat', 'Ответ Körin', 'chat', ''] };
 async function doAgent(c, m, intent, q, step, done){
   const [task, title, , pub] = AGENT[intent] || AGENT.chat, f = facts(c);
   const ctx = { company: f.name || '', niche: f.niche || '', city: f.city || '', rivals: [] };
@@ -549,8 +653,10 @@ async function doAgent(c, m, intent, q, step, done){
   m.label = { text: `Текст написала нейросеть ${d.model || ''}`.trim(), warn: false };  // /api/agent не сообщает engine/search — пишем только модель
   if (intent === 'chat') { m.text = d.text || ''; m.next = []; return }
   m.art = { id: uid(), type: 'draft', title, sub: f.name || '', data: { text: clean(d.text), pub, model: d.model } };
-  m.text = `Черновик готов. Места, где нужны ваши факты, отмечены **[что вписать]** — замените их перед публикацией.`;
-  m.next = intent === 'faq' ? ['review', 'bio'] : intent === 'review' ? ['faq', 'bio'] : ['faq', 'review'];
+  const live = pub === 'tg' || pub === 'wp';
+  m.text = (/\[(что вписать|не знаю)/i.test(d.text || '') ? `Черновик готов. Места, где нужны ваши факты, отмечены **[что вписать]** — замените их перед публикацией.` : 'Черновик готов. Прочитайте его и поправьте прямо в панели.')
+    + (live ? ` Опубликовать в ${SVC[pub]} можно кнопкой под черновиком — сначала покажу, как это будет выглядеть.` : '');
+  m.next = intent === 'faq' ? ['tgpost', 'review'] : intent === 'tgpost' ? ['faq', 'review'] : intent === 'review' ? ['tgpost', 'bio'] : ['faq', 'tgpost'];
 }
 
 async function doWhy(c, m, step, done){
@@ -599,12 +705,18 @@ const clean = s => String(s || '').split('\n').map(l => l.replace(/^\s*#{1,6}\s+
 
 /* ---------- отрисовка ---------- */
 function renderAll(){ renderSide(); renderMain(); renderPanel() }
+const light = () => document.documentElement.dataset.theme === 'light';
+function toggleTheme(){
+  const th = light() ? 'dark' : 'light'; document.documentElement.dataset.theme = th;
+  try { localStorage.setItem('korin-theme-v4', th) } catch (e) {}
+  $('meta[name=theme-color]').content = th === 'light' ? '#ffffff' : '#000000'; renderSide();
+}
 
 function renderSide(){
   const chats = S.chats.filter(c => (c.companyId || null) === (S.co || null) && c.msgs.length);
   const srv = UI.srv === 'ok' ? (UI.ai ? t('srvOk') : t('srvNoAi')) : UI.srv === 'down' ? t('srvDown') : t('srvWait');
   $('#side').innerHTML = `
-    <div class="brand">${markEl}Körin<small>AI</small><span style="flex:1"></span><button class="ib mob-only" data-act="menu-close" aria-label="${t('close')}" style="display:${innerWidth <= 900 ? 'grid' : 'none'}">${ic('x')}</button></div>
+    <div class="brand"><a href="../" title="kenesai.asia/korin">${markEl}Körin</a><small>AI</small><span style="flex:1"></span><button class="ib mob-only" data-act="menu-close" aria-label="${t('close')}" style="display:${innerWidth <= 900 ? 'grid' : 'none'}">${ic('x')}</button></div>
     <button class="side-new" data-act="new">${ic('plus')}${t('newChat')}</button>
     <div class="side-scroll">
       <div class="sec">${t('companies')}<button data-act="add-co" aria-label="${t('addCo')}" title="${t('addCo')}">${ic('plus')}</button></div>
@@ -612,11 +724,12 @@ function renderSide(){
       <div class="sec">${t('history')}</div>
       ${chats.length ? chats.slice(0, 40).map(c => `<button class="item ${c.id === S.chat && UI.view === 'chat' ? 'on' : ''}" data-chat="${c.id}">${ic('chat')}<span>${esc(c.title || t('newChat'))}</span></button>`).join('') : `<div class="empty-note">${t('noChats')}</div>`}
       <div class="sec" style="padding-top:18px"></div>
-      <button class="item ${UI.view === 'conn' ? 'on' : ''}" data-act="conn">${ic('plug')}<span>${t('connections')}</span></button>
+      <button class="item ${UI.view === 'conn' ? 'on' : ''}" data-act="conn">${ic('plug')}<span>${t('connections')}</span>${Object.keys(CN).length ? `<span class="cnt">● ${Object.keys(CN).length}</span>` : ''}</button>
     </div>
     <div class="side-foot">
       <div class="srv"><span class="dot ${UI.srv}"></span><span>${srv}</span>${UI.srv === 'down' ? `<button data-act="ping">${t('retry')}</button>` : ''}</div>
-      <div class="lang" role="group" aria-label="Язык"><button class="${S.lang === 'ru' ? 'on' : ''}" data-lang="ru">рус</button><button class="${S.lang === 'kk' ? 'on' : ''}" data-lang="kk">қаз</button></div>
+      <div class="foot-row"><div class="lang" role="group" aria-label="Язык"><button class="${S.lang === 'ru' ? 'on' : ''}" data-lang="ru">рус</button><button class="${S.lang === 'kk' ? 'on' : ''}" data-lang="kk">қаз</button></div>
+        <button class="theme" data-act="theme" aria-label="${light() ? 'Тёмная тема' : 'Светлая тема'}" title="${light() ? 'Тёмная тема' : 'Светлая тема'}">${ic(light() ? 'moon' : 'sun')}</button></div>
     </div>`;
 }
 
@@ -659,6 +772,7 @@ function msgHTML(m){
     h += `<details class="steps" data-steps="${m.id}" ${open ? 'open' : ''}><summary>${m.running ? '<span class="spin"></span>' + esc(run ? run.text : t('working')) : ic('list') + t('steps')(m.steps.length)}${ic('chev', 'chev')}</summary><ol>${m.steps.map(s => `<li><span class="st-ic">${stepIcon(s.ok)}</span><span>${esc(s.text)}</span></li>`).join('')}</ol></details>`;
   }
   if (m.text) h += `<div class="prose">${md(m.text)}</div>`;
+  if (m.link && /^https:\/\//.test(m.link.href)) h += `<a class="btn" style="align-self:flex-start" href="${esc(m.link.href)}" target="_blank" rel="noopener">${ic('ext')}${esc(m.link.text)}</a>`;
   if (m.running && !m.text) h += `<div class="typing" aria-label="${t('working')}"><i></i><i></i><i></i></div>`;
   if (m.error) h += `<div class="err" role="alert"><b>${t('fail')}.</b> ${esc(m.error)}<div class="row"><button class="btn" data-retry="${m.id}">${ic('refresh')}${t('retry')}</button></div></div>`;
   for (const l of [m.label2, m.label]) if (l && l.text) h += `<span class="label ${l.warn ? 'warn' : ''}"><span class="dot ${l.warn ? '' : 'ok'}"></span>${esc(l.text)}</span>`;
@@ -707,7 +821,7 @@ function renderPanel(){
     body += `<div class="stat"><b>${n} из ${d.results.length}</b><span>ответов, где назвали «${esc(d.company)}»</span></div><div class="bar"><i style="width:${Math.round(n / d.results.length * 100)}%"></i></div>
       <div class="note" style="margin-top:10px">${a.sample ? 'Движок: пример — это не ответ нейросети.' : esc(lab.text) + (lab.warn ? '. Ответ без поиска показывает, что модель «помнит», а не что находит сейчас.' : '.')}${d.at ? ` Замер от ${new Date(d.at).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}.` : ''}</div>
       <div class="p-sec"><h3>Вопросы и ответы нейросети</h3>${d.results.map((r, i) => `<div class="qa" data-qa="${i}"><div class="q"><b>${esc(cap(r.question))}</b><span class="tag ${r.named ? 'ok' : 'no'}">${r.named ? 'назвали' : 'не назвали'}</span></div><div class="a">${esc(r.answer)}</div><button class="more" data-more="${i}">Показать полностью</button>${(r.sources && r.sources.length) || r.cached ? `<div class="meta">${(r.sources || []).map(s => `<span class="tag">${esc(s)}</span>`).join('')}${r.cached ? '<span class="tag" title="Тот же вопрос уже задавали недавно: сервер вернул сохранённый ответ">из кэша сервера</span>' : ''}</div>` : ''}</div>`).join('')}</div>`;
-    foot = `<div class="acts"><button class="btn btn-p" data-copy>${ic('copy')}${t('copy')}</button>${btnSoon('Каждую неделю', 'Повторять замер каждую неделю: расписание появится вместе с аккаунтами')}${btnSoon('В Telegram', 'Отчёт в Telegram: подключение скоро')}</div>`;
+    foot = `<div class="acts"><button class="btn btn-p" data-copy>${ic('copy')}${t('copy')}</button>${btnSoon('Каждую неделю', 'Повторять замер каждую неделю: расписание появится вместе с аккаунтами')}</div>`;
   } else if (a.type === 'audit') {
     const d = a.data;
     const botState = b => b.allowed === true ? ['ok', 'открыт', 'check'] : b.allowed === false ? ['no', 'закрыт', 'no'] : ['unk', 'неизвестно', 'q'];
@@ -726,12 +840,25 @@ function renderPanel(){
     foot = `<div class="acts"><button class="btn btn-p" data-copy>${ic('copy')}${t('copy')}</button>${btnSoon('В план работ', 'План работ появится вместе с аккаунтами')}</div>`;
   } else {
     body += `<label class="sr" for="draft">Черновик</label><textarea class="draft" id="draft">${esc(a.data.text)}</textarea><div class="note">Черновик можно править прямо здесь. Пометки [что вписать] — места для ваших фактов: нейросеть их не выдумывает.</div>`;
-    foot = `<div class="acts"><button class="btn btn-p" data-copy>${ic('copy')}${t('copy')}</button>${a.data.pub ? `<button class="btn" disabled title="${esc(a.data.pub)} — ${t('soon')}">${ic('check')}${t('publish')} <span class="soon">${t('soon')}</span></button>` : ''}</div>${a.data.pub ? `<span class="hint">${esc(a.data.pub)}: подключение появится скоро. Сейчас — скопируйте и вставьте вручную.</span>` : ''}`;
+    foot = draftFoot(a);
+    const pd = a.data.published;
+    if (pd) body += `<div class="pubd">${ic('check', 'st-ok')}<span>${pd.where === 'wp' ? (pd.status === 'publish' ? 'Опубликовано на сайте' : 'Черновик страницы создан в WordPress') : 'Опубликовано в Telegram'} · ${new Date(pd.at).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</span>${pd.link ? `<a href="${esc(pd.link)}" target="_blank" rel="noopener">${pd.where === 'wp' ? 'Открыть в WordPress' : 'Открыть пост'}</a>` : ''}</div>`;
   }
   el.innerHTML = `<div class="p-head"><div class="pt"><h2>${esc(a.title)}${a.sample ? ` <span class="ex">${t('example')}</span>` : ''}</h2><div class="ps">${esc(a.sub || '')}</div></div><button class="ib" data-act="close-art" aria-label="${t('close')}">${ic('x')}</button></div><div class="p-body">${body}</div><div class="p-foot">${foot}</div>`;
   const ta = $('#draft'); if (ta) ta.style.height = Math.max(280, ta.scrollHeight + 4) + 'px';
   // «Показать полностью» — только там, где ответ правда обрезан (меряем после того, как панель раскрылась)
   setTimeout(() => $$('.qa', el).forEach(q => { const x = $('.a', q), b = $('.more', q); if (b && !q.classList.contains('full')) b.hidden = x.scrollHeight <= x.clientHeight + 2 }), 320);
+}
+/* Подвал черновика: настоящая публикация для Telegram и WordPress, честное «скоро» для остального */
+function draftFoot(a){
+  const pub = a.data.pub, live = pub === 'tg' || pub === 'wp';
+  const copyB = `<button class="btn ${live && CN[pub] ? '' : 'btn-p'}" data-copy>${ic('copy')}${t('copy')}</button>`;
+  if (!pub) return `<div class="acts">${copyB}</div>`;
+  if (!live) return `<div class="acts">${copyB}<button class="btn" disabled title="${esc(pub)} — ${t('soon')}">${ic('check')}${t('publish')} <span class="soon">${t('soon')}</span></button></div><span class="hint">${esc(pub)}: подключение появится скоро. Сейчас — скопируйте и вставьте вручную.</span>`;
+  const c = CN[pub], name = SVC[pub];
+  if (!c) return `<div class="acts"><button class="btn btn-p" data-act="cn-${pub}">${ic('plug')}Подключить ${name}</button>${copyB}</div><span class="hint">Чтобы Körin опубликовал этот текст, подключите ${pub === 'tg' ? 'ваш Telegram-канал' : 'сайт на WordPress'} — это пара минут. Публикация всегда только после вашего одобрения.</span>`;
+  const where = pub === 'tg' ? `канал «${esc(c.title || c.chat)}»` : `сайт ${esc(c.site.replace(/^https:\/\//, ''))}`;
+  return `<div class="acts"><button class="btn ${a.data.published ? '' : 'btn-p'}" data-act="pub">${ic(pub === 'tg' ? 'tg' : 'send')}${a.data.published ? 'Опубликовать ещё раз…' : `Опубликовать в ${name}…`}</button>${copyB}</div><span class="hint">Куда: ${where}. Сначала покажу предпросмотр — без вашего подтверждения ничего не уйдёт.</span>`;
 }
 function artText(a){
   const d = a.data;
@@ -750,8 +877,8 @@ function toast(s){ const el = $('#toast'); el.textContent = s; el.classList.add(
 
 /* ---------- подключения ---------- */
 const CONN = [
-  ['tg', 'Telegram', '#2aabee', 'TG', 'Публикует посты в ваш канал и раз в неделю присылает отчёт о замере.'],
-  ['wp', 'WordPress', '#21759b', 'W', 'Создаёт страницу вопросов и ответов и добавляет разметку данных о компании.'],
+  ['tg', 'Telegram', '#2aabee', 'TG', 'Публикует в ваш канал посты, которые Körin написал, а вы одобрили. Работает через вашего бота.'],
+  ['wp', 'WordPress', '#21759b', 'W', 'Создаёт на сайте страницу «Вопросы и ответы» — по умолчанию черновиком, чтобы вы проверили её в WordPress.'],
   ['tilda', 'Tilda', '#ff855d', 'T', 'Создаёт страницу вопросов и ответов на вашем сайте после вашего одобрения.'],
   ['ig', 'Instagram', 'linear-gradient(135deg,#f9ce34,#ee2a7b 55%,#6228d7)', 'IG', 'Обновляет описание профиля и публикует посты, которые вы одобрили.'],
   ['threads', 'Threads', '#101010', '@', 'Публикует посты и помогает отвечать на комментарии.'],
@@ -763,16 +890,154 @@ const CONN = [
   ['wa', 'WhatsApp', '#25d366', 'WA', 'Отправляет клиентам просьбу оставить отзыв — только по вашему одобрению.'],
   ['kaspi', 'Kaspi', '#f14635', 'K', 'Следит за рейтингом продавца и отзывами о товарах.']
 ];
+const LIVE = ['tg', 'wp'];
+const logo = (id, cls = 'lg') => { const x = CONN.find(c => c[0] === id); return `<span class="${cls}" style="background:${x[2]};${x[3].length > 2 ? 'font-size:10.5px' : ''}">${esc(x[3])}</span>` };
+function connWho(id){
+  const c = CN[id]; if (!c) return '';
+  return id === 'tg' ? `${ic('tg')}<span>Канал <b>${esc(c.title || c.chat)}</b> · ${esc(c.chat)}</span>` : `${ic('globe')}<span><b>${esc(c.site.replace(/^https:\/\//, ''))}</b> · ${esc(c.name || c.user)}</span>`;
+}
 function connectors(){
+  const card = ([id, name, , , what]) => {
+    if (!LIVE.includes(id)) return `<div class="cn-card soon-card" data-cn="${id}"><div class="cn-top">${logo(id)}<b>${esc(name)}</b><span class="soon">${t('soon')}</span></div><p>${esc(what)}</p></div>`;
+    const on = !!CN[id];
+    return `<div class="cn-card ${on ? 'is-on' : ''}" data-cn="${id}"><div class="cn-top">${logo(id)}<b>${esc(name)}</b>${on ? `<span class="tag ok">● ${t('connected')}</span>` : ''}</div><p>${esc(what)}</p>
+      ${on ? `<div class="cn-who">${connWho(id)}</div><div class="cn-acts"><button class="btn" data-act="recheck-${id}">${ic('refresh')}${t('recheck')}</button><button class="btn btn-q" data-act="off-${id}">${ic('trash')}${t('disconnect')}</button></div>`
+           : `<div class="cn-acts"><button class="btn btn-p" data-act="cn-${id}">${ic('plug')}${t('connect')}</button></div>`}</div>`;
+  };
   return `<div class="cn"><h1>${t('cnTitle')}</h1><p class="lead">${t('cnLead')}</p>
-    <div class="honest">${ic('info')}<span>${t('cnHonest')}</span></div>
-    <div class="cn-grid">${CONN.map(([id, name, bg, mark, what]) => `<div class="cn-card"><div class="cn-top"><span class="lg" style="background:${bg};${mark.length > 2 ? 'font-size:10.5px' : ''}">${esc(mark)}</span><b>${esc(name)}</b><span class="soon">${t('soon')}</span></div><p>${esc(what)}</p></div>`).join('')}</div></div>`;
+    <div class="cn-h">${t('cnWorks')}</div><div class="cn-grid live">${CONN.filter(c => LIVE.includes(c[0])).map(card).join('')}</div>
+    <div class="honest">${ic('lock')}<span>${t('cnHonest')}</span></div>
+    <div class="cn-h">${t('cnSoon')}</div><div class="cn-grid">${CONN.filter(c => !LIVE.includes(c[0])).map(card).join('')}</div></div>`;
+}
+
+/* ---------- подключить: пошаговая инструкция, проверка на сервере, ключ — в этот браузер ---------- */
+const HOW = {
+  tg: { title: 'Подключить Telegram-канал', sub: 'Körin будет публиковать в канал от имени вашего бота — только то, что вы одобрили.', steps: [
+      'Откройте в Telegram <b>@BotFather</b>, отправьте <code>/newbot</code>, придумайте имя и адрес бота. В ответ придёт <b>токен</b> вида <code>123456789:AAH…</code>',
+      'Откройте ваш канал → <b>Управление каналом → Администраторы → Добавить администратора</b>, найдите бота и оставьте включённым право <b>«Публикация сообщений»</b>.',
+      'Вставьте токен и публичное имя канала ниже. Körin проверит, что бот видит канал и может в нём писать.'],
+    fields: [['token', 'Токен бота', 'password', '123456789:AAH…', 'Из сообщения @BotFather'], ['chat', 'Канал', 'text', '@имя_канала', 'Публичное имя из ссылки t.me/имя_канала']] },
+  wp: { title: 'Подключить сайт на WordPress', sub: 'Körin создаст страницу черновиком — вы проверите её в WordPress и опубликуете сами.', steps: [
+      'Войдите в админку WordPress → <b>Пользователи → Профиль</b>.',
+      'Внизу, в разделе <b>«Пароли приложений»</b>, впишите имя <code>Körin</code> и нажмите <b>«Добавить новый пароль приложения»</b>. Скопируйте пароль вида <code>abcd efgh ijkl mnop qrst uvwx</code> — WordPress покажет его один раз.',
+      'Укажите адрес сайта (с https://), ваш логин и этот пароль. Нужна роль «Редактор» или «Администратор». Это не пароль от админки: его можно отозвать в профиле в любой момент.'],
+    fields: [['site', 'Адрес сайта', 'url', 'https://example.kz', ''], ['user', 'Логин WordPress', 'text', 'admin', ''], ['app_password', 'Пароль приложения', 'password', 'abcd efgh ijkl mnop qrst uvwx', 'Не пароль от админки, а пароль приложения']] }
+};
+let onConnected = null;
+function connectDlg(id, then){
+  const h = HOW[id], d = $('#dlg'), was = CN[id] || {};
+  onConnected = then || null;
+  d.className = 'wide';
+  d.innerHTML = `<form class="dlg" id="cnForm" data-id="${id}" novalidate><h2>${h.title}</h2><p class="sub">${h.sub}</p>
+    <ol class="how">${h.steps.map(x => `<li><span>${x}</span></li>`).join('')}</ol>
+    ${h.fields.map(([k, l, type, ph, hint]) => `<label class="fld"><span>${l}</span><input name="${k}" type="${type}" placeholder="${esc(ph)}" value="${esc(was[k] || '')}" maxlength="${k === 'site' ? 200 : 120}" autocomplete="off" autocapitalize="off" spellcheck="false" required>${hint ? `<small>${hint}</small>` : ''}</label>`).join('')}
+    <div class="lock">${ic('lock')}<span>${t('lockNote').replace('{svc}', SVC[id])}</span></div>
+    <p class="d-err" id="cnErr" role="alert"></p>
+    <div class="row"><button class="btn" type="button" data-act="dlg-close">${t('cancel')}</button><button class="btn btn-p" id="cnGo" type="submit">${t('checkConnect')}</button></div></form>`;
+  if (!d.open) d.showModal();
+  $('#cnForm').addEventListener('submit', e => { e.preventDefault(); doConnect(id) });
+  $('#cnForm').addEventListener('input', () => { $('#cnErr').textContent = '' });
+  const first = $$('#cnForm input').find(x => !x.value); if (first && innerWidth > 900) first.focus();
+}
+async function testConn(id, v){
+  if (id === 'tg') { const d = await call('/api/connect/telegram/test', { token: v.token, chat: v.chat }, 60000); return { token: v.token, chat: d.chat, title: d.title, bot: d.bot, at: Date.now() } }
+  const d = await call('/api/connect/wordpress/test', { site: v.site, user: v.user, app_password: v.app_password }, 60000);
+  return { site: d.site, user: v.user, app_password: v.app_password, name: d.name, can_publish: d.can_publish, at: Date.now() };
+}
+async function doConnect(id){
+  const f = $('#cnForm'), go = $('#cnGo'), err = $('#cnErr'), v = Object.fromEntries(new FormData(f).entries());
+  for (const k in v) v[k] = String(v[k]).trim();
+  const empty = HOW[id].fields.find(([k]) => !v[k]);
+  if (empty) { err.textContent = `Заполните поле «${empty[1]}».`; return }
+  go.disabled = true; go.innerHTML = `<span class="spin"></span>${t('checking')}`; err.textContent = '';
+  try {
+    CN[id] = await testConn(id, v); saveConn();
+    TRK.track('подключил: ' + SVC[id]);
+    const then = onConnected; onConnected = null;
+    $('#dlg').close(); renderAll();
+    toast(id === 'tg' ? `Telegram подключён: ${CN.tg.title || CN.tg.chat}` : `WordPress подключён: ${CN.wp.site.replace(/^https:\/\//, '')}`);
+    if (then) then();
+  } catch (e) {
+    if (!$('#cnErr')) return;
+    err.textContent = e.message || String(e); go.disabled = false; go.textContent = t('checkConnect');
+  }
+}
+async function recheck(id){
+  const btn = $(`[data-act="recheck-${id}"]`); if (btn) { btn.disabled = true; btn.innerHTML = `<span class="spin"></span>${t('checking')}` }
+  try { CN[id] = await testConn(id, CN[id]); saveConn(); toast(`${SVC[id]}: всё работает`) }
+  catch (e) { toast(`${SVC[id]}: ${e.message}`) }
+  renderAll();
+}
+function disconnect(id){
+  delete CN[id]; saveConn(); renderAll();
+  toast(`${SVC[id]} отключён: ключ удалён из этого браузера`);
+}
+
+/* ---------- публикация: предпросмотр → «Одобрить и опубликовать» → один запрос ---------- */
+const TODO_RE = /\[(что вписать|не знаю)[^\]]*\]/i;
+function wpHTML(text){
+  return String(text).trim().split(/\n\s*\n/).map(b => { const ls = b.split('\n').map(x => x.trim()).filter(Boolean); if (!ls.length) return ''; let h = ''; if (ls.length > 1 && ls[0].length <= 140 && ls[0].endsWith('?')) { h = `<h3>${esc(ls[0])}</h3>`; ls.shift() } return h + `<p>${ls.map(esc).join('<br>')}</p>` }).join('');
+}
+// заголовок уже есть у страницы: первая строка черновика с тем же текстом не повторяется в теле
+const wpBody = (text, title) => { const ls = text.split('\n'); return ls[0].trim().toLowerCase() === title.trim().toLowerCase() ? ls.slice(1).join('\n').trim() : text };
+function publishDlg(){
+  const a = UI.art; if (!a || a.type !== 'draft') return;
+  const id = a.data.pub, c = CN[id]; if (!c) return connectDlg(id, publishDlg);
+  const ta = $('#draft'), text = (ta ? ta.value : a.data.text).trim();
+  a.data.text = text; save();
+  const todo = TODO_RE.test(text), long = id === 'tg' && text.length > 4096, d = $('#dlg');
+  const block = todo ? 'В тексте остались пометки [что вписать]. Замените их своими фактами в черновике — с ними публиковать нельзя.' : long ? `Текст длиннее 4096 знаков (${text.length}) — Telegram не примет его одним постом. Сократите черновик.` : !text ? 'Текст пустой.' : '';
+  const where = id === 'tg' ? `${logo('tg')}<span>Канал <b>${esc(c.title || c.chat)}</b> · ${esc(c.chat)}</span>` : `${logo('wp')}<span>Сайт <b>${esc(c.site.replace(/^https:\/\//, ''))}</b> · новая страница</span>`;
+  d.className = 'wide';
+  d.innerHTML = `<form class="dlg" id="pubForm"><h2>Проверьте перед публикацией</h2><p class="sub">Так текст увидят ${id === 'tg' ? 'подписчики канала' : 'посетители сайта'}. Körin отправит его один раз — только после вашего нажатия.</p>
+    <div class="where">${where}</div>
+    ${id === 'wp' ? `<label class="fld"><span>Заголовок страницы</span><input name="title" maxlength="200" value="${esc(a.title.replace(/^Страница\s+/, '').replace(/[«»]/g, ''))}" required></label>` : ''}
+    <div class="pv ${id === 'tg' ? 'tgp' : ''}" id="pv">${id === 'tg' ? esc(text) : ''}</div>
+    <div class="pv-meta"><span>${id === 'tg' ? `${text.length} из 4096 знаков` : `${text.length} знаков`}</span><span>${id === 'tg' ? 'без разметки, как обычный пост' : 'абзацы и вопросы-заголовки сохранятся'}</span></div>
+    ${id === 'wp' ? `<div style="margin-top:14px"><label class="opt"><input type="radio" name="status" value="draft" checked><span><b>Черновиком в WordPress</b><small>Страница не видна посетителям, пока вы не нажмёте «Опубликовать» в админке. Рекомендуем.</small></span></label><label class="opt"><input type="radio" name="status" value="publish"><span><b>Опубликовать сразу</b><small>Страница сразу появится на сайте.</small></span></label></div>` : ''}
+    ${block ? `<div class="warnbox">${block}</div>` : ''}
+    <p class="d-err" id="pubErr" role="alert"></p>
+    <div class="row"><button class="btn" type="button" data-act="dlg-close">${t('cancel')}</button><button class="btn btn-p" id="pubGo" type="submit" ${block ? 'disabled' : ''}>${ic('check')}${t('approve')}</button></div></form>`;
+  if (!d.open) d.showModal();
+  $('#pubForm').addEventListener('submit', e => { e.preventDefault(); if (!block) doPublish(a, id, text) });
+  if (id === 'wp') { const ti = $('#pubForm [name=title]'), pv = () => { const tt = ti.value.trim(); $('#pv').innerHTML = `<h2 style="font-size:19px;margin:0 0 10px">${esc(tt || '—')}</h2>` + wpHTML(wpBody(text, tt)) }; ti.addEventListener('input', pv); pv() }
+}
+async function doPublish(a, id, text){
+  const go = $('#pubGo'), err = $('#pubErr'), c = CN[id];
+  const fd = new FormData($('#pubForm')), title = String(fd.get('title') || '').trim(), status = String(fd.get('status') || 'draft');
+  if (id === 'wp' && !title) { err.textContent = 'Нужен заголовок страницы.'; return }
+  go.disabled = true; go.innerHTML = `<span class="spin"></span>${t('publishing')}`; err.textContent = '';
+  try {
+    let res, done;
+    if (id === 'tg') { res = await call('/api/publish/telegram', { token: c.token, chat: c.chat, text }, 60000); done = { where: 'tg', at: Date.now(), link: res.link || '', title: c.title || c.chat } }
+    else {
+      const content = wpBody(text, title);
+      res = await call('/api/publish/wordpress', { site: c.site, user: c.user, app_password: c.app_password, title, content, status }, 60000); done = { where: 'wp', at: Date.now(), link: res.edit_link || res.link || '', view: res.link || '', status: res.status || status, title } }
+    a.data.published = done;
+    logPublished(a, done);
+    TRK.track('опубликовал: ' + SVC[id]);
+    save();
+    $('#dlg').innerHTML = `<div class="dlg"><div class="d-ok"><span class="big">${ic('check')}</span><h2>${id === 'tg' ? 'Пост опубликован' : done.status === 'publish' ? 'Страница опубликована' : 'Черновик страницы создан'}</h2>
+      <p class="sub" style="margin:0">${id === 'tg' ? `В канале «${esc(done.title)}».` : done.status === 'publish' ? `На сайте ${esc(c.site.replace(/^https:\/\//, ''))}.` : 'Откройте его в WordPress, проверьте и нажмите «Опубликовать».'}</p></div>
+      <div class="row" style="justify-content:center;margin-top:16px">${done.link ? `<a class="btn btn-p" href="${esc(done.link)}" target="_blank" rel="noopener">${ic('ext')}${id === 'tg' ? 'Открыть пост' : 'Открыть в WordPress'}</a>` : ''}<button class="btn" type="button" data-act="dlg-close">${t('close')}</button></div></div>`;
+    renderAll();
+  } catch (e) {
+    if (!$('#pubErr')) return;
+    err.textContent = e.message || String(e); go.disabled = false; go.innerHTML = `${ic('check')}${t('approve')}`;
+  }
+}
+/* в чате остаётся след: что, куда и когда опубликовано */
+function logPublished(a, done){
+  const c = S.chats.find(ch => ch.msgs.some(m => m.art === a || (m.art && m.art.id === a.id))); if (!c) return;
+  const steps = [{ text: 'Вы просмотрели текст и нажали «Одобрить и опубликовать»', ok: true }, { text: done.where === 'tg' ? `Отправил пост в Telegram-канал «${done.title}»` : `Создал страницу «${done.title}» в WordPress (${done.status === 'publish' ? 'опубликована' : 'черновик'})`, ok: true }];
+  addMsg(c, { r: 'a', steps, text: done.where === 'tg' ? `Опубликовал пост в канале **${done.title}**.` : done.status === 'publish' ? `Опубликовал страницу **${done.title}** на сайте.` : `Создал в WordPress черновик страницы **${done.title}**. Проверьте его и опубликуйте в админке.`, link: done.link ? { href: done.link, text: done.where === 'tg' ? 'Открыть пост' : 'Открыть в WordPress' } : null, label: { text: done.where === 'tg' ? 'Telegram Bot API · sendMessage' : 'WordPress REST API · /wp/v2/pages', warn: false } });
 }
 
 /* ---------- данные компании ---------- */
 function editCo(){
   const f = co(); if (!f) return;
   const d = $('#dlg');
+  d.className = '';
   d.innerHTML = `<form class="dlg" method="dialog" id="coForm"><h2>${t('coTitle')}</h2>
     ${[['name', t('fName')], ['niche', t('fNiche')], ['city', t('fCity')], ['site', t('fSite')]].map(([k, l]) => `<label class="fld"><span>${l}</span><input name="${k}" value="${esc(f[k] || '')}" maxlength="${k === 'site' ? 200 : 60}"></label>`).join('')}
     <div class="row"><button class="btn" value="cancel" type="button" data-act="dlg-close">${t('cancel')}</button><button class="btn btn-p" value="ok">${t('save')}</button></div></form>`;
@@ -800,6 +1065,9 @@ document.addEventListener('click', e => {
   if (act === 'close-art') return closeArt();
   if (act === 'edit-co') return editCo();
   if (act === 'dlg-close') return $('#dlg').close();
+  if (act === 'theme') return toggleTheme();
+  if (act === 'pub') return publishDlg();
+  if (act && /^(cn|recheck|off)-(tg|wp)$/.test(act)) { const [k, id] = act.split('-'); return k === 'cn' ? connectDlg(id, el.closest('.panel') ? publishDlg : null) : k === 'recheck' ? recheck(id) : disconnect(id) }
   if (el.dataset.lang) { S.lang = el.dataset.lang; document.documentElement.lang = S.lang === 'kk' ? 'kk' : 'ru'; save(); return renderAll() }
   if (el.dataset.co) { S.co = el.dataset.co; const last = S.chats.find(c => c.companyId === S.co && c.msgs.length); S.chat = last ? last.id : null; UI.view = 'chat'; closeArt(); $('#app').classList.remove('menu'); save(); return renderAll() }
   if (el.dataset.chat) { S.chat = el.dataset.chat; UI.view = 'chat'; closeArt(); $('#app').classList.remove('menu'); save(); return renderAll() }
@@ -818,6 +1086,36 @@ $('#scrim').addEventListener('click', () => $('#app').classList.remove('menu'));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#app').classList.contains('menu')) $('#app').classList.remove('menu'); else if (UI.art) closeArt() } });
 let wasMobile = innerWidth <= 900;
 addEventListener('resize', () => { const mob = innerWidth <= 900; if (mob !== wasMobile) { wasMobile = mob; renderSide() } });
+
+/* ссылка с сайта: ?company=Название — сразу заводим компанию; ?src= — метка, откуда пришёл человек */
+(() => {
+  const name = (new URLSearchParams(location.search).get('company') || '').trim().slice(0, 40);
+  if (!name) return;
+  let c = S.companies.find(x => x.name.toLowerCase() === name.toLowerCase());
+  if (!c) { c = { id: uid(), name, niche: '', city: '', site: '' }; S.companies.unshift(c) }
+  if (S.co !== c.id) { S.co = c.id; S.chat = null }
+  save();
+})();
+const SHEET = 'https://script.google.com/macros/s/AKfycbymjjOb_07W6QFm-vZu7EpVT9kvzA8WbfzVFvVA4UfU5bKlHRZ3G1pCIDZ2kY0nP1CG/exec';
+/* те же номер посетителя и метка источника (ключ korin-src), что на странице Körin; в автотестах ничего не шлём */
+const TRK = (() => {
+  let vid = null; try { vid = localStorage.getItem('vid'); if (!vid) { vid = Math.random().toString(36).slice(2, 7).toUpperCase(); localStorage.setItem('vid', vid) } } catch (e) { vid = 'без номера' }
+  const P = new URLSearchParams(location.search);
+  let src = (P.get('utm_source') || P.get('src') || (document.referrer && !document.referrer.includes(location.hostname) ? new URL(document.referrer).hostname : '')).slice(0, 40);
+  try { if (src) sessionStorage.setItem('korin-src', src); else src = sessionStorage.getItem('korin-src') || '' } catch (e) {}
+  src = src || 'прямой заход';
+  const dev = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'телефон' : 'компьютер', t0 = Date.now();
+  let left = false;
+  const track = (what, extra, beacon) => {
+    if (navigator.webdriver) return;
+    const body = JSON.stringify({ name: 'Körin кабинет: ' + what, business: extra || 'откуда: ' + src, whatsapp: 'посетитель ' + vid + ' · ' + dev, lang: 'korin' });
+    try { if (beacon && navigator.sendBeacon) navigator.sendBeacon(SHEET, body); else fetch(SHEET, { method: 'POST', mode: 'no-cors', body, keepalive: true }).catch(() => {}) } catch (e) {}
+  };
+  let seen = false; try { seen = sessionStorage.getItem('seen-Körin кабинет'); sessionStorage.setItem('seen-Körin кабинет', 1) } catch (e) {}
+  if (!seen) track('зашёл');
+  addEventListener('pagehide', () => { if (!left) { left = true; track('ушёл: был ' + Math.round((Date.now() - t0) / 1000) + ' сек', '', true) } });
+  return { track, vid, src };
+})();
 
 document.documentElement.lang = S.lang === 'kk' ? 'kk' : 'ru';
 renderAll();

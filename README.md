@@ -66,7 +66,8 @@ python3 -m unittest discover -s tests
 
 ## Körin: приложение и сервер
 
-- `korin/` — сайт продукта, `korin/app/` — кабинет. Без сервера кабинет работает в демо-режиме на условных цифрах.
+- `korin/` — сайт продукта, `korin/ai/` — кабинет (чат). Старый адрес `korin/app/` переадресует в `korin/ai/` с теми же `?company=` и `?src=`.
+- Подключения клиента: Telegram-канал (бот из @BotFather — администратор канала) и сайт на WordPress (пароль приложения). Ключи хранятся только в браузере клиента; сервер передаёт их дальше на время одного запроса (`/api/connect/telegram/test`, `/api/publish/telegram`, `/api/connect/wordpress/test`, `/api/publish/wordpress`) и не сохраняет. Публикация — только после предпросмотра и «Одобрить и опубликовать».
 - `server/app.py` — сервер без сторонних пакетов. Три адреса: `/api/site-audit` (настоящая проверка сайта: robots.txt для ботов нейросетей и главная страница), `/api/check` (опрос нейросети по вопросам) и `/api/agent` (ИИ-агенты). Два последних требуют `OPENAI_API_KEY` с положительным балансом.
 
 Запуск:
@@ -75,4 +76,4 @@ python3 -m unittest discover -s tests
 PORT=8000 KORIN_ORIGINS=https://kenesai.asia python3 -m server.app
 ```
 
-Чтобы кабинет ходил на сервер, впишите его адрес в `const API` в начале скрипта `korin/app/index.html`.
+Чтобы кабинет ходил на сервер, впишите его адрес в `const API` в начале скрипта `korin/ai/index.html`.
