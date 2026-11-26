@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Körin — помощник маркетолога</title>
+<meta name="description" content="Körin: чат, который проверяет, называют ли нейросети ваш бизнес, читает сайт и пишет тексты для маркетинга.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;--side:#f7f7f8;--card:#ffffff;--sub:#f4f4f6;--hover:#efeff2;--line:#ececef;--line2:#dfdfe4;
+  --ink:#14161b;--text:#2b2f36;--muted:#6b7079;--dim:#9a9ea6;
+  --acc:#2f5bff;--acc-h:#2249e6;--acc-bg:#eef2ff;--acc-line:#d6defe;
+  --ok:#15803d;--ok-bg:#ecfdf3;--bad:#c2410c;--bad-bg:#fff4ed;--warn:#a16207;--warn-bg:#fefce8;
+  --sh:0 1px 2px rgba(16,24,40,.04),0 6px 24px rgba(16,24,40,.06);
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --side-w:264px;--panel-w:min(500px,40vw);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.55 var(--sans);-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01";overflow:hidden}
+h1,h2,h3,h4,p{margin:0}
+h1,h2,h3,h4{color:var(--ink)}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+button:disabled{cursor:not-allowed}
+a{color:var(--acc)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:8px}
+svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- layout ---------- */
+.app{display:grid;grid-template-columns:var(--side-w) minmax(0,1fr) 0;height:100dvh;transition:grid-template-columns .25s ease}
+.app.panel-open{grid-template-columns:var(--side-w) minmax(0,1fr) var(--panel-w)}
+.side{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
+.panel{border-left:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
+
+/* ---------- sidebar ---------- */
+.brand{display:flex;align-items:center;gap:9px;padding:16px 16px 10px;font-weight:650;font-size:17px;letter-spacing:-.02em;color:var(--ink)}
+.mark{width:24px;height:24px;border-radius:7px;background:var(--acc);display:grid;place-items:center;flex:none}
+.mark i{width:8px;height:8px;border-radius:50%;background:#fff;display:block;box-shadow:5px -5px 0 -1px rgba(255,255,255,.55)}
+.brand small{font-weight:500;font-size:11px;color:var(--acc);background:var(--acc-bg);border-radius:6px;padding:1px 6px;letter-spacing:0;margin-left:2px}
+.side-new{margin:6px 12px 8px;display:flex;align-items:center;gap:9px;height:38px;padding:0 12px;border-radius:10px;background:var(--card);border:1px solid var(--line2);font-weight:550;font-size:14px;color:var(--ink)}
+.side-new:hover{border-color:var(--dim)}
+.side-scroll{flex:1;overflow:auto;padding:4px 8px 8px}
+.sec{display:flex;align-items:center;justify-content:space-between;padding:14px 8px 4px;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--dim)}
+.sec button{color:var(--muted);width:22px;height:22px;border-radius:6px;display:grid;place-items:center}
+.sec button:hover{background:var(--hover);color:var(--ink)}
+.item{width:100%;display:flex;align-items:center;gap:9px;text-align:left;padding:7px 9px;border-radius:8px;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.item:hover{background:var(--hover)}
+.item.on{background:#e9e9ee;color:var(--ink);font-weight:550}
+.co-dot{width:22px;height:22px;border-radius:6px;background:var(--acc-bg);color:var(--acc);display:grid;place-items:center;font-size:11.5px;font-weight:650;flex:none}
+.empty-note{font-size:13px;color:var(--dim);padding:4px 9px 6px}
+.side-foot{border-top:1px solid var(--line);padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.lang{display:inline-flex;background:var(--hover);border-radius:8px;padding:2px;align-self:flex-start}
+.lang button{font-size:12.5px;font-weight:550;padding:3px 10px;border-radius:6px;color:var(--muted)}
+.lang button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.srv{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+.srv button{color:var(--acc);font-size:12.5px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex:none}
+.dot.ok{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+.dot.down{background:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.15)}
+.dot.wait{background:var(--acc);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+
+/* ---------- top bar (mobile) / header ---------- */
+.top{display:none;align-items:center;gap:6px;height:52px;padding:0 8px;border-bottom:1px solid var(--line);flex:none}
+.top .ttl{flex:1;text-align:center;font-weight:600;font-size:15px;color:var(--ink);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ib{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--text);flex:none}
+.ib:hover{background:var(--hover)}
+.head{display:flex;align-items:center;gap:10px;height:52px;padding:0 20px;flex:none}
+.head .ttl{font-weight:550;font-size:14.5px;color:var(--ink);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* ---------- start screen ---------- */
+.view{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column}
+.start{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px 40px}
+.start-in{width:100%;max-width:680px}
+.hello{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:26px;text-align:center}
+.hello .mark{width:30px;height:30px;border-radius:9px}
+.hello .mark i{width:10px;height:10px}
+.hello h1{font-size:30px;font-weight:600;letter-spacing:-.035em;line-height:1.15}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.chip{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);font-size:13.5px;color:var(--text);font-weight:500;white-space:nowrap}
+.chip:hover{border-color:var(--acc-line);background:var(--acc-bg);color:var(--acc)}
+.chip svg.i{width:16px;height:16px;color:var(--muted)}
+.chip:hover svg.i{color:var(--acc)}
+.foot-note{margin-top:22px;text-align:center;font-size:12.5px;color:var(--dim);line-height:1.6}
+.foot-note button{color:var(--muted);text-decoration:underline;text-decoration-color:var(--line2);text-underline-offset:3px;font-size:12.5px}
+.foot-note button:hover{color:var(--acc)}
+
+/* ---------- composer ---------- */
+.composer{background:var(--card);border:1px solid var(--line2);border-radius:20px;box-shadow:var(--sh);padding:12px 12px 10px 16px;transition:border-color .15s,box-shadow .15s}
+.composer:focus-within{border-color:#c9cff0;box-shadow:0 0 0 4px rgba(47,91,255,.07),var(--sh)}
+.composer textarea{width:100%;border:0;outline:0;resize:none;background:transparent;font-size:15.5px;line-height:1.5;min-height:26px;max-height:200px;padding:2px 0;color:var(--ink)}
+.composer textarea::placeholder{color:var(--dim)}
+.c-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.c-ctx{flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
+.ctx{display:inline-flex;align-items:center;gap:6px;max-width:100%;height:28px;padding:0 10px;border-radius:8px;background:var(--sub);font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctx:hover{background:var(--hover);color:var(--ink)}
+.ctx svg.i{width:14px;height:14px}
+.send{width:34px;height:34px;border-radius:10px;background:var(--acc);color:#fff;display:grid;place-items:center;flex:none;transition:background .15s,opacity .15s}
+.send:hover{background:var(--acc-h)}
+.send:disabled{background:#c8cdd8;opacity:.9}
+.send svg.i{width:17px;height:17px;stroke-width:2.1}
+.dock{flex:none;padding:8px 20px 14px;background:linear-gradient(to bottom,rgba(255,255,255,0),var(--bg) 18px)}
+.dock-in{max-width:740px;margin:0 auto}
+.disclaimer{text-align:center;font-size:11.5px;color:var(--dim);margin-top:7px}
+
+/* ---------- conversation ---------- */
+.conv{max-width:740px;width:100%;margin:0 auto;padding:18px 20px 10px;display:flex;flex-direction:column;gap:22px}
+.msg-u{align-self:flex-end;max-width:82%;background:var(--sub);border-radius:18px 18px 6px 18px;padding:10px 15px;color:var(--ink);white-space:pre-wrap;word-wrap:break-word}
+.msg-a{display:flex;gap:12px;align-items:flex-start}
+.msg-a>.mark{margin-top:2px;width:26px;height:26px;border-radius:8px}
+.msg-a .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.prose{color:var(--text);word-wrap:break-word}
+.prose p+p{margin-top:8px}
+.prose b,.prose strong{color:var(--ink);font-weight:600}
+.steps{border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
+.steps summary{list-style:none;display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13.5px;color:var(--muted);cursor:pointer;user-select:none}
+.steps summary::-webkit-details-marker{display:none}
+.steps summary .chev{margin-left:auto;transition:transform .2s}
+.steps[open] summary .chev{transform:rotate(180deg)}
+.steps ol{list-style:none;margin:0;padding:2px 12px 10px;display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--line)}
+.steps li{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;color:var(--text);padding-top:7px;line-height:1.45}
+.st-ic{width:18px;height:18px;flex:none;display:grid;place-items:center;margin-top:1px}
+.st-ic svg.i{width:15px;height:15px;stroke-width:2.2}
+.st-ok{color:var(--ok)}.st-no{color:var(--bad)}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--acc-line);border-top-color:var(--acc);animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.label{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:12px;color:var(--muted);background:var(--sub);border-radius:7px;padding:3px 9px}
+.label .dot{width:6px;height:6px}
+.label.warn{background:var(--warn-bg);color:var(--warn)}
+.art-card{display:flex;align-items:center;gap:12px;text-align:left;width:100%;max-width:440px;border:1px solid var(--line2);border-radius:14px;background:var(--card);padding:12px 14px;transition:border-color .15s,box-shadow .15s}
+.art-card:hover{border-color:var(--acc-line);box-shadow:var(--sh)}
+.art-card .ai{width:38px;height:38px;border-radius:10px;background:var(--acc-bg);color:var(--acc);display:grid;place-items:center;flex:none}
+.art-card .at{font-weight:600;color:var(--ink);font-size:14px;line-height:1.3}
+.art-card .as{font-size:12.5px;color:var(--muted);margin-top:2px}
+.art-card .go{margin-left:auto;color:var(--dim)}
+.next{display:flex;flex-wrap:wrap;gap:7px}
+.next .chip{height:32px;font-size:13px;padding:0 12px}
+.err{border:1px solid #fed7aa;background:var(--bad-bg);border-radius:12px;padding:11px 14px;font-size:14px;color:#7c2d12}
+.err .row{display:flex;gap:8px;margin-top:9px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font-weight:550;font-size:13.5px;white-space:nowrap}
+.btn:hover:not(:disabled){background:var(--sub)}
+.btn-p{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn-p:hover:not(:disabled){background:var(--acc-h)}
+.btn:disabled{color:var(--dim);background:var(--sub);border-color:var(--line)}
+.btn svg.i{width:16px;height:16px}
+.soon{font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--acc);background:var(--acc-bg);border-radius:5px;padding:1px 6px}
+.ex{display:inline-flex;font-size:10.5px;font-weight:650;letter-spacing:.04em;text-transform:uppercase;color:var(--warn);background:var(--warn-bg);border:1px solid #fde68a;border-radius:5px;padding:0 6px}
+.typing{display:inline-flex;gap:4px;padding:8px 0}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--dim);animation:pulse 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+
+/* ---------- artifact panel ---------- */
+.p-head{display:flex;align-items:center;gap:10px;height:56px;padding:0 10px 0 20px;border-bottom:1px solid var(--line);flex:none}
+.p-head .pt{flex:1;min-width:0}
+.p-head h2{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-head .ps{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-body{flex:1;overflow:auto;padding:20px}
+.p-foot{flex:none;border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg)}
+.p-foot .acts{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0}
+.p-foot .acts::-webkit-scrollbar{display:none}
+.p-foot .acts .btn{flex:none}
+.p-foot .hint{flex-basis:100%;font-size:12px;color:var(--dim)}
+.stat{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-bottom:4px}
+.stat b{white-space:nowrap;font-size:40px;font-weight:650;letter-spacing:-.04em;color:var(--ink);line-height:1}
+.stat span{color:var(--muted);font-size:14px}
+.bar{height:6px;background:var(--sub);border-radius:99px;overflow:hidden;margin:12px 0 6px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:99px}
+.p-sec{margin-top:22px}
+.p-sec>h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:10px}
+.qa{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card)}
+.qa+.qa{margin-top:10px}
+.qa .q{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.qa .q b{font-weight:600;color:var(--ink);font-size:14px;line-height:1.4}
+.qa .a{margin-top:8px;font-size:13.5px;color:var(--text);line-height:1.55;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.qa.full .a{display:block}
+.qa .more{margin-top:6px;font-size:12.5px;color:var(--acc)}
+.qa .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:550;border-radius:6px;padding:2px 8px;white-space:nowrap;background:var(--sub);color:var(--muted)}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}.tag.no{background:var(--bad-bg);color:var(--bad)}.tag.unk{background:var(--warn-bg);color:var(--warn)}
+.chk{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+.chk:last-child{border-bottom:0}
+.chk .ci{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none;margin-top:1px}
+.chk .ci.ok{background:var(--ok-bg);color:var(--ok)}.chk .ci.no{background:var(--bad-bg);color:var(--bad)}.chk .ci.unk{background:var(--warn-bg);color:var(--warn)}
+.chk .ci svg.i{width:13px;height:13px;stroke-width:2.6}
+.chk .cl{font-size:14px;color:var(--ink);font-weight:500;line-height:1.4}
+.chk .cd{font-size:12.5px;color:var(--muted);margin-top:1px}
+.draft{width:100%;min-height:280px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14.5px;line-height:1.6;resize:vertical;outline:0;background:var(--card);color:var(--ink)}
+.draft:focus{border-color:#c9cff0;box-shadow:0 0 0 4px rgba(47,91,255,.07)}
+.note{font-size:12.5px;color:var(--muted);background:var(--sub);border-radius:10px;padding:10px 12px;margin-top:12px;line-height:1.5}
+.verdict{font-size:17px;font-weight:600;color:var(--ink);letter-spacing:-.01em;line-height:1.4}
+.gap{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.gap+.gap{margin-top:10px}
+.gap b{color:var(--ink);font-weight:600;font-size:14px}
+.gap p{font-size:13.5px;color:var(--text);margin-top:4px}
+.gap q{display:block;font-size:13px;color:var(--muted);border-left:2px solid var(--line2);padding-left:10px;margin-top:8px;quotes:none}
+.ex-banner{display:flex;gap:10px;align-items:flex-start;background:var(--warn-bg);border:1px solid #fde68a;border-radius:12px;padding:10px 12px;font-size:13px;color:#713f12;margin-bottom:16px}
+
+/* ---------- connectors ---------- */
+.cn{max-width:960px;width:100%;margin:0 auto;padding:28px 24px 40px}
+.cn h1{font-size:26px;font-weight:600;letter-spacing:-.03em}
+.cn .lead{color:var(--muted);margin-top:6px;max-width:620px}
+.cn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:22px}
+.cn-card{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--card);display:flex;flex-direction:column;gap:10px}
+.cn-top{display:flex;align-items:center;gap:11px}
+.lg{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none;letter-spacing:-.02em}
+.cn-top b{font-weight:600;color:var(--ink);font-size:15px}
+.cn-top .soon{margin-left:auto}
+.cn-card p{font-size:13.5px;color:var(--text);line-height:1.5;flex:1}
+.honest{display:flex;gap:10px;align-items:flex-start;margin-top:18px;background:var(--acc-bg);border-radius:12px;padding:12px 14px;font-size:13.5px;color:#1e3a8a;max-width:720px}
+.honest svg.i{color:var(--acc);margin-top:1px}
+
+/* ---------- dialog ---------- */
+dialog{border:0;border-radius:18px;padding:0;width:min(440px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(16,24,40,.18);color:var(--text)}
+dialog::backdrop{background:rgba(20,22,27,.35)}
+.dlg{padding:20px}
+.dlg h2{font-size:17px;font-weight:600;margin-bottom:14px}
+.fld{display:block;margin-bottom:12px}
+.fld span{display:block;font-size:12.5px;color:var(--muted);margin-bottom:4px;font-weight:500}
+.fld input{width:100%;height:40px;border:1px solid var(--line2);border-radius:10px;padding:0 12px;font-size:14.5px;outline:0;background:var(--card)}
+.fld input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(47,91,255,.1)}
+.dlg .row{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+
+.scrim{display:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13.5px;border-radius:10px;padding:9px 14px;opacity:0;pointer-events:none;transition:.2s;z-index:90}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+/* ---------- mobile ---------- */
+@media (max-width:900px){
+  .app,.app.panel-open{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;inset:0 auto 0 0;width:min(300px,84vw);z-index:60;transform:translateX(-102%);transition:transform .25s ease;box-shadow:none}
+  .app.menu .side{transform:none;box-shadow:0 10px 40px rgba(0,0,0,.18)}
+  .scrim{display:block;position:fixed;inset:0;background:rgba(20,22,27,.32);z-index:55;opacity:0;pointer-events:none;transition:opacity .2s}
+  .app.menu .scrim{opacity:1;pointer-events:auto}
+  .top{display:flex}
+  .head{display:none}
+  .panel{position:fixed;inset:0;z-index:70;border:0;transform:translateY(100%);transition:transform .28s ease;visibility:hidden}
+  .app.panel-open .panel{transform:none;visibility:visible}
+  .p-body{padding:16px}
+  .start{justify-content:flex-start;padding:7vh 16px 20px}
+  .hello{flex-direction:column;gap:12px;margin-bottom:20px}
+  .hello h1{font-size:24px}
+  .start .chips{display:grid;grid-auto-flow:column;grid-template-rows:auto auto;justify-content:start;overflow-x:auto;scrollbar-width:none;margin:14px -16px 0;padding:0 16px 2px;gap:8px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 16px,#000 calc(100% - 28px),transparent)}
+  .start .chips::-webkit-scrollbar{display:none}
+  .stat b{font-size:34px}
+  .chip{height:34px;font-size:13px;padding:0 11px}
+  .conv{padding:14px 16px 6px;gap:18px}
+  .dock{padding:6px 12px calc(10px + env(safe-area-inset-bottom))}
+  .msg-a>.mark{display:none}
+  .msg-u{max-width:88%}
+  .cn{padding:20px 16px 32px}
+  .cn h1{font-size:22px}
+  .cn-grid{grid-template-columns:1fr;gap:10px}
+  .cn .lead{font-size:14px}
+  .cn-card{padding:14px;gap:8px}
+  .lg{width:32px;height:32px;border-radius:9px}
+  .p-foot .acts{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="side" id="side" aria-label="Меню"></aside>
+  <div class="scrim" id="scrim"></div>
+  <main class="main" id="main"></main>
+  <section class="panel" id="panel" aria-label="Результат"></section>
+</div>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* Körin AI — прототип: чат-помощник маркетолога.
+   Всё, что Körin «делает», — это настоящие запросы к серверу server/app.py:
+     GET  /api/health      — сервер на связи? какой движок (provider) и есть ли ключ ИИ (ai)
+     POST /api/quick       — замер: 3 вопроса нейросети о нише и городе ({company,niche,city,i}), по одному
+     POST /api/site-audit  — проверка сайта: robots.txt для ботов нейросетей, главная страница, карта сайта ({url})
+     POST /api/agent       — тексты: task faq | review | bio | chat ({task,question,context})
+     POST /api/analyze     — разбор «почему называют конкурентов» по ответам замера
+   Если сервер спит или ответил ошибкой, говорим об этом прямо и предлагаем повторить. Результаты не придумываются. */
+
+const API = 'https://korin-api.onrender.com';  // тот же сервер, что у korin/app/index.html
+// Чаты и компании пока живут в localStorage этого браузера. TODO: перенести в серверные аккаунты.
+const KEY = 'korin-ai-v1';
+
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+
+/* ---------- иконки ---------- */
+const P = {
+  plus: '<path d="M12 5v14M5 12h14"/>', menu: '<path d="M4 7h16M4 12h16M4 17h10"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  up: '<path d="M12 19V5M6 11l6-6 6 6"/>', chat: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
+  plug: '<path d="M9 2v5M15 2v5M7 7h10v4a5 5 0 0 1-10 0V7zM12 16v6"/>', eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>', file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+  star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>', cam: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6"/>',
+  why: '<path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/>', check: '<path d="M5 12.5l4.5 4.5L19 7"/>', no: '<path d="M7 7l10 10M17 7L7 17"/>', q: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14M12 17.2v.1"/>',
+  copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>', send: '<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',
+  chev: '<path d="M6 9l6 6 6-6"/>', right: '<path d="M9 6l6 6-6 6"/>', edit: '<path d="M4 20h4L19 9l-4-4L4 16v4z"/>', report: '<path d="M4 4h16v16H4z"/><path d="M8 15v-3M12 15V9M16 15v-5"/>',
+  list: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.1"/>', refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'
+};
+const ic = (n, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n] || ''}</svg>`;
+const markEl = '<span class="mark" aria-hidden="true"><i></i></span>';
+
+/* ---------- строки интерфейса: рус / қаз ---------- */
+const T = {
+  ru: {
+    hello: 'Что сделать для вашего бизнеса?', ph: 'Напишите задачу для Körin…', phReply: 'Ответьте Körin…', send: 'Отправить',
+    newChat: 'Новый чат', companies: 'Компании', history: 'История', connections: 'Подключения', addCo: 'Добавить компанию',
+    noCo: 'Компании появятся, когда вы назовёте свою в чате.', noChats: 'Здесь будут ваши чаты.', menu: 'Меню', close: 'Закрыть',
+    chips: [['measure', 'eye', 'Называют ли нас нейросети?'], ['audit', 'globe', 'Проверить мой сайт'], ['faq', 'file', 'Страница вопросов для сайта'], ['review', 'star', 'Попросить отзыв'], ['bio', 'cam', 'Описание для Instagram'], ['why', 'why', 'Почему называют конкурентов?']],
+    note: 'Körin задаёт вопросы настоящим нейросетям и читает ваш сайт. Если чего-то не знает — так и говорит.', sample: 'Посмотреть пример отчёта',
+    disclaimer: 'Körin проверяет сайт и спрашивает нейросети через сервер. Тексты — черновики: прочитайте перед публикацией.',
+    srvWait: 'Связываюсь с сервером…', srvOk: 'Сервер на связи', srvDown: 'Сервер не отвечает', srvNoAi: 'Сервер на связи, нейросеть не подключена', retry: 'Повторить',
+    copy: 'Скопировать', copied: 'Скопировано', publish: 'Одобрить и опубликовать', soon: 'скоро', example: 'пример', open: 'Открыть',
+    steps: n => `Шаги: ${n}`, working: 'Работаю…', edit: 'Изменить', save: 'Сохранить', cancel: 'Отмена', del: 'Удалить чат',
+    fName: 'Название компании', fNiche: 'Чем занимаетесь', fCity: 'Город', fSite: 'Сайт', coTitle: 'Данные компании',
+    cnTitle: 'Подключения', cnLead: 'Через подключения Körin будет сам публиковать то, что вы одобрили, и приносить цифры. Сейчас ни одно подключение не работает — честно отмечаем каждое как «скоро».',
+    cnHonest: 'Что работает уже сейчас: в чате дайте адрес сайта — Körin откроет его и проверит. Публикации, отзывы и аналитика появятся вместе с подключениями.',
+    ask: { name: 'Как называется ваша компания?', niche: 'Чем занимается компания? Например: стоматология, курсы английского, доставка цветов.', city: 'В каком городе ваши клиенты?', site: 'Какой адрес у вашего сайта? Например: example.kz' },
+    askHint: { name: 'Название нужно, чтобы понять, называют ли вас нейросети.', niche: 'По нише я составлю вопросы, которые задают покупатели.', city: '', site: '' },
+    badSite: 'Это не похоже на адрес сайта. Напишите, например, example.kz',
+    down: 'Сервер Körin сейчас не отвечает. Бесплатный сервер засыпает без запросов и просыпается около минуты. Результата нет — я ничего не придумываю. Нажмите «Повторить» через минуту.',
+    fail: 'Не получилось', partial: n => `Нейросеть не ответила на ${n} из 3 вопросов — показываю только настоящие ответы.`,
+    needMeasure: 'Чтобы объяснить, почему называют конкурентов, нужны настоящие ответы нейросети. Сначала сделаю замер, потом разберу.',
+    menuSample: 'пример', newCoChat: 'Назовите компанию в чате — я её запомню.'
+  },
+  kk: {
+    hello: 'Бизнесіңіз үшін не істейік?', ph: 'Körin-ге тапсырма жазыңыз…', phReply: 'Körin-ге жауап беріңіз…', send: 'Жіберу',
+    newChat: 'Жаңа чат', companies: 'Компаниялар', history: 'Тарих', connections: 'Қосылымдар', addCo: 'Компания қосу',
+    noCo: 'Чатта компанияңызды атасаңыз, осында пайда болады.', noChats: 'Мұнда сіздің чаттарыңыз болады.', menu: 'Мәзір', close: 'Жабу',
+    chips: [['measure', 'eye', 'Нейросеттер бізді атай ма?'], ['audit', 'globe', 'Сайтымды тексеру'], ['faq', 'file', 'Сайтқа сұрақ-жауап беті'], ['review', 'star', 'Пікір сұрау'], ['bio', 'cam', 'Instagram сипаттамасы'], ['why', 'why', 'Неге бәсекелестерді атайды?']],
+    note: 'Körin нағыз нейросеттерге сұрақ қояды және сайтыңызды оқиды. Білмесе — солай дейді.', sample: 'Есеп мысалын көру',
+    disclaimer: 'Körin сайтты тексереді және сервер арқылы нейросеттерден сұрайды. Мәтіндер — жоба: жарияламас бұрын оқыңыз.',
+    srvWait: 'Сервермен байланысып жатыр…', srvOk: 'Сервер байланыста', srvDown: 'Сервер жауап бермейді', srvNoAi: 'Сервер байланыста, нейросеть қосылмаған', retry: 'Қайталау',
+    copy: 'Көшіру', copied: 'Көшірілді', publish: 'Мақұлдап, жариялау', soon: 'жақында', example: 'мысал', open: 'Ашу',
+    steps: n => `Қадамдар: ${n}`, working: 'Жұмыс істеп жатырмын…', edit: 'Өзгерту', save: 'Сақтау', cancel: 'Бас тарту', del: 'Чатты өшіру',
+    fName: 'Компания атауы', fNiche: 'Немен айналысасыз', fCity: 'Қала', fSite: 'Сайт', coTitle: 'Компания деректері',
+    cnTitle: 'Қосылымдар', cnLead: 'Қосылымдар арқылы Körin сіз мақұлдаған нәрсені өзі жариялайды және сандарды әкеледі. Қазір бірде-бір қосылым жұмыс істемейді — әрқайсысын адал «жақында» деп белгілейміз.',
+    cnHonest: 'Қазір не жұмыс істейді: чатта сайт мекенжайын жазыңыз — Körin оны ашып, тексереді. Жарияланымдар, пікірлер және аналитика қосылымдармен бірге келеді.',
+    ask: { name: 'Компанияңыз қалай аталады?', niche: 'Компания немен айналысады? Мысалы: стоматология, ағылшын тілі курстары, гүл жеткізу.', city: 'Клиенттеріңіз қай қалада?', site: 'Сайтыңыздың мекенжайы қандай? Мысалы: example.kz' },
+    askHint: { name: 'Нейросеттер сізді атай ма, соны білу үшін атауы керек.', niche: 'Сала бойынша сатып алушылардың сұрақтарын құрастырамын.', city: '', site: '' },
+    badSite: 'Бұл сайт мекенжайына ұқсамайды. Мысалы: example.kz деп жазыңыз',
+    down: 'Körin сервері қазір жауап бермейді. Тегін сервер сұраусыз ұйықтап қалады және бір минуттай ішінде оянады. Нәтиже жоқ — мен ештеңе ойдан шығармаймын. Бір минуттан кейін «Қайталау» басыңыз.',
+    fail: 'Болмады', partial: n => `Нейросеть 3 сұрақтың ${n}-не жауап бермеді — тек нағыз жауаптарды көрсетемін.`,
+    needMeasure: 'Неге бәсекелестерді атайтынын түсіндіру үшін нейросеттің нағыз жауаптары керек. Алдымен өлшеймін, содан кейін талдаймын.',
+    menuSample: 'мысал', newCoChat: 'Компанияны чатта атаңыз — есте сақтаймын.'
+  }
+};
+let S = load();
+const t = k => (T[S.lang] || T.ru)[k] ?? T.ru[k];
+
+/* ---------- хранилище ---------- */
+function load(){
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(KEY)) } catch (e) {}
+  if (!s || typeof s !== 'object') s = {};
+  return { lang: s.lang === 'kk' ? 'kk' : 'ru', companies: Array.isArray(s.companies) ? s.companies : [], chats: Array.isArray(s.chats) ? s.chats : [], co: s.co || null, chat: s.chat || null };
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)) } catch (e) {} }
+
+/* ---------- состояние экрана ---------- */
+const UI = { view: 'chat', art: null, menu: false, srv: 'wait', provider: '', ai: true, busy: false, openSteps: new Set() };
+const co = () => S.companies.find(c => c.id === S.co) || null;
+const chat = () => S.chats.find(c => c.id === S.chat) || null;
+const ENGINE = { gemini: 'Gemini', openai: 'ChatGPT' };
+const engName = e => ENGINE[e] || (e ? String(e) : '');
+
+/* ---------- сервер ---------- */
+class ApiError extends Error { constructor(msg, down){ super(msg); this.down = down } }
+async function call(path, body, ms = 120000){
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), ms);
+  let r;
+  try { r = await fetch(API + path, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined, signal: ctl.signal }) }
+  catch (e) { setSrv('down'); throw new ApiError(t('down'), true) }
+  finally { clearTimeout(timer) }
+  let d = null;
+  try { d = await r.json() } catch (e) {}
+  if (!r.ok) { if (r.status >= 502 && r.status !== 503) { setSrv('down'); throw new ApiError(t('down'), true) } throw new ApiError((d && d.error) || `Сервер ответил кодом ${r.status}.`, false) }
+  setSrv('ok');
+  return d || {};
+}
+function setSrv(s){ if (UI.srv !== s) { UI.srv = s; renderSide() } }
+async function ping(){
+  UI.srv = 'wait'; renderSide();
+  try { const d = await call('/api/health', null, 75000); UI.provider = d.provider || ''; UI.ai = !!d.ai; setSrv('ok'); renderSide() } catch (e) {}
+}
+
+/* ---------- понимание запроса ---------- */
+const CITIES = ['Алматы', 'Астана', 'Шымкент', 'Караганда', 'Актобе', 'Тараз', 'Павлодар', 'Усть-Каменогорск', 'Семей', 'Атырау', 'Костанай', 'Кызылорда', 'Уральск', 'Петропавловск', 'Актау', 'Туркестан'];
+const URL_RE = /\b((?:https?:\/\/)?(?:[a-z0-9Ѐ-ӿ-]+\.)+(?:kz|қаз|com|ru|net|org|shop|site|store|online|io|me|info|biz|pro|app|asia|uz|kg)(?:\/[^\s]*)?)/i;
+function intentOf(text){
+  const s = text.toLowerCase();
+  if (/конкурент|бәсекелес|почему (их|не нас|называют)|неге/.test(s)) return 'why';
+  if (/faq|вопрос[а-я]* и ответ|страниц[а-я]* вопрос|сұрақ/.test(s)) return 'faq';
+  if (/отзыв|пікір/.test(s)) return 'review';
+  if (/instagram|инстаграм|инста|\bbio\b|био|описани[ея] профил|профил/.test(s)) return 'bio';
+  if (/замер|видимост|называ|назыв|упомина|chatgpt|gemini|нейросет|атай/.test(s)) return 'measure';
+  if (/сайт|robots|аудит|seo|сео/.test(s) || URL_RE.test(s)) return 'audit';
+  return 'chat';
+}
+const NEEDS = { measure: ['name', 'niche', 'city'], audit: ['site'], faq: ['name', 'niche', 'city'], review: ['name', 'niche', 'city'], bio: ['name', 'niche', 'city'], why: ['name', 'niche', 'city'], chat: [] };
+// данные компании: либо сохранённая компания, либо черновик чата (пока компанию не назвали)
+const facts = c => co() || (c.draft ||= {});
+function absorb(c, text){
+  const f = facts(c), m = text.match(URL_RE);
+  if (m) f.site = m[1].replace(/[.,;)]+$/, '');
+  if (!f.city) { const low = ' ' + text.toLowerCase(); const city = CITIES.find(x => { const stem = x.length > 5 ? x.toLowerCase().slice(0, -1) : x.toLowerCase(); return new RegExp('[^а-яёәіңғүұқөһ]' + stem).test(low) }); if (city) f.city = city }
+}
+function fill(c, slot, text){
+  const v = text.trim().replace(/^[«"']+|[»"'.!]+$/g, '').slice(0, 60);
+  if (slot === 'site') { const m = text.match(URL_RE); if (!m) return false; facts(c).site = m[1].replace(/[.,;)]+$/, ''); return true }
+  if (!v) return false;
+  if (slot === 'name' && !co()) {
+    const d = c.draft || {}, nc = { id: uid(), name: v, niche: d.niche || '', city: d.city || '', site: d.site || '' };
+    S.companies.unshift(nc); S.co = nc.id; c.companyId = nc.id; delete c.draft; return true
+  }
+  facts(c)[slot] = slot === 'city' ? (CITIES.find(x => x.toLowerCase().startsWith(v.toLowerCase().slice(0, 4))) || v) : v;
+  return true;
+}
+
+/* ---------- чат ---------- */
+function newChat(){ const c = { id: uid(), companyId: S.co, title: '', msgs: [], at: Date.now() }; S.chats.unshift(c); S.chat = c.id; return c }
+function ensureChat(){ return chat() || newChat() }
+function addMsg(c, m){ m.id = m.id || uid(); c.msgs.push(m); c.at = Date.now(); return m }
+
+async function onSend(text, forced){
+  text = (text || '').trim();
+  if (!text || UI.busy) return;
+  UI.view = 'chat';
+  const c = ensureChat();
+  if (!c.title) c.title = text.slice(0, 48);
+  addMsg(c, { r: 'u', text });
+  if (forced) c.pending = null;
+  if (c.pending && c.pending.slot) {
+    if (!fill(c, c.pending.slot, text)) { addMsg(c, { r: 'a', text: c.pending.slot === 'site' ? t('badSite') : t('ask')[c.pending.slot] }); save(); return renderAll() }
+  } else {
+    absorb(c, text);
+    c.pending = { intent: forced || intentOf(text), q: text };
+  }
+  save(); renderAll();
+  proceed(c);
+}
+function proceed(c){
+  const p = c.pending; if (!p) return;
+  const f = facts(c), miss = NEEDS[p.intent].find(k => !f[k] || (k === 'name' && !co()));
+  if (miss) {
+    p.slot = miss;
+    const hint = t('askHint')[miss];
+    const chips = miss === 'city' ? CITIES.slice(0, 4).map(x => ({ text: x })) : [];
+    addMsg(c, { r: 'a', text: t('ask')[miss] + (hint ? '\n' + hint : ''), chips, ask: true });
+    save(); return renderAll();
+  }
+  c.pending = null; save();
+  run(c, p.intent, p.q);
+}
+
+/* ---------- действия: только настоящие запросы ---------- */
+async function run(c, intent, q){
+  const m = addMsg(c, { r: 'a', steps: [], running: true, intent, q });
+  UI.busy = true; UI.openSteps.add(m.id); renderAll();
+  const step = (text, ok = null) => { m.steps.push({ text, ok }); renderConv(); return m.steps.length - 1 };
+  const done = (i, ok, text) => { if (m.steps[i]) { m.steps[i].ok = ok; if (text) m.steps[i].text = text } renderConv() };
+  try {
+    if (intent === 'measure') await doMeasure(c, m, step, done);
+    else if (intent === 'audit') await doAudit(c, m, step, done);
+    else if (intent === 'why') await doWhy(c, m, step, done);
+    else await doAgent(c, m, intent, q, step, done);
+  } catch (e) {
+    m.steps.forEach(s => { if (s.ok === null) s.ok = false });
+    m.error = e.message || String(e); m.down = !!e.down; m.retry = { intent, q };
+  }
+  m.running = false; UI.busy = false; UI.openSteps.delete(m.id); save(); renderAll();
+  if (m.art && innerWidth > 900) openArt(m.art);
+}
+
+async function doMeasure(c, m, step, done){
+  const f = co(), eng = engName(UI.provider) || 'нейросети';
+  step(`Задаю 3 вопроса ${eng} — как спросил бы покупатель в городе ${f.city}`, true);
+  const results = []; let failed = 0, lastErr = null;
+  for (let i = 0; i < 3; i++) {
+    const s = step(`Вопрос ${i + 1} из 3…`);
+    try {
+      const d = await call('/api/quick', { company: f.name, niche: f.niche, city: f.city, i });
+      const r = d.result; results.push(r);
+      done(s, true, `«${cap(r.question)}» — ${r.named ? 'назвали ' + f.name : 'не назвали'}`);
+    } catch (e) {
+      if (e.down && !results.length) throw e;
+      failed++; lastErr = e; done(s, false, `Вопрос ${i + 1}: ${e.message}`);
+    }
+  }
+  if (!results.length) throw lastErr || new ApiError('Нейросеть не ответила.', false);
+  const named = results.filter(r => r.named).length;
+  step(`Считаю, где назвали «${f.name}»: ${named} из ${results.length}`, true);
+  f.lastMeasure = { at: Date.now(), results };
+  const art = { id: uid(), type: 'report', title: 'Замер видимости', sub: `${f.name} · ${f.niche} · ${f.city}`, data: { company: f.name, niche: f.niche, city: f.city, results, at: Date.now() } };
+  m.art = art; m.label = howLabel(results);
+  m.text = named === 0
+    ? `Нейросеть ответила на ${results.length} ${results.length === 1 ? 'вопрос' : 'вопроса'} о нише «${f.niche}» в городе ${f.city} и **ни разу не назвала ${f.name}**. Это частая картина: она советует тех, о ком много пишут на картах, в подборках и на сайтах.`
+    : `Нейросеть назвала **${f.name}** в ${named} из ${results.length} ответов о нише «${f.niche}» в городе ${f.city}.`;
+  if (failed) m.text += '\n' + t('partial')(failed);
+  m.next = ['why', 'faq', f.site ? 'audit' : null].filter(Boolean);
+}
+function howLabel(results){
+  const engs = [...new Set(results.map(r => engName(r.engine)).filter(Boolean))].join(', ') || 'нейросеть';
+  const srch = results.map(r => r.search);
+  const all = srch.every(x => x === true), none = srch.every(x => x === false);
+  const how = all ? 'с поиском в интернете' : none ? 'без поиска — по памяти модели' : srch.some(x => x === true) ? 'часть ответов с поиском' : '';
+  const models = [...new Set(results.map(r => r.model).filter(Boolean))].join(', ');
+  return { text: [engs + (models ? ' · ' + models : ''), how].filter(Boolean).join(' · '), warn: !all };
+}
+
+async function doAudit(c, m, step, done){
+  const f = facts(c);
+  const s = step(`Читаю сайт ${f.site}: robots.txt, главную страницу и карту сайта…`);
+  const d = await call('/api/site-audit', { url: f.site }, 60000);
+  done(s, true, `Прочитал ${d.url}`);
+  const closed = d.bots.filter(b => b.allowed === false).length, unk = d.bots.filter(b => b.allowed === null).length, bad = d.checks.filter(x => !x.ok).length;
+  step(`Боты нейросетей: открыт доступ ${d.bots.length - closed - unk} из ${d.bots.length}${closed ? `, закрыт ${closed}` : ''}${unk ? `, неизвестно ${unk}` : ''}`, closed === 0 && unk === 0);
+  step(`Признаки страницы: в порядке ${d.checks.length - bad} из ${d.checks.length}`, bad === 0);
+  m.art = { id: uid(), type: 'audit', title: 'Проверка сайта', sub: d.url, data: d };
+  m.label = { text: 'Без нейросети: сервер сам открыл страницы сайта', warn: false };
+  m.text = bad || closed
+    ? `Проверил **${d.url}**. Нашёл, что поправить: ${bad} ${bad === 1 ? 'пункт' : 'пунктов'} на странице${closed ? ` и ${closed} ${closed === 1 ? 'бот закрыт' : 'ботов закрыто'} в robots.txt` : ''}. Список — в панели справа.`
+    : `Проверил **${d.url}**: всё, что я умею проверять, в порядке.`;
+  m.next = ['faq', 'measure'];
+}
+
+const AGENT = { faq: ['faq', 'Страница «Вопросы и ответы»', 'file', 'Опубликовать на сайте (WordPress, Tilda)'], review: ['review', 'Просьба оставить отзыв', 'star', 'Отправить клиентам в WhatsApp'], bio: ['bio', 'Описание профиля Instagram', 'cam', 'Обновить профиль Instagram'], chat: ['chat', 'Ответ Körin', 'chat', ''] };
+async function doAgent(c, m, intent, q, step, done){
+  const [task, title, , pub] = AGENT[intent] || AGENT.chat, f = facts(c);
+  const ctx = { company: f.name || '', niche: f.niche || '', city: f.city || '', rivals: [] };
+  if (f.site) ctx.links = { 'Сайт': f.site };
+  if (f.lastMeasure) ctx.not_named_on = f.lastMeasure.results.filter(r => !r.named).map(r => r.question);
+  const s = step(intent === 'chat' ? 'Думаю над ответом…' : `Пишу черновик: ${title.toLowerCase()}${f.site ? ' — сначала прочитаю ваш сайт' : ''}…`);
+  const d = await call('/api/agent', { task, question: q.slice(0, 1000), context: ctx });
+  m.steps.splice(s, 1);
+  (d.steps || []).forEach(x => step(x.text, !!x.ok));
+  m.label = { text: `Текст написала нейросеть ${d.model || ''}`.trim(), warn: false };  // /api/agent не сообщает engine/search — пишем только модель
+  if (intent === 'chat') { m.text = d.text || ''; m.next = []; return }
+  m.art = { id: uid(), type: 'draft', title, sub: f.name || '', data: { text: clean(d.text), pub, model: d.model } };
+  m.text = `Черновик готов. Места, где нужны ваши факты, отмечены **[что вписать]** — замените их перед публикацией.`;
+  m.next = intent === 'faq' ? ['review', 'bio'] : intent === 'review' ? ['faq', 'bio'] : ['faq', 'review'];
+}
+
+async function doWhy(c, m, step, done){
+  const f = co();
+  if (!f.lastMeasure) { m.text = t('needMeasure'); renderConv(); await doMeasure(c, m, step, done); m.text = t('needMeasure') + '\n\n' + m.text; m.art2 = m.art; m.label2 = m.label }
+  const res = f.lastMeasure.results;
+  const s = step('Перечитываю ответы нейросети и сайты, на которые она ссылается…');
+  const sources = [...new Set(res.flatMap(r => r.sources || []))];
+  const d = await call('/api/analyze', { company: f.name, niche: f.niche, city: f.city, rivals: [], site: f.site || '', sources, answers: res.map(r => ({ q: r.question, a: r.answer })) });
+  m.steps.splice(s, 1);
+  (d.steps || []).forEach(x => step(x.text, !!x.ok));
+  const a = d.analysis;
+  m.art = { id: uid(), type: 'analysis', title: 'Почему называют конкурентов', sub: `${f.name} · ${f.city}`, data: { analysis: a, text: d.text || '', model: d.model } };
+  m.label = { text: `Разбор написала нейросеть ${d.model || ''}`.trim() + ' по ответам замера', warn: false };
+  const why = a && a.verdict ? `**${a.verdict}**` : 'Разбор готов.';
+  m.text = (m.text ? m.text + '\n\n' : '') + why + (a && a.gaps && a.gaps.length ? `\nЧто сделать первым: ${a.gaps[0].title}.` : '');
+  m.next = ['faq', 'review'];
+}
+
+/* ---------- пример (вымышленный, помечен) ---------- */
+function sampleArt(){
+  const q = ['Курсы английского в городе Алматы: кого посоветуешь?', 'Курсы английского с хорошими отзывами, Алматы — назови конкретные компании', 'Алматы қаласында ағылшын тілі курстары: қай компанияны ұсынасың?'];
+  const a = ['Пример ответа: в Алматы часто советуют «Школа А» и «Школа Б» — у них много отзывов на картах и подробные страницы с программами.', 'Пример ответа: обратите внимание на «Школа Б», «Пример-Школа» и «Школа В». Перед оплатой сходите на пробный урок.', 'Мысал жауап: «Школа А» және «Школа В» жиі ұсынылады.'];
+  return { id: 'sample', type: 'report', sample: true, title: 'Замер видимости', sub: 'Пример-Школа · курсы английского · Алматы', data: { company: 'Пример-Школа', niche: 'курсы английского', city: 'Алматы', at: 0, results: q.map((x, i) => ({ question: x, answer: a[i], named: i === 1, sources: i === 0 ? ['2gis.kz', 'instagram.com'] : ['2gis.kz'], engine: '', search: null, model: '' })) } };
+}
+
+/* ---------- мини-разметка ответа ---------- */
+function md(s){
+  const inl = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\[(что вписать|не знаю)[^\]]*\]/gi, m => `<span class="ex" style="text-transform:none;letter-spacing:0">${m}</span>`);
+  const out = []; let list = null;
+  for (const raw of String(s || '').split('\n')) {
+    const line = raw.trim();
+    const li = line.match(/^(?:[-*•]|\d+[.)])\s+(.*)/);
+    if (li) { (list ||= []).push(`<li>${inl(li[1])}</li>`); continue }
+    if (list) { out.push(`<ul style="margin:4px 0;padding-left:20px">${list.join('')}</ul>`); list = null }
+    if (!line) continue;
+    const h = line.match(/^#{1,4}\s+(.*)/);
+    out.push(h ? `<p><b>${inl(h[1])}</b></p>` : `<p>${inl(line)}</p>`);
+  }
+  if (list) out.push(`<ul style="margin:4px 0;padding-left:20px">${list.join('')}</ul>`);
+  return out.join('');
+}
+const cap = s => String(s || '').charAt(0).toUpperCase() + String(s || '').slice(1);
+// черновик для вставки: без значков разметки (## и **), но с абзацами
+const clean = s => String(s || '').split('\n').map(l => l.replace(/^\s*#{1,6}\s+/, '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/^\s*[*•]\s+/, '— ')).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+
+/* ---------- отрисовка ---------- */
+function renderAll(){ renderSide(); renderMain(); renderPanel() }
+
+function renderSide(){
+  const chats = S.chats.filter(c => (c.companyId || null) === (S.co || null) && c.msgs.length);
+  const srv = UI.srv === 'ok' ? (UI.ai ? t('srvOk') : t('srvNoAi')) : UI.srv === 'down' ? t('srvDown') : t('srvWait');
+  $('#side').innerHTML = `
+    <div class="brand">${markEl}Körin<small>AI</small><span style="flex:1"></span><button class="ib mob-only" data-act="menu-close" aria-label="${t('close')}" style="display:${innerWidth <= 900 ? 'grid' : 'none'}">${ic('x')}</button></div>
+    <button class="side-new" data-act="new">${ic('plus')}${t('newChat')}</button>
+    <div class="side-scroll">
+      <div class="sec">${t('companies')}<button data-act="add-co" aria-label="${t('addCo')}" title="${t('addCo')}">${ic('plus')}</button></div>
+      ${S.companies.length ? S.companies.map(c => `<button class="item ${c.id === S.co ? 'on' : ''}" data-co="${c.id}"><span class="co-dot">${esc(c.name.slice(0, 1).toUpperCase())}</span><span>${esc(c.name)}</span></button>`).join('') : `<div class="empty-note">${t('noCo')}</div>`}
+      <div class="sec">${t('history')}</div>
+      ${chats.length ? chats.slice(0, 40).map(c => `<button class="item ${c.id === S.chat && UI.view === 'chat' ? 'on' : ''}" data-chat="${c.id}">${ic('chat')}<span>${esc(c.title || t('newChat'))}</span></button>`).join('') : `<div class="empty-note">${t('noChats')}</div>`}
+      <div class="sec" style="padding-top:18px"></div>
+      <button class="item ${UI.view === 'conn' ? 'on' : ''}" data-act="conn">${ic('plug')}<span>${t('connections')}</span></button>
+    </div>
+    <div class="side-foot">
+      <div class="srv"><span class="dot ${UI.srv}"></span><span>${srv}</span>${UI.srv === 'down' ? `<button data-act="ping">${t('retry')}</button>` : ''}</div>
+      <div class="lang" role="group" aria-label="Язык"><button class="${S.lang === 'ru' ? 'on' : ''}" data-lang="ru">рус</button><button class="${S.lang === 'kk' ? 'on' : ''}" data-lang="kk">қаз</button></div>
+    </div>`;
+}
+
+function composer(reply){
+  const f = co(), c = chat();
+  const ask = c && c.pending && c.pending.slot;
+  const ctx = f ? `<button class="ctx" data-act="edit-co" title="${t('edit')}">${ic('edit')}${esc([f.name, f.niche, f.city].filter(Boolean).join(' · '))}</button>` : '';
+  return `<form class="composer" id="form">
+    <label class="sr" for="inp">${t('ph')}</label>
+    <textarea id="inp" rows="1" placeholder="${ask ? t('phReply') : t('ph')}" autocomplete="off"></textarea>
+    <div class="c-row"><div class="c-ctx">${ctx}</div><button class="send" id="sendBtn" type="submit" aria-label="${t('send')}" disabled>${ic('up')}</button></div>
+  </form>`;
+}
+
+function renderMain(){
+  const c = chat(), title = UI.view === 'conn' ? t('connections') : (c && c.title) || (co() ? co().name : 'Körin');
+  const top = `<div class="top"><button class="ib" data-act="menu" aria-label="${t('menu')}">${ic('menu')}</button><div class="ttl">${esc(title)}</div><button class="ib" data-act="new" aria-label="${t('newChat')}">${ic('plus')}</button></div>`;
+  if (UI.view === 'conn') { $('#main').innerHTML = top + `<div class="view">${connectors()}</div>`; return }
+  if (!c || !c.msgs.length) {
+    $('#main').innerHTML = top + `<div class="view"><div class="start"><div class="start-in">
+      <div class="hello">${markEl}<h1>${t('hello')}</h1></div>
+      ${composer()}
+      <div class="chips">${t('chips').map(([id, icon, label]) => `<button class="chip" data-start="${id}">${ic(icon)}${esc(label)}</button>`).join('')}</div>
+      <p class="foot-note">${t('note')}<br><button data-act="sample">${t('sample')}</button> <span class="ex">${t('example')}</span></p>
+    </div></div></div>`;
+  } else {
+    $('#main').innerHTML = top + `<div class="head"><div class="ttl">${esc(title)}</div></div><div class="view" id="scroller"><div class="conv" id="conv"></div></div><div class="dock"><div class="dock-in">${composer(true)}<div class="disclaimer">${t('disclaimer')}</div></div></div>`;
+    renderConv(true);
+  }
+  bindComposer();
+}
+
+function stepIcon(ok){ return ok === null ? '<span class="spin" aria-label="…"></span>' : ok ? ic('check', 'st-ok') : ic('no', 'st-no') }
+function msgHTML(m){
+  if (m.r === 'u') return `<div class="msg-u">${esc(m.text)}</div>`;
+  let h = '';
+  if (m.steps && m.steps.length) {
+    const open = m.running || UI.openSteps.has(m.id);
+    const run = m.steps.find(s => s.ok === null);
+    h += `<details class="steps" data-steps="${m.id}" ${open ? 'open' : ''}><summary>${m.running ? '<span class="spin"></span>' + esc(run ? run.text : t('working')) : ic('list') + t('steps')(m.steps.length)}${ic('chev', 'chev')}</summary><ol>${m.steps.map(s => `<li><span class="st-ic">${stepIcon(s.ok)}</span><span>${esc(s.text)}</span></li>`).join('')}</ol></details>`;
+  }
+  if (m.text) h += `<div class="prose">${md(m.text)}</div>`;
+  if (m.running && !m.text) h += `<div class="typing" aria-label="${t('working')}"><i></i><i></i><i></i></div>`;
+  if (m.error) h += `<div class="err" role="alert"><b>${t('fail')}.</b> ${esc(m.error)}<div class="row"><button class="btn" data-retry="${m.id}">${ic('refresh')}${t('retry')}</button></div></div>`;
+  for (const l of [m.label2, m.label]) if (l && l.text) h += `<span class="label ${l.warn ? 'warn' : ''}"><span class="dot ${l.warn ? '' : 'ok'}"></span>${esc(l.text)}</span>`;
+  for (const a of [m.art2, m.art].filter((x, i, arr) => x && arr.indexOf(x) === i)) {
+    const icon = a.type === 'report' ? 'report' : a.type === 'audit' ? 'list' : a.type === 'analysis' ? 'why' : 'file';
+    h += `<button class="art-card" data-art="${m.id}:${a.id}"><span class="ai">${ic(icon)}</span><span><span class="at">${esc(a.title)}</span><span class="as" style="display:block">${esc(a.sub || '')} · ${t('open')}</span></span><span class="go">${ic('right')}</span></button>`;
+  }
+  const chips = [...(m.chips || []).map(x => ({ text: x.text })), ...(m.next || []).map(id => { const ch = t('chips').find(x => x[0] === id); return ch && { text: ch[2], intent: id, icon: ch[1] } }).filter(Boolean)];
+  if (chips.length && !m.running) h += `<div class="next">${chips.map(x => `<button class="chip" data-say="${esc(x.text)}" ${x.intent ? `data-intent="${x.intent}"` : ''}>${x.icon ? ic(x.icon) : ''}${esc(x.text)}</button>`).join('')}</div>`;
+  return `<div class="msg-a">${markEl}<div class="body">${h}</div></div>`;
+}
+function renderConv(force){
+  const box = $('#conv'), c = chat(); if (!box || !c) return;
+  const sc = $('#scroller'), near = force || (sc.scrollHeight - sc.scrollTop - sc.clientHeight < 140);
+  box.innerHTML = c.msgs.map(msgHTML).join('');
+  if (near) sc.scrollTop = sc.scrollHeight;
+  const btn = $('#sendBtn'); if (btn) btn.disabled = UI.busy || !$('#inp').value.trim();
+}
+function bindComposer(){
+  const f = $('#form'), inp = $('#inp'), btn = $('#sendBtn'); if (!f) return;
+  const fit = () => { inp.style.height = 'auto'; inp.style.height = Math.min(inp.scrollHeight, 200) + 'px'; btn.disabled = UI.busy || !inp.value.trim() };
+  inp.addEventListener('input', fit);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); f.requestSubmit() } });
+  f.addEventListener('submit', e => { e.preventDefault(); const v = inp.value; if (!v.trim() || UI.busy) return; inp.value = ''; onSend(v) });
+  if (innerWidth > 900) inp.focus();
+}
+
+/* ---------- панель артефакта ---------- */
+function findArt(key){
+  if (key === 'sample') return sampleArt();
+  const [mid, aid] = key.split(':'); const c = chat(); if (!c) return null;
+  const m = c.msgs.find(x => x.id === mid); if (!m) return null;
+  return [m.art, m.art2].find(a => a && a.id === aid) || null;
+}
+function openArt(a){ UI.art = a; $('#app').classList.add('panel-open'); renderPanel() }
+function closeArt(){ UI.art = null; $('#app').classList.remove('panel-open'); setTimeout(() => { if (!UI.art) $('#panel').innerHTML = '' }, 300) }
+const btnSoon = (label, title) => `<button class="btn" disabled title="${esc(title || '')}">${esc(label)} <span class="soon">${t('soon')}</span></button>`;
+
+function renderPanel(){
+  const a = UI.art, el = $('#panel');
+  if (!a) { el.innerHTML = ''; return }
+  let body = '', foot = '';
+  if (a.sample) body += `<div class="ex-banner">${ic('info')}<span><span class="ex">${t('example')}</span> Вымышленная компания и выдуманные ответы — так выглядит отчёт. Настоящий замер появится, когда вы попросите его в чате.</span></div>`;
+  if (a.type === 'report') {
+    const d = a.data, n = d.results.filter(r => r.named).length, lab = a.sample ? null : howLabel(d.results);
+    body += `<div class="stat"><b>${n} из ${d.results.length}</b><span>ответов, где назвали «${esc(d.company)}»</span></div><div class="bar"><i style="width:${Math.round(n / d.results.length * 100)}%"></i></div>
+      <div class="note" style="margin-top:10px">${a.sample ? 'Движок: пример — это не ответ нейросети.' : esc(lab.text) + (lab.warn ? '. Ответ без поиска показывает, что модель «помнит», а не что находит сейчас.' : '.')}${d.at ? ` Замер от ${new Date(d.at).toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}.` : ''}</div>
+      <div class="p-sec"><h3>Вопросы и ответы нейросети</h3>${d.results.map((r, i) => `<div class="qa" data-qa="${i}"><div class="q"><b>${esc(cap(r.question))}</b><span class="tag ${r.named ? 'ok' : 'no'}">${r.named ? 'назвали' : 'не назвали'}</span></div><div class="a">${esc(r.answer)}</div><button class="more" data-more="${i}">Показать полностью</button>${(r.sources && r.sources.length) || r.cached ? `<div class="meta">${(r.sources || []).map(s => `<span class="tag">${esc(s)}</span>`).join('')}${r.cached ? '<span class="tag" title="Тот же вопрос уже задавали недавно: сервер вернул сохранённый ответ">из кэша сервера</span>' : ''}</div>` : ''}</div>`).join('')}</div>`;
+    foot = `<div class="acts"><button class="btn btn-p" data-copy>${ic('copy')}${t('copy')}</button>${btnSoon('Каждую неделю', 'Повторять замер каждую неделю: расписание появится вместе с аккаунтами')}${btnSoon('В Telegram', 'Отчёт в Telegram: подключение скоро')}</div>`;
+  } else if (a.type === 'audit') {
+    const d = a.data;
+    const botState = b => b.allowed === true ? ['ok', 'открыт', 'check'] : b.allowed === false ? ['no', 'закрыт', 'no'] : ['unk', 'неизвестно', 'q'];
+    body += `<div class="note" style="margin-top:0">Проверено: <b>${esc(d.url)}</b>. ${d.robots === 'read' ? 'Файл robots.txt прочитан.' : d.robots === 'missing' ? 'Файла robots.txt нет — значит, ботов ничто не закрывает.' : 'robots.txt прочитать не удалось — доступ ботов неизвестен, «открыт» не пишем.'}</div>
+      <div class="p-sec"><h3>Главная страница</h3>${d.checks.map(x => `<div class="chk"><span class="ci ${x.ok ? 'ok' : 'no'}">${ic(x.ok ? 'check' : 'no')}</span><div><div class="cl">${esc(x.label)}</div><div class="cd">${esc(x.detail)}</div></div></div>`).join('')}</div>
+      <div class="p-sec"><h3>Боты нейросетей в robots.txt</h3>${d.bots.map(b => { const [k, w, i] = botState(b); return `<div class="chk"><span class="ci ${k}">${ic(i)}</span><div><div class="cl">${esc(b.bot)} <span class="tag ${k}" style="margin-left:4px">${w}</span></div><div class="cd">${esc(b.what)}</div></div></div>` }).join('')}</div>`;
+    foot = `<div class="acts"><button class="btn btn-p" data-copy>${ic('copy')}${t('copy')}</button>${btnSoon('Исправить через WordPress', 'Подключение WordPress — скоро')}</div>`;
+  } else if (a.type === 'analysis') {
+    const x = a.data.analysis;
+    if (x) {
+      body += `<div class="verdict">${esc(x.verdict)}</div>`;
+      if (x.reasons && x.reasons.length) body += `<div class="p-sec"><h3>За что называют других</h3>${x.reasons.map(r => `<div class="gap"><b>${esc(r.rival)}</b><p>${esc(r.why)}</p>${r.quote ? `<q>${esc(r.quote)}</q>` : ''}</div>`).join('')}</div>`;
+      if (x.gaps && x.gaps.length) body += `<div class="p-sec"><h3>Что сделать</h3>${x.gaps.map(g => `<div class="gap"><b>${esc(g.title)}</b>${g.effort ? ` <span class="tag">${esc(g.effort)}</span>` : ''}<p>${esc(g.why)}</p>${g.how ? `<p><b style="font-size:13px">Сегодня:</b> ${esc(g.how)}</p>` : ''}</div>`).join('')}</div>`;
+    } else body += `<div class="prose">${md(a.data.text)}</div>`;
+    body += `<div class="note">Разбор написала нейросеть ${esc(a.data.model || '')} только по настоящим ответам замера и прочитанным сайтам. Проверьте выводы перед тем, как действовать.</div>`;
+    foot = `<div class="acts"><button class="btn btn-p" data-copy>${ic('copy')}${t('copy')}</button>${btnSoon('В план работ', 'План работ появится вместе с аккаунтами')}</div>`;
+  } else {
+    body += `<label class="sr" for="draft">Черновик</label><textarea class="draft" id="draft">${esc(a.data.text)}</textarea><div class="note">Черновик можно править прямо здесь. Пометки [что вписать] — места для ваших фактов: нейросеть их не выдумывает.</div>`;
+    foot = `<div class="acts"><button class="btn btn-p" data-copy>${ic('copy')}${t('copy')}</button>${a.data.pub ? `<button class="btn" disabled title="${esc(a.data.pub)} — ${t('soon')}">${ic('check')}${t('publish')} <span class="soon">${t('soon')}</span></button>` : ''}</div>${a.data.pub ? `<span class="hint">${esc(a.data.pub)}: подключение появится скоро. Сейчас — скопируйте и вставьте вручную.</span>` : ''}`;
+  }
+  el.innerHTML = `<div class="p-head"><div class="pt"><h2>${esc(a.title)}${a.sample ? ` <span class="ex">${t('example')}</span>` : ''}</h2><div class="ps">${esc(a.sub || '')}</div></div><button class="ib" data-act="close-art" aria-label="${t('close')}">${ic('x')}</button></div><div class="p-body">${body}</div><div class="p-foot">${foot}</div>`;
+  const ta = $('#draft'); if (ta) ta.style.height = Math.max(280, ta.scrollHeight + 4) + 'px';
+  // «Показать полностью» — только там, где ответ правда обрезан (меряем после того, как панель раскрылась)
+  setTimeout(() => $$('.qa', el).forEach(q => { const x = $('.a', q), b = $('.more', q); if (b && !q.classList.contains('full')) b.hidden = x.scrollHeight <= x.clientHeight + 2 }), 320);
+}
+function artText(a){
+  const d = a.data;
+  if (a.type === 'report') return `${a.sample ? '[ПРИМЕР] ' : ''}Замер видимости: ${d.company} · ${d.niche} · ${d.city}\nНазвали в ${d.results.filter(r => r.named).length} из ${d.results.length} ответов.\n\n` + d.results.map(r => `— ${r.question}\n  ${r.named ? 'назвали' : 'не назвали'}\n  ${r.answer}`).join('\n\n');
+  if (a.type === 'audit') return `Проверка сайта ${d.url}\n\n` + d.checks.map(x => `${x.ok ? '✓' : '✗'} ${x.label} (${x.detail})`).join('\n') + '\n\nБоты нейросетей:\n' + d.bots.map(b => `${b.allowed === true ? '✓' : b.allowed === false ? '✗' : '?'} ${b.bot} — ${b.what}`).join('\n');
+  if (a.type === 'analysis') { const x = d.analysis; return x ? `${x.verdict}\n\n` + (x.reasons || []).map(r => `${r.rival}: ${r.why}`).join('\n') + '\n\nЧто сделать:\n' + (x.gaps || []).map(g => `— ${g.title}. ${g.how}`).join('\n') : d.text }
+  const ta = $('#draft'); return ta ? ta.value : d.text;
+}
+async function copy(text){
+  try { await navigator.clipboard.writeText(text) }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy') } catch (x) {} ta.remove() }
+  toast(t('copied'));
+}
+let toastT;
+function toast(s){ const el = $('#toast'); el.textContent = s; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 1800) }
+
+/* ---------- подключения ---------- */
+const CONN = [
+  ['tg', 'Telegram', '#2aabee', 'TG', 'Публикует посты в ваш канал и раз в неделю присылает отчёт о замере.'],
+  ['wp', 'WordPress', '#21759b', 'W', 'Создаёт страницу вопросов и ответов и добавляет разметку данных о компании.'],
+  ['tilda', 'Tilda', '#ff855d', 'T', 'Создаёт страницу вопросов и ответов на вашем сайте после вашего одобрения.'],
+  ['ig', 'Instagram', 'linear-gradient(135deg,#f9ce34,#ee2a7b 55%,#6228d7)', 'IG', 'Обновляет описание профиля и публикует посты, которые вы одобрили.'],
+  ['threads', 'Threads', '#101010', '@', 'Публикует посты и помогает отвечать на комментарии.'],
+  ['ga', 'Google Analytics', '#e37400', 'GA', 'Показывает, сколько людей пришло на сайт из ChatGPT, Gemini и других нейросетей.'],
+  ['bitrix', 'Битрикс24', '#2fc6f6', 'Б24', 'Считает заявки, которые пришли после ответов нейросетей.'],
+  ['amo', 'amoCRM', '#339dc7', 'amo', 'Связывает упоминания в нейросетях с реальными сделками.'],
+  ['gmaps', 'Google Карты', '#1a73e8', 'G', 'Следит за карточкой компании и помогает отвечать на отзывы. Главный источник для Gemini.'],
+  ['gis', '2ГИС', '#19aa1e', '2ГИС', 'Следит за рейтингом, отзывами и данными филиалов.'],
+  ['wa', 'WhatsApp', '#25d366', 'WA', 'Отправляет клиентам просьбу оставить отзыв — только по вашему одобрению.'],
+  ['kaspi', 'Kaspi', '#f14635', 'K', 'Следит за рейтингом продавца и отзывами о товарах.']
+];
+function connectors(){
+  return `<div class="cn"><h1>${t('cnTitle')}</h1><p class="lead">${t('cnLead')}</p>
+    <div class="honest">${ic('info')}<span>${t('cnHonest')}</span></div>
+    <div class="cn-grid">${CONN.map(([id, name, bg, mark, what]) => `<div class="cn-card"><div class="cn-top"><span class="lg" style="background:${bg};${mark.length > 2 ? 'font-size:10.5px' : ''}">${esc(mark)}</span><b>${esc(name)}</b><span class="soon">${t('soon')}</span></div><p>${esc(what)}</p></div>`).join('')}</div></div>`;
+}
+
+/* ---------- данные компании ---------- */
+function editCo(){
+  const f = co(); if (!f) return;
+  const d = $('#dlg');
+  d.innerHTML = `<form class="dlg" method="dialog" id="coForm"><h2>${t('coTitle')}</h2>
+    ${[['name', t('fName')], ['niche', t('fNiche')], ['city', t('fCity')], ['site', t('fSite')]].map(([k, l]) => `<label class="fld"><span>${l}</span><input name="${k}" value="${esc(f[k] || '')}" maxlength="${k === 'site' ? 200 : 60}"></label>`).join('')}
+    <div class="row"><button class="btn" value="cancel" type="button" data-act="dlg-close">${t('cancel')}</button><button class="btn btn-p" value="ok">${t('save')}</button></div></form>`;
+  d.showModal();
+  $('#coForm').addEventListener('submit', () => {
+    const fd = new FormData($('#coForm'));
+    ['name', 'niche', 'city', 'site'].forEach(k => { const v = String(fd.get(k) || '').trim(); if (k !== 'name' || v) f[k] = v });
+    if (f.lastMeasure) delete f.lastMeasure;  // данные изменились — старый замер больше не про эту компанию
+    save(); renderAll();
+  });
+}
+
+/* ---------- события ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('button,summary'); if (!el) return;
+  const act = el.dataset.act;
+  if (el.tagName === 'SUMMARY') { const det = el.parentElement, id = det.dataset.steps; setTimeout(() => { det.open ? UI.openSteps.add(id) : UI.openSteps.delete(id) }); return }
+  if (act === 'menu') { $('#app').classList.add('menu'); return }
+  if (act === 'menu-close') { $('#app').classList.remove('menu'); return }
+  if (act === 'new') { S.chat = null; UI.view = 'chat'; closeArt(); $('#app').classList.remove('menu'); save(); return renderAll() }
+  if (act === 'add-co') { S.co = null; S.chat = null; UI.view = 'chat'; closeArt(); $('#app').classList.remove('menu'); save(); renderAll(); toast(t('newCoChat')); return }
+  if (act === 'conn') { UI.view = 'conn'; closeArt(); $('#app').classList.remove('menu'); return renderAll() }
+  if (act === 'ping') return ping();
+  if (act === 'sample') return openArt(sampleArt());
+  if (act === 'close-art') return closeArt();
+  if (act === 'edit-co') return editCo();
+  if (act === 'dlg-close') return $('#dlg').close();
+  if (el.dataset.lang) { S.lang = el.dataset.lang; document.documentElement.lang = S.lang === 'kk' ? 'kk' : 'ru'; save(); return renderAll() }
+  if (el.dataset.co) { S.co = el.dataset.co; const last = S.chats.find(c => c.companyId === S.co && c.msgs.length); S.chat = last ? last.id : null; UI.view = 'chat'; closeArt(); $('#app').classList.remove('menu'); save(); return renderAll() }
+  if (el.dataset.chat) { S.chat = el.dataset.chat; UI.view = 'chat'; closeArt(); $('#app').classList.remove('menu'); save(); return renderAll() }
+  if (el.dataset.start) { const ch = t('chips').find(x => x[0] === el.dataset.start); S.chat = null; return onSend(ch[2], ch[0]) }
+  if (el.dataset.say) return onSend(el.dataset.say, el.dataset.intent);
+  if (el.dataset.art) { const a = findArt(el.dataset.art); if (a) openArt(a); return }
+  if (el.dataset.more) { const q = el.closest('.qa'); q.classList.toggle('full'); el.textContent = q.classList.contains('full') ? 'Свернуть' : 'Показать полностью'; return }
+  if ('copy' in el.dataset && UI.art) return copy(artText(UI.art));
+  if (el.dataset.retry) {
+    const c = chat(), m = c && c.msgs.find(x => x.id === el.dataset.retry); if (!m || UI.busy) return;
+    const r = m.retry; c.msgs = c.msgs.filter(x => x !== m); save(); renderAll();
+    return run(c, r.intent, r.q);
+  }
+});
+$('#scrim').addEventListener('click', () => $('#app').classList.remove('menu'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#app').classList.contains('menu')) $('#app').classList.remove('menu'); else if (UI.art) closeArt() } });
+let wasMobile = innerWidth <= 900;
+addEventListener('resize', () => { const mob = innerWidth <= 900; if (mob !== wasMobile) { wasMobile = mob; renderSide() } });
+
+document.documentElement.lang = S.lang === 'kk' ? 'kk' : 'ru';
+renderAll();
+ping();
+</script>
+</body>
+</html>
