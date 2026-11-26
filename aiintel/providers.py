@@ -91,6 +91,29 @@ def perplexity(prompt, system=None):
     return Answer(data["choices"][0]["message"].get("content") or "", urls, data.get("model", model), engine="perplexity", search=bool(urls))
 
 
+def undouble(text):
+    """The same answer given twice in a row (whole text, or the same run of paragraphs) comes back once."""
+    s = str(text or "")
+    t = s.strip()
+    n = len(t)
+    if n >= 40:
+        for gap in range(0, 5):
+            if (n - gap) % 2:
+                continue
+            h = (n - gap) // 2
+            if t[:h] == t[n - h:] and not t[h:n - h].strip():
+                return t[:h].strip()
+    paras = [x.strip() for x in re.split(r"\n\s*\n", t)]
+    if n >= 40 and len(paras) >= 2 and len(paras) % 2 == 0 and paras[: len(paras) // 2] == paras[len(paras) // 2:]:
+        return "\n\n".join(paras[: len(paras) // 2])
+    out = []
+    for x in paras:
+        if out and len(x) >= 30 and x == out[-1]:
+            continue
+        out.append(x)
+    return "\n\n".join(out) if len(out) < len(paras) else s
+
+
 def gemini(prompt, system=None, search=None, model=None, retries=3, timeout=180):
     # gemini-2.5-flash is reported to be switched off for this API on 2026-12-01; Google's moving flash-lite name
     # follows the cheap line the server prefers. The server always passes its own model; this default is for the CLI.
@@ -108,7 +131,15 @@ def gemini(prompt, system=None, search=None, model=None, retries=3, timeout=180)
         retries=retries,
     )
     cand = (data.get("candidates") or [{}])[0]
-    text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
+    # thought parts are the model's notes, not the answer; a part that repeats the text already given (seen with
+    # grounded answers: the whole reply comes twice) is dropped, so the page never shows the same answer twice
+    text = ""
+    for p in cand.get("content", {}).get("parts", []):
+        piece = p.get("text", "") if isinstance(p, dict) and not p.get("thought") else ""
+        if len(piece.strip()) >= 20 and piece.strip() in text:
+            continue
+        text += piece
+    text = undouble(text)
     grounding = cand.get("groundingMetadata") or {}
     chunks = grounding.get("groundingChunks") or []
     # with the google_search tool the model itself decides whether to search; it did only if Google says so

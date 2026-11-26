@@ -36,7 +36,7 @@ async function stub(page, opts = {}) {
     const json = (status, obj) => route.fulfill({ status, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify(obj) });
     if (opts.down && opts.down()) return route.abort('connectionrefused');
     if (url.pathname === '/api/health') return json(200, { ok: true, ai: true, provider: 'gemini', threads: false });
-    if (url.pathname === '/api/quick') { const i = body.i; return json(200, { company: body.company, result: { question: QS[i], answer: ANS[i], named: i === 1, sources: i === 0 ? ['2gis.kz', 'instagram.com'] : ['2gis.kz'], model: 'gemini-2.5-flash', cached: i === 2, engine: 'gemini', search: true } }) }
+    if (url.pathname === '/api/quick') { const i = body.i, rival = body.company === 'Lingva Test'; return json(200, { company: body.company, result: { question: QS[i], answer: ANS[i], named: rival ? i < 3 : i === 1, sources: i === 0 ? ['2gis.kz', 'instagram.com'] : ['2gis.kz'], model: 'gemini-2.5-flash', cached: rival || i === 2, engine: 'gemini', search: true } }) }
     if (url.pathname === '/api/site-audit') return json(200, { url: 'https://akku-test.kz/', robots: 'read', bots: [['OAI-SearchBot', 'поиск в ChatGPT', true], ['GPTBot', 'обучение моделей OpenAI', false], ['ChatGPT-User', 'когда человек просит ChatGPT открыть страницу', true], ['PerplexityBot', 'Perplexity', true], ['Google-Extended', 'Gemini', true], ['ClaudeBot', 'Claude', true], ['bingbot', 'поиск Bing', true]].map(([bot, what, allowed]) => ({ bot, what, allowed })), checks: [
       { id: 'robots', label: 'Файл robots.txt найден', ok: true, detail: 'код ответа 200' }, { id: 'open', label: 'Главная страница открывается без входа', ok: true, detail: 'код ответа 200' }, { id: 'text', label: 'Текст виден без JavaScript', ok: false, detail: '120 знаков текста в коде страницы' }, { id: 'title', label: 'Есть заголовок и описание страницы', ok: true, detail: 'теги title и meta description' }, { id: 'price', label: 'На странице упомянуты цены', ok: false, detail: 'слова о цене или знак ₸' }, { id: 'contact', label: 'Есть телефон или адрес', ok: true, detail: 'телефон или адрес в тексте' }, { id: 'schema', label: 'Есть разметка данных о компании', ok: false, detail: 'блок JSON-LD' }, { id: 'speed', label: 'Страница отвечает быстрее трёх секунд', ok: true, detail: '0.84 с' }, { id: 'sitemap', label: 'Есть карта сайта для Bing и других поисковиков', ok: true, detail: 'sitemap.xml найден' }] });
     if (url.pathname === '/api/connect/telegram/test') {
@@ -47,12 +47,22 @@ async function stub(page, opts = {}) {
     if (url.pathname === '/api/connect/wordpress/test') return json(200, { ok: true, site: 'https://akku-test.kz', name: 'Айгерим', can_publish: true });
     if (url.pathname === '/api/publish/wordpress') return json(200, { ok: true, id: 15, status: body.status, link: 'https://akku-test.kz/?page_id=15', edit_link: 'https://akku-test.kz/wp-admin/post.php?post=15&action=edit' });
     if (url.pathname === '/api/agent' && body.task === 'tgpost') return json(200, { text: 'Набор в летние группы открыт!\n\nЗанимаемся по 90 минут, в группе до 8 человек. Первый урок — пробный.\n\nЗапись — в личных сообщениях канала.', model: 'gemini-2.5-flash', steps: [{ text: 'Сайт: прочитал 2400 знаков', ok: true }, { text: 'Текст написала нейросеть gemini-2.5-flash', ok: true }] });
+    // the bug the owner saw: a reply that came twice in one answer must be shown once
+    if (url.pathname === '/api/agent' && body.task === 'chat') return json(200, { text: DUP + '\n\n' + DUP, model: 'gemini-2.5-flash', steps: [{ text: 'Текст написала нейросеть gemini-2.5-flash', ok: true }] });
+    if (url.pathname === '/api/agent' && ['weekplan', 'reply', 'review', 'pitch', 'narrow', 'bio'].includes(body.task)) return json(200, { text: `Черновик (${body.task}).\n\nПервый пункт для «${body.context.company}».`, model: 'gemini-2.5-flash', steps: [{ text: 'Текст написала нейросеть gemini-2.5-flash', ok: true }] });
     if (url.pathname === '/api/agent') return json(200, { text: '## Вопросы и ответы\n\n**С какого возраста вы берёте детей?**\nМы занимаемся с детьми от [что вписать] лет.\n\n**Сколько человек в группе?**\nВ группе до [что вписать] учеников.', model: 'gemini-2.5-flash', steps: [{ text: 'Сайт: прочитал 2400 знаков', ok: true }, { text: 'Взял из замера вопросы, где компанию не назвали: 2', ok: true }, { text: 'Текст написала нейросеть gemini-2.5-flash', ok: true }] });
     if (url.pathname === '/api/analyze') return json(200, { model: 'gemini-2.5-flash', text: '', steps: [{ text: 'Перечитал ответы нейросети: 3', ok: true }, { text: 'Прочитал ваш сайт: 2400 знаков', ok: true }, { text: 'Разбор написала нейросеть gemini-2.5-flash', ok: true }], analysis: { verdict: 'Конкурентов называют за отзывы на 2ГИС и подробные страницы программ.', reasons: [{ rival: 'Lingva Test', why: 'много свежих отзывов', quote: 'у них много отзывов на 2ГИС' }], gaps: [{ title: 'Соберите 10 отзывов на 2ГИС', why: 'у конкурентов их больше', how: 'отправьте просьбу пяти клиентам', effort: 'день' }] } });
     return json(404, { error: 'Не найдено.' });
   });
   return calls;
 }
+
+const DUP = 'Поздравление готово: «Аққу English поздравляет вас с Наурызом!» Добавьте фото группы и время занятий в праздники.';
+// saved data for the company home: three real-shaped measurements and a site check, as the page stores them
+const DAY = 864e5, NOW = Date.now();
+const saved = (extra = {}) => ({ lang: 'ru', co: 'c1', chat: null, chats: [], companies: [{ id: 'c1', name: 'Аққу English', niche: 'rehcs fyukbqcrjuj', city: 'Алматы', site: 'akku-test.kz',
+  measures: [[NOW - 14 * DAY, 0], [NOW - 7 * DAY, 0], [NOW - 2 * DAY, 1]].map(([at, k]) => ({ at, results: QS.map((q, i) => ({ question: q, answer: ANS[i], named: i < k, sources: i === 0 ? ['2gis.kz', 'instagram.com'] : ['2gis.kz'], engine: 'gemini', model: 'gemini-2.5-flash', search: true, cached: false })) })),
+  audit: { at: NOW - 2 * DAY, url: 'https://akku-test.kz/', ok: 6, total: 9, bad: ['Текст виден без JavaScript', 'На странице упомянуты цены', 'Есть разметка данных о компании'], closed: ['GPTBot'] }, ...extra }] });
 
 let expect400 = 0;  // a stubbed «bad token» answer is logged by Chrome as a failed resource: allowed only where expected
 function watch(page, errors) {
@@ -61,16 +71,16 @@ function watch(page, errors) {
 }
 
 async function noHScroll(page, label) {
-  const w = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
-  assert(w[0] <= w[1], `${label}: no horizontal scroll (${w[0]} <= ${w[1]})`);
+  const w = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth, [...document.querySelectorAll('body *')].filter(e => e.getBoundingClientRect().right > innerWidth + 0.5 && getComputedStyle(e).visibility !== 'hidden' && !e.closest('.panel:not(:has(*))')).slice(0, 4).map(e => e.tagName + '.' + e.className + ' ' + Math.round(e.getBoundingClientRect().right)).join(', ')]);
+  assert(w[0] <= w[1], `${label}: no horizontal scroll (${w[0]} <= ${w[1]})${w[0] > w[1] ? ' — wider: ' + w[2] : ''}`);
 }
 
-async function measure(page) {
+async function measure(page, niche = 'курсы английского') {
   await page.click('[data-start="measure"]');
   await page.waitForSelector('text=Как называется ваша компания?');
   await page.fill('#inp', 'Аққу English'); await page.press('#inp', 'Enter');
   await page.waitForSelector('text=Чем занимается компания?');
-  await page.fill('#inp', 'курсы английского'); await page.press('#inp', 'Enter');
+  await page.fill('#inp', niche); await page.press('#inp', 'Enter');
   await page.waitForSelector('text=В каком городе ваши клиенты?');
   await page.click('.chip[data-say="Алматы"]');
   await page.waitForSelector('.art-card');
@@ -95,6 +105,8 @@ async function measure(page) {
     assert(!(await page.content()).match(/₸\s*\d|\d\s*₸|тенге\/мес|тариф/i), 'no prices on the page');
     const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     assert(await bg() === 'rgb(0, 0, 0)' && await page.getAttribute('html', 'data-theme') === 'dark', 'dark (black) design by default, like the landing');
+    const ids = await page.$$eval('.start .tool', els => els.map(e => e.dataset.start));
+    assert(ids.join() === 'measure,why,audit,faq,tgpost,weekplan,reply,review,bio,pitch,narrow,compare', 'start screen: gallery of 12 tools, each a real flow');
     await shot(page, 'desktop-1-start.png');
     await page.click('[data-act="theme"]');
     assert(await bg() === 'rgb(255, 255, 255)' && await page.evaluate(() => localStorage.getItem('korin-theme-v4')) === 'light', 'theme toggle switches to light and remembers it');
@@ -102,7 +114,8 @@ async function measure(page) {
     await page.click('[data-act="theme"]');
     assert(await bg() === 'rgb(0, 0, 0)', 'and back to dark');
 
-    await measure(page);
+    await measure(page, 'rehcs fyukbqcrjuj');  // «курсы английского» typed with the English layout on
+    assert((await page.textContent('.lfix')).includes('Исправил раскладку') && (await page.textContent('.lfix')).includes('курсы английского') && await page.isVisible('.lfix [data-unfix]'), 'wrong keyboard layout is fixed and said so, with «Вернуть как было»');
     await page.waitForSelector('.panel .stat', { state: 'visible', timeout: 3000 }).catch(() => {});
     assert(await page.isVisible('.panel .stat'), 'measurement report opens in the side panel');
     await page.waitForTimeout(350);
@@ -114,6 +127,14 @@ async function measure(page) {
     assert((await page.evaluate(() => navigator.clipboard.readText())).includes('Замер видимости: Аққу English'), 'copy puts the report into the clipboard');
     await shot(page, 'desktop-2-measurement.png');
 
+    // free chat: the reply text appears once even when the server's answer carries it twice
+    await page.fill('#inp', 'напиши поздравление клиентам с Наурызом'); await page.press('#inp', 'Enter');
+    await page.waitForFunction(() => document.querySelectorAll('#conv .prose').length && [...document.querySelectorAll('#conv .prose')].pop().textContent.includes('Поздравление готово'));
+    const last = await page.evaluate(() => [...document.querySelectorAll('#conv .msg-a')].pop().textContent);
+    assert(last.split('Поздравление готово').length === 2, 'a chat reply is rendered once, not twice');
+    assert(await page.evaluate(() => [...document.querySelectorAll('#conv .msg-a')].pop().querySelectorAll('.next .chip[data-intent]').length) >= 1, 'a chat reply ends with tool buttons, not just prose');
+    const chatCall = calls.find(c => c.path === '/api/agent' && c.body.task === 'chat');
+    assert(chatCall && chatCall.body.context.niche === 'курсы английского', 'the fixed niche is what goes to the server');
     await page.click('.next .chip[data-intent="why"]');
     await page.waitForSelector('.panel .verdict');
     const an = calls.find(c => c.path === '/api/analyze');
@@ -126,7 +147,7 @@ async function measure(page) {
 
     await page.click('.next .chip[data-intent="faq"]');
     await page.waitForSelector('#draft');
-    const ag = calls.find(c => c.path === '/api/agent');
+    const ag = calls.find(c => c.path === '/api/agent' && c.body.task === 'faq');
     assert(ag.body.task === 'faq' && ag.body.context.links['Сайт'] === 'akku-test.kz' && ag.body.context.not_named_on.length === 2, '/api/agent faq gets site link and not_named_on');
     assert(await page.isVisible('.panel [data-act="cn-wp"]') && !(await page.isVisible('.panel [data-act="pub"]')), 'draft offers «Подключить WordPress» before anything can be published');
     await shot(page, 'desktop-4-draft.png');
@@ -205,7 +226,7 @@ async function measure(page) {
 
     await page.click('[data-lang="kk"]');
     await page.click('[data-act="new"]');
-    assert(await page.isVisible('text=Бизнесіңіз үшін не істейік?'), 'қаз switch changes UI strings');
+    assert(await page.isVisible('text=Аптаның істері') && await page.isVisible('.tool:has-text("Көріну өлшемі")'), 'қаз switch changes UI strings');
     await page.click('[data-lang="ru"]');
 
     await page.reload();
@@ -214,6 +235,93 @@ async function measure(page) {
     await page.click('[data-act="sample"]');
     assert((await page.textContent('.panel')).includes('пример'), 'sample report is marked «пример»');
     await ctx.close();
+
+    /* ---------- company home from saved data, plan reply, tools ---------- */
+    for (const [vw, tag] of [[{ width: 1280, height: 800 }, 'desktop'], [{ width: 390, height: 664 }, 'mobile']]) {
+      ctx = await browser.newContext(tag === 'mobile' ? { viewport: vw, isMobile: true, hasTouch: true, deviceScaleFactor: 2 } : { viewport: vw });
+      page = await ctx.newPage(); watch(page, errors);
+      calls = await stub(page);
+      await page.addInitScript(d => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('korin-ai-v1', d); sessionStorage.setItem('seeded', '1') } }, JSON.stringify(saved()));
+      await page.goto(URL_);
+      await page.waitForSelector('.home .dash');
+      const dash = await page.textContent('.dash');
+      assert(dash.includes('1 из 3') && dash.includes('Gemini · gemini-2.5-flash · с поиском') && dash.includes('+1 к прошлому замеру'), `${tag} home: last score, date, engine and change from saved measurements`);
+      assert(await page.$$eval('.spark i', e => e.length) === 3 && (await page.textContent('.spark')).includes('0/3'), `${tag} home: trend of the 3 saved measurements`);
+      assert(dash.includes('Lingva Test') && dash.includes('Speak Test') && !/Аққу English\s*\d/.test(dash.split('Кого называют')[1].split('Вы ·')[0]), `${tag} home: rivals named most often, counted from saved answers (not the company itself)`);
+      assert(dash.includes('2gis.kz · 9') && dash.includes('instagram.com · 3'), `${tag} home: sources cited, counted`);
+      assert(dash.includes('6 из 9') && dash.includes('GPTBot закрыт в robots.txt'), `${tag} home: last site check`);
+      assert((await page.textContent('.fixbar')).includes('«rehcs fyukbqcrjuj» → «курсы английского»') && (await page.textContent('.home-head')).includes('курсы английского'), `${tag} home: niche saved in the wrong layout is fixed, said so`);
+      const tasks = await page.$$eval('.tasks .task', els => els.map(e => [e.querySelector('[data-tool]').dataset.tool, e.textContent]));
+      assert(tasks.length === 3 && tasks[0][0] === 'faq' && tasks[0][1].includes('вас не назвали') && tasks.some(x => x[0] === 'audit' && x[1].includes('поправить 4')), `${tag} home: «Дела на неделю» — 3 tasks from real gaps (${tasks.map(x => x[0])})`);
+      await shot(page, `${tag}-11-company-home.png`);
+      if (tag === 'desktop') { await page.evaluate(() => document.querySelector('.tasks').scrollIntoView()); await shot(page, 'desktop-11b-company-home-tasks.png') }
+      // «Вернуть как было» for the saved niche
+      await page.click('[data-act="unfix-co"]');
+      assert((await page.textContent('.home-head')).includes('rehcs fyukbqcrjuj') && !(await page.isVisible('.fixbar')), `${tag} undo puts the niche back as typed`);
+      await page.reload(); await page.waitForSelector('.home .dash');
+      assert(!(await page.isVisible('.fixbar')), `${tag} and it is not «fixed» again after reload`);
+      await page.click('[data-act="edit-co"]'); await page.fill('#coForm [name=niche]', 'курсы английского'); await page.click('#coForm .btn-p');
+      await page.waitForSelector('.home .dash');
+      assert((await page.textContent('.dash')).includes('Сделать первый замер') && !(await page.textContent('.dash')).includes('из 3'), `${tag} changed niche: old numbers gone, clear CTA «Сделать первый замер»`);
+      if (tag === 'desktop') await shot(page, 'desktop-12-company-home-empty.png');
+      await page.reload();
+      await page.evaluate(d => localStorage.setItem('korin-ai-v1', d), JSON.stringify(saved({ niche: 'курсы английского' })));
+      await page.reload(); await page.waitForSelector('.home .dash .spark');
+
+      // generic question → a plan made of tool buttons, no prose from the model
+      const agentBefore = calls.filter(c => c.path === '/api/agent').length;
+      await page.fill('#inp', 'как ты мне поможешь?'); await page.press('#inp', 'Enter');
+      await page.waitForSelector('#conv .plan .task');
+      const plan = await page.$$eval('#conv .plan .task', els => els.map(e => [e.querySelector('[data-tool]').dataset.tool, e.querySelector('[data-tool]').textContent, e.textContent]));
+      assert(plan.length >= 4 && plan.every(x => /Сделать|Повторить/.test(x[1])) && plan[0][0] === 'faq', `${tag} «как ты мне поможешь?» → plan of tool buttons (${plan.map(x => x[0])})`);
+      assert(calls.filter(c => c.path === '/api/agent').length === agentBefore, `${tag} the plan is built from saved data, no model talk`);
+      await noHScroll(page, `${tag} plan`);
+      await shot(page, `${tag}-13-plan-reply.png`);
+      await page.click('#conv .plan .task >> nth=0 >> [data-tool]');
+      await page.waitForFunction(() => document.querySelectorAll('#conv .art-card').length >= 1);
+      const faq = calls.filter(c => c.path === '/api/agent' && c.body.task === 'faq').pop();
+      assert(faq && faq.body.question.includes(QS[1]) && faq.body.context.site_problems.length === 4 && faq.body.context.rivals.includes('Lingva Test'), `${tag} «Сделать» runs the FAQ tool for the question where the company was not named`);
+      if (tag === 'mobile') { await page.click('[data-act="close-art"]').catch(() => {}); await page.waitForTimeout(300) }
+
+      // tools: content plan, review reply, compare with a competitor
+      if (tag === 'desktop') {
+        await page.click('[data-act="tools"]');
+        assert(await page.$$eval('.cn .tool', e => e.length) === 12, 'sidebar «Инструменты» opens the gallery');
+        await shot(page, 'desktop-14-tools.png');
+        await page.click('.cn .tool[data-start="weekplan"]');
+        await page.waitForSelector('.panel #draft');
+        const wp = calls.filter(c => c.path === '/api/agent' && c.body.task === 'weekplan').pop();
+        assert(wp && /Даты постов: (пн|вт|ср|чт|пт|сб), \d+ [а-я]+; /.test(wp.body.question) && wp.body.question.split(';').length === 5, 'content plan: /api/agent weekplan with 5 real dates');
+        await page.click('[data-act="tools"]'); await page.click('.cn .tool[data-start="reply"]');
+        await page.waitForSelector('text=Вставьте текст отзыва');
+        await page.fill('#inp', 'Ждали администратора 20 минут, но преподаватель Айгуль супер!'); await page.press('#inp', 'Enter');
+        await page.waitForSelector('.panel #draft');
+        const rp = calls.filter(c => c.path === '/api/agent' && c.body.task === 'reply').pop();
+        assert(rp && rp.body.question.includes('Отзыв клиента:\nЖдали администратора 20 минут'), 'review reply: the pasted review goes to /api/agent reply as is');
+        await page.click('[data-act="tools"]'); await page.click('.cn .tool[data-start="review"]');
+        await page.waitForSelector('.panel [data-act="wa"]');
+        assert(calls.some(c => c.path === '/api/agent' && c.body.task === 'review'), 'review request: draft with «Открыть в WhatsApp»');
+        for (const [id, task] of [['pitch', 'pitch'], ['narrow', 'narrow'], ['bio', 'bio']]) {
+          await page.click('[data-act="tools"]'); await page.click(`.cn .tool[data-start="${id}"]`);
+          await page.waitForFunction(n => [...document.querySelectorAll('#conv .msg-a')].pop().textContent.includes('Черновик готов'), id);
+          assert(calls.some(c => c.path === '/api/agent' && c.body.task === task), `tool ${id} → /api/agent ${task}`);
+        }
+      }
+      await page.click(tag === 'mobile' ? '.top [data-act="menu"]' : '[data-act="home"]');
+      if (tag === 'mobile') { await page.waitForTimeout(300); await page.click('[data-act="home"]') }
+      await page.waitForSelector('.home .dash');
+      await page.click('.dash [data-tool="compare"][data-rival="Lingva Test"]');
+      await page.waitForSelector('.art-card:has-text("Сравнение с конкурентом")');
+      const rq = calls.filter(c => c.path === '/api/quick' && c.body.company === 'Lingva Test');
+      assert(rq.length === 3 && rq.every((c, i) => c.body.i === i && c.body.niche === 'курсы английского'), `${tag} compare: the same 3 questions for the competitor via /api/quick`);
+      if (tag === 'mobile') await page.click('.art-card:has-text("Сравнение с конкурентом")');
+      await page.waitForSelector('.panel .cmp', { state: 'visible' });
+      assert((await page.textContent('.panel .stat')).includes('1 : 3'), `${tag} compare: both measurements side by side`);
+      await page.waitForTimeout(400);
+      await noHScroll(page, `${tag} compare`);
+      await shot(page, `${tag}-15-compare.png`);
+      await ctx.close();
+    }
 
     /* ---------- server down: honest error, retry ---------- */
     ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });

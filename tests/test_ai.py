@@ -697,5 +697,44 @@ class UnchangedTest(Base):
         self.assertEqual(data["writers"], {"own": ["main"], "client": ["main"]})
 
 
+# ---------- 6. cabinet tools: new agent tasks, a reply never comes twice ----------
+class AgentTasksTest(Base):
+    def setUp(self):
+        super().setUp()
+        self.patch(app, "read_page", lambda raw: {"url": raw, "status": 404, "title": "", "text": ""})
+
+    def test_week_plan_and_review_reply_are_agent_tasks(self):
+        seen = []
+
+        def ask(prompt, system=None):
+            seen.append((prompt, system))
+            return ("План готов.", [], "test-model")
+
+        self.patch(app, "ask", ask)
+        for task, question in (("weekplan", "Даты постов: вт 1 декабря, ср 2 декабря"), ("reply", "Отзыв клиента: долго ждали ответа")):
+            out = app.run_agent({"task": task, "question": question, "context": {"company": "Аққу English", "niche": "курсы", "city": "Алматы"}})
+            self.assertEqual(set(out), {"text", "model", "steps"})
+            self.assertEqual(seen[-1][1], app.AGENTS[task])
+            self.assertIn(question, seen[-1][0])
+            self.assertIn("[что вписать]", app.AGENTS[task])  # no invented facts, as in the other tasks
+        self.assertIn("5 постов", app.AGENTS["weekplan"])
+
+    def test_a_reply_given_twice_is_shown_once(self):
+        once = "Я помогу: сначала замер, потом страница вопросов.\n\nВторой абзац ответа про сайт."
+        for doubled in (once + "\n\n" + once, once + once, once + "\n" + once):
+            self.patch(app, "ask", lambda prompt, system=None, d=doubled: (d, [], "m"))
+            self.assertEqual(app.run_agent({"task": "chat", "question": "как ты поможешь?", "context": {}})["text"], once)
+        self.assertEqual(providers.undouble("Да.\n\nДа."), "Да.\n\nДа.")  # short texts are left alone
+        self.assertEqual(providers.undouble("Первый абзац.\n\nВторой абзац."), "Первый абзац.\n\nВторой абзац.")
+
+    def test_gemini_parts_repeating_the_answer_are_dropped(self):
+        os.environ["GEMINI_API_KEY"] = "k"
+        text = "Советую Alfa и Beta: у них много отзывов на картах."
+        reply = gemini_reply(text)
+        reply["candidates"][0]["content"]["parts"] = [{"text": "думаю…", "thought": True}, {"text": text}, {"text": text}]
+        self.http(gemini=[reply])
+        self.assertEqual(providers.gemini("q", model="gemini-test", retries=0)[0], text)
+
+
 if __name__ == "__main__":
     unittest.main()
