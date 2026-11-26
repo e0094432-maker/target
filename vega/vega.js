@@ -38,6 +38,11 @@
     watch.forEach(el => io.observe(el));
   }
 
+  /* шапка темнеет после начала прокрутки; меню на телефоне закрывается после выбора пункта */
+  const top = document.querySelector('.top'), mt = document.getElementById('menu-t');
+  if (top) { const sc = () => top.classList.toggle('s', scrollY > 40); sc(); addEventListener('scroll', sc, { passive: true }) }
+  if (mt) document.querySelectorAll('.nav a').forEach(a => a.addEventListener('click', () => { mt.checked = false }));
+
   const f = document.getElementById('leadForm'); if (!f) return;
   const msg = f.querySelector('.msg');
   let began = false; f.addEventListener('input', () => { if (!began) { began = true; track('начал заполнять форму') } });

@@ -25,7 +25,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' text-anchor='middle' fill='%23e0a77a'%3EV%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../vega.css">
 <script type="application/ld+json">
 {
@@ -94,29 +94,37 @@
 </script>
 </head>
 <body>
-<header class="top"><div class="wrap">
-  <a class="logo" href="../kz/">VEGA <b>LEGAL</b></a>
-  <nav class="nav" aria-label="Menu"><a href="../kz/" aria-current="page">Басты бет</a><a href="../mfca/">АХҚО (орысша)</a><a href="../astana-hub/">Astana Hub (орысша)</a><a href="#contact">Байланыс</a></nav>
-  <div class="langs"><a href="../" hreflang="ru" lang="ru">RU</a><a href="../kz/" hreflang="kk" lang="kk" aria-current="true">KZ</a><a href="../en/" hreflang="en" lang="en">EN</a></div>
-  <a class="btn btn-cu" href="https://wa.me/77021686733?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5%21%20%D0%90%D0%A5%D2%9A%D0%9E-%D0%B4%D0%B0%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%82%D1%96%D1%80%D0%BA%D0%B5%D1%83%20%D0%BD%D0%B5%D0%BC%D0%B5%D1%81%D0%B5%20Astana%20Hub%20%D2%9B%D0%B0%D1%82%D1%8B%D1%81%D1%83%D1%88%D1%8B%D1%81%D1%8B%20%D0%BC%D3%99%D1%80%D1%82%D0%B5%D0%B1%D0%B5%D1%81%D1%96%20%D0%B1%D0%BE%D0%B9%D1%8B%D0%BD%D1%88%D0%B0%20%D0%B7%D0%B0%D2%A3%D0%B3%D0%B5%D1%80%20%D0%BA%D0%B5%D2%A3%D0%B5%D1%81%D1%96%20%D0%BA%D0%B5%D1%80%D0%B5%D0%BA." target="_blank" rel="noopener" aria-label="WhatsApp-қа жазу"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg><span>WhatsApp</span></a>
-</div></header>
+<header class="top">
+  <input type="checkbox" id="menu-t" class="menu-t" aria-label="Мәзір">
+  <div class="wrap bar">
+    <a class="logo" href="../kz/"><img src="../logo.png" width="83" height="34" alt="Vega Legal"></a>
+    <div class="pill">
+      <nav class="nav" aria-label="Menu"><a href="../kz/" aria-current="page">Басты бет</a><a href="../mfca/">АХҚО (орысша)</a><a href="../astana-hub/">Astana Hub (орысша)</a><a href="#contact">Байланыс</a></nav>
+      <div class="tools">
+        <div class="langs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg><a href="../" hreflang="ru" lang="ru">RU</a><a href="../kz/" hreflang="kk" lang="kk" aria-current="true">KZ</a><a href="../en/" hreflang="en" lang="en">EN</a></div>
+        <a class="cta" href="https://wa.me/77021686733?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5%21%20%D0%90%D0%A5%D2%9A%D0%9E-%D0%B4%D0%B0%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%82%D1%96%D1%80%D0%BA%D0%B5%D1%83%20%D0%BD%D0%B5%D0%BC%D0%B5%D1%81%D0%B5%20Astana%20Hub%20%D2%9B%D0%B0%D1%82%D1%8B%D1%81%D1%83%D1%88%D1%8B%D1%81%D1%8B%20%D0%BC%D3%99%D1%80%D1%82%D0%B5%D0%B1%D0%B5%D1%81%D1%96%20%D0%B1%D0%BE%D0%B9%D1%8B%D0%BD%D1%88%D0%B0%20%D0%B7%D0%B0%D2%A3%D0%B3%D0%B5%D1%80%20%D0%BA%D0%B5%D2%A3%D0%B5%D1%81%D1%96%20%D0%BA%D0%B5%D1%80%D0%B5%D0%BA." target="_blank" rel="noopener" aria-label="WhatsApp-қа жазу"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.7-4.7A8.5 8.5 0 1 1 21 11.5z"/></svg><span>Мәселені талқылау</span></a>
+        <label class="burger" for="menu-t" aria-hidden="true"><i></i><i></i></label>
+      </div>
+    </div>
+  </div>
+</header>
 <main>
-<section class="hero"><div class="wrap">
-  <span class="eyebrow">Заң фирмасы · Астана</span>
+<section class="hero"><div class="hero-bg" aria-hidden="true"></div><div class="wrap">
   <h1>АХҚО-да компания тіркеу және Astana Hub мәртебесі — <em>Vega Legal заңгерлерінің сүйемелдеуі</em></h1>
   <p class="lead">Vega Legal — Астанадағы заң фирмасы. IT-компанияларға, стартаптарға және шетелдік инвесторларға «Астана» Халықаралық қаржы орталығында (АХҚО, AIFC) компания тіркеуге және Astana Hub технопаркі қатысушысы мәртебесіне өтінім дайындауға көмектесеміз.</p>
   <div class="btns">
-    <a class="btn btn-cu" href="https://wa.me/77021686733?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5%21%20%D0%90%D0%A5%D2%9A%D0%9E-%D0%B4%D0%B0%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%82%D1%96%D1%80%D0%BA%D0%B5%D1%83%20%D0%BD%D0%B5%D0%BC%D0%B5%D1%81%D0%B5%20Astana%20Hub%20%D2%9B%D0%B0%D1%82%D1%8B%D1%81%D1%83%D1%88%D1%8B%D1%81%D1%8B%20%D0%BC%D3%99%D1%80%D1%82%D0%B5%D0%B1%D0%B5%D1%81%D1%96%20%D0%B1%D0%BE%D0%B9%D1%8B%D0%BD%D1%88%D0%B0%20%D0%B7%D0%B0%D2%A3%D0%B3%D0%B5%D1%80%20%D0%BA%D0%B5%D2%A3%D0%B5%D1%81%D1%96%20%D0%BA%D0%B5%D1%80%D0%B5%D0%BA." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg>WhatsApp-қа жазу</a>
-    <a class="btn" href="#contact">Өтінім қалдыру</a>
+    <a class="btn btn-light" href="https://wa.me/77021686733?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5%21%20%D0%90%D0%A5%D2%9A%D0%9E-%D0%B4%D0%B0%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%82%D1%96%D1%80%D0%BA%D0%B5%D1%83%20%D0%BD%D0%B5%D0%BC%D0%B5%D1%81%D0%B5%20Astana%20Hub%20%D2%9B%D0%B0%D1%82%D1%8B%D1%81%D1%83%D1%88%D1%8B%D1%81%D1%8B%20%D0%BC%D3%99%D1%80%D1%82%D0%B5%D0%B1%D0%B5%D1%81%D1%96%20%D0%B1%D0%BE%D0%B9%D1%8B%D0%BD%D1%88%D0%B0%20%D0%B7%D0%B0%D2%A3%D0%B3%D0%B5%D1%80%20%D0%BA%D0%B5%D2%A3%D0%B5%D1%81%D1%96%20%D0%BA%D0%B5%D1%80%D0%B5%D0%BA." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.7-4.7A8.5 8.5 0 1 1 21 11.5z"/></svg>WhatsApp-қа жазу</a>
+    <a class="link-arrow" href="#contact">Өтінім қалдыру <span aria-hidden="true">→</span></a>
   </div>
-  <p class="small" style="margin-top:18px">Тіркеу туралы шешімді AFSA, қатысушы мәртебесі туралы шешімді Astana Hub қабылдайды. Заңгерлер құжаттарды дайындап, процесті сүйемелдейді, бірақ нәтижеге уәде бермейді.</p>
-</div></section>
-<section id="how"><div class="wrap">
-  <h2>Қалай жұмыс істейміз</h2>
+  <p class="small hero-note">Тіркеу туралы шешімді AFSA, қатысушы мәртебесі туралы шешімді Astana Hub қабылдайды. Заңгерлер құжаттарды дайындап, процесті сүйемелдейді, бірақ нәтижеге уәде бермейді.</p>
+</div>
+<div class="scroll-hint" aria-hidden="true"><span>Төмен айналдырыңыз</span><i></i></div></section>
+<section id="how"><div class="wrap split">
+  <h2>Қалай жұмыс <em>істейміз</em></h2>
   <ol class="steps"><li><h3>Кеңес</h3><p>Компанияның қызметін, құрылтайшыларын және АХҚО немесе Astana Hub не үшін керек екенін талқылаймыз.</p></li><li><h3>Сәйкестігін тексеру</h3><p>Бизнесті талаптармен салыстырамыз; жол сәйкес келмесе, ашық айтамыз.</p></li><li><h3>Құжаттар</h3><p>Құрылтай құжаттарын, бизнес-жоспарды және басқа материалдарды дайындаймыз.</p></li><li><h3>Өтінім беру</h3><p>Ресми портал арқылы өтінім береміз және тексерушілердің сұрақтарына жауап береміз.</p></li><li><h3>Сүйемелдеу</h3><p>Шешімнен кейін шарттар мен корпоративтік мәселелерге көмектесеміз.</p></li></ol>
 </div></section>
 <section id="services"><div class="wrap">
-  <h2>Бағыттар</h2>
+  <h2>Жұмыс <em>бағыттары</em></h2>
   <div class="grid grid-2">
     <div class="card"><h3>АХҚО құқығы</h3><p>AIFC-те компания тіркеу, AFSA лицензиялары, ағылшын құқығы бойынша шарттар, АХҚО салық режимдері.</p><a class="more" href="../mfca/" hreflang="ru">АХҚО-да тіркеу (орысша) →</a></div>
     <div class="card"><h3>Astana Hub</h3><p>Astana Hub қатысушысы мәртебесін алуда сүйемелдеу.</p><a class="more" href="../astana-hub/" hreflang="ru">Astana Hub мәртебесі (орысша) →</a></div>
@@ -127,15 +135,15 @@
 </div></section>
 <section id="contact"><div class="wrap lead-box">
   <div>
-    <h2>Мәселеңізді талқылайық</h2>
+    <h2>Мәселеңізді <em>талқылайық</em></h2>
     <p class="lead">WhatsApp-қа жазыңыз немесе байланыс деректеріңізді қалдырыңыз — Vega Legal заңгері жауап беріп, кеңес уақытын ұсынады.</p>
-    <div class="btns"><a class="btn btn-cu" href="https://wa.me/77021686733?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5%21%20%D0%90%D0%A5%D2%9A%D0%9E-%D0%B4%D0%B0%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%82%D1%96%D1%80%D0%BA%D0%B5%D1%83%20%D0%BD%D0%B5%D0%BC%D0%B5%D1%81%D0%B5%20Astana%20Hub%20%D2%9B%D0%B0%D1%82%D1%8B%D1%81%D1%83%D1%88%D1%8B%D1%81%D1%8B%20%D0%BC%D3%99%D1%80%D1%82%D0%B5%D0%B1%D0%B5%D1%81%D1%96%20%D0%B1%D0%BE%D0%B9%D1%8B%D0%BD%D1%88%D0%B0%20%D0%B7%D0%B0%D2%A3%D0%B3%D0%B5%D1%80%20%D0%BA%D0%B5%D2%A3%D0%B5%D1%81%D1%96%20%D0%BA%D0%B5%D1%80%D0%B5%D0%BA." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg>WhatsApp-қа жазу</a></div>
-    <ul class="contacts">
-      <li><div><b>WhatsApp және телефон</b><a href="https://wa.me/77021686733">+7 702 168 67 33</a> · <a href="tel:+77021686733">қоңырау шалу</a></div></li>
-      <li><div><b>Пошта</b><a href="mailto:admin@vegalegal.kz">admin@vegalegal.kz</a></div></li>
-      <li><div><b>Кеңсе</b>Астана қ., Сауран к-сі 18, Д блогы, 68-кеңсе</div></li>
-      <li><div><b>Сайт</b><a href="https://vegalegal.kz">vegalegal.kz</a></div></li>
-    </ul>
+    <div class="tiles">
+      <a class="tile tile-cu" href="https://wa.me/77021686733?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5%21%20%D0%90%D0%A5%D2%9A%D0%9E-%D0%B4%D0%B0%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%82%D1%96%D1%80%D0%BA%D0%B5%D1%83%20%D0%BD%D0%B5%D0%BC%D0%B5%D1%81%D0%B5%20Astana%20Hub%20%D2%9B%D0%B0%D1%82%D1%8B%D1%81%D1%83%D1%88%D1%8B%D1%81%D1%8B%20%D0%BC%D3%99%D1%80%D1%82%D0%B5%D0%B1%D0%B5%D1%81%D1%96%20%D0%B1%D0%BE%D0%B9%D1%8B%D0%BD%D1%88%D0%B0%20%D0%B7%D0%B0%D2%A3%D0%B3%D0%B5%D1%80%20%D0%BA%D0%B5%D2%A3%D0%B5%D1%81%D1%96%20%D0%BA%D0%B5%D1%80%D0%B5%D0%BA." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.7-4.7A8.5 8.5 0 1 1 21 11.5z"/></svg><span>WhatsApp</span><svg class="ur" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
+      <a class="tile" href="tel:+77021686733" aria-label="Қоңырау шалу: +7 702 168 67 33"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.1 4.2 2 2 0 0 1 3.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L7 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span>+7 702 168 67 33</span></a>
+      <a class="tile wide" href="mailto:admin@vegalegal.kz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>admin@vegalegal.kz</span></a>
+    </div>
+    <p class="addr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Астана қ., Сауран к-сі 18, Д блогы, 68-кеңсе</span></p>
+    <p class="small site">Фирма сайты: <a href="https://vegalegal.kz">vegalegal.kz</a></p>
   </div>
   <form class="lead" id="leadForm" novalidate>
     <label>Атыңыз<input name="name" autocomplete="name" maxlength="80" required></label>
@@ -149,13 +157,21 @@
 </div></section>
 </main>
 <footer><div class="wrap">
-  <p><a class="logo" href="../kz/" style="font-size:18px">VEGA <b>LEGAL</b></a></p>
-  <p style="margin-top:14px">Vega Legal — ТОО «SciCom», БИН 250640020511, заңды мекенжайы: Астана қ., Мәңгілік Ел даңғ. 55/7.</p>
-  <p>Астана қ., Сауран к-сі 18, Д блогы, 68-кеңсе · <a href="https://wa.me/77021686733">+7 702 168 67 33</a> · <a href="mailto:admin@vegalegal.kz">admin@vegalegal.kz</a></p>
-  <p>Ақпарат заңгерлік кеңес болып табылмайды. АХҚО-да компанияларды тіркеу және лицензиялар туралы шешімді AFSA, қатысушы мәртебесі туралы шешімді Astana Hub қабылдайды; Vega Legal нәтижеге кепілдік бермейді.</p>
-  <p>Vega Legal туралы жиі қойылатын сұрақтарға жауап беретін бет. Фирманың негізгі сайты — <a href="https://vegalegal.kz">vegalegal.kz</a>.</p>
+  <div class="foot">
+    <div class="foot-brand">
+      <a class="logo-f" href="../kz/"><img src="../logo.png" width="98" height="40" alt="Vega Legal" loading="lazy"></a>
+      <p>Астанадағы заң фирмасы: АХҚО құқығы, Astana Hub, даулар мен төрелік, M&amp;A.</p>
+    </div>
+    <div><p class="foot-h">Беттер</p><nav class="foot-links" aria-label="Беттер"><a href="../kz/">Басты бет</a><a href="../mfca/">АХҚО (орысша)</a><a href="../astana-hub/">Astana Hub (орысша)</a><a href="#contact">Байланыс</a></nav></div>
+    <div><p class="foot-h">Байланыс</p><div class="foot-links"><a href="https://wa.me/77021686733">+7 702 168 67 33</a><a href="mailto:admin@vegalegal.kz">admin@vegalegal.kz</a><a href="https://vegalegal.kz">vegalegal.kz</a><span>Астана қ., Сауран к-сі 18, Д блогы, 68-кеңсе</span></div></div>
+  </div>
+  <div class="foot-legal">
+    <p>Vega Legal — ТОО «SciCom», БИН 250640020511, заңды мекенжайы: Астана қ., Мәңгілік Ел даңғ. 55/7.</p>
+    <p>Ақпарат заңгерлік кеңес болып табылмайды. АХҚО-да компанияларды тіркеу және лицензиялар туралы шешімді AFSA, қатысушы мәртебесі туралы шешімді Astana Hub қабылдайды; Vega Legal нәтижеге кепілдік бермейді.</p>
+    <p>Vega Legal туралы жиі қойылатын сұрақтарға жауап беретін бет. Фирманың негізгі сайты — <a href="https://vegalegal.kz">vegalegal.kz</a>.</p>
+  </div>
 </div></footer>
-<a class="btn btn-cu wa-float" aria-hidden="true" tabindex="-1" href="https://wa.me/77021686733?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5%21%20%D0%90%D0%A5%D2%9A%D0%9E-%D0%B4%D0%B0%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%82%D1%96%D1%80%D0%BA%D0%B5%D1%83%20%D0%BD%D0%B5%D0%BC%D0%B5%D1%81%D0%B5%20Astana%20Hub%20%D2%9B%D0%B0%D1%82%D1%8B%D1%81%D1%83%D1%88%D1%8B%D1%81%D1%8B%20%D0%BC%D3%99%D1%80%D1%82%D0%B5%D0%B1%D0%B5%D1%81%D1%96%20%D0%B1%D0%BE%D0%B9%D1%8B%D0%BD%D1%88%D0%B0%20%D0%B7%D0%B0%D2%A3%D0%B3%D0%B5%D1%80%20%D0%BA%D0%B5%D2%A3%D0%B5%D1%81%D1%96%20%D0%BA%D0%B5%D1%80%D0%B5%D0%BA." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg>WhatsApp-қа жазу</a>
+<a class="wa-float" aria-hidden="true" tabindex="-1" href="https://wa.me/77021686733?text=%D0%A1%D3%99%D0%BB%D0%B5%D0%BC%D0%B5%D1%82%D1%81%D1%96%D0%B7%20%D0%B1%D0%B5%21%20%D0%90%D0%A5%D2%9A%D0%9E-%D0%B4%D0%B0%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%82%D1%96%D1%80%D0%BA%D0%B5%D1%83%20%D0%BD%D0%B5%D0%BC%D0%B5%D1%81%D0%B5%20Astana%20Hub%20%D2%9B%D0%B0%D1%82%D1%8B%D1%81%D1%83%D1%88%D1%8B%D1%81%D1%8B%20%D0%BC%D3%99%D1%80%D1%82%D0%B5%D0%B1%D0%B5%D1%81%D1%96%20%D0%B1%D0%BE%D0%B9%D1%8B%D0%BD%D1%88%D0%B0%20%D0%B7%D0%B0%D2%A3%D0%B3%D0%B5%D1%80%20%D0%BA%D0%B5%D2%A3%D0%B5%D1%81%D1%96%20%D0%BA%D0%B5%D1%80%D0%B5%D0%BA." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.7-4.7A8.5 8.5 0 1 1 21 11.5z"/></svg><span class="vh">WhatsApp-қа жазу</span></a>
 <script src="../vega.js" defer></script>
 </body>
 </html>

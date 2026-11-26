@@ -21,7 +21,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' text-anchor='middle' fill='%23e0a77a'%3EV%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../vega.css">
 <script type="application/ld+json">
 {
@@ -183,21 +183,28 @@
 </script>
 </head>
 <body>
-<header class="top"><div class="wrap">
-  <a class="logo" href="../">VEGA <b>LEGAL</b></a>
-  <nav class="nav" aria-label="Menu"><a href="../">Главная</a><a href="../mfca/" aria-current="page">МФЦА</a><a href="../astana-hub/">Astana Hub</a><a href="#contact">Контакты</a></nav>
-  <div class="langs"><a href="../" hreflang="ru" lang="ru" aria-current="true">RU</a><a href="../kz/" hreflang="kk" lang="kk">KZ</a><a href="../en/" hreflang="en" lang="en">EN</a></div>
-  <a class="btn btn-cu" href="https://wa.me/77021686733?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8E%20%D0%B2%20%D0%9C%D0%A4%D0%A6%D0%90%20%28AIFC%29.%20%D0%9D%D1%83%D0%B6%D0%BD%D0%B0%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8F%20%D1%8E%D1%80%D0%B8%D1%81%D1%82%D0%B0." target="_blank" rel="noopener" aria-label="Написать в WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg><span>WhatsApp</span></a>
-</div></header>
+<header class="top">
+  <input type="checkbox" id="menu-t" class="menu-t" aria-label="Меню">
+  <div class="wrap bar">
+    <a class="logo" href="../"><img src="../logo.png" width="83" height="34" alt="Vega Legal"></a>
+    <div class="pill">
+      <nav class="nav" aria-label="Menu"><a href="../">Главная</a><a href="../mfca/" aria-current="page">МФЦА</a><a href="../astana-hub/">Astana Hub</a><a href="#contact">Контакты</a></nav>
+      <div class="tools">
+        <div class="langs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18"/></svg><a href="../" hreflang="ru" lang="ru" aria-current="true">RU</a><a href="../kz/" hreflang="kk" lang="kk">KZ</a><a href="../en/" hreflang="en" lang="en">EN</a></div>
+        <a class="cta" href="https://wa.me/77021686733?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8E%20%D0%B2%20%D0%9C%D0%A4%D0%A6%D0%90%20%28AIFC%29.%20%D0%9D%D1%83%D0%B6%D0%BD%D0%B0%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8F%20%D1%8E%D1%80%D0%B8%D1%81%D1%82%D0%B0." target="_blank" rel="noopener" aria-label="Написать в WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.7-4.7A8.5 8.5 0 1 1 21 11.5z"/></svg><span>Обсудить задачу</span></a>
+        <label class="burger" for="menu-t" aria-hidden="true"><i></i><i></i></label>
+      </div>
+    </div>
+  </div>
+</header>
 <main>
-<section class="hero"><div class="wrap">
+<section class="hero"><div class="hero-bg" aria-hidden="true"></div><div class="wrap">
   <nav class="crumbs" aria-label="Навигация"><a href="../">Vega Legal</a> / Регистрация в МФЦА</nav>
-  <span class="eyebrow">Вопрос и ответ · право МФЦА</span>
-  <h1>Как зарегистрировать компанию в&nbsp;МФЦА (AIFC)?</h1>
+  <h1>Как зарегистрировать компанию <em>в&nbsp;МФЦА (AIFC)?</em></h1>
   <p class="answer">Компании в Международном финансовом центре «Астана» регистрирует Регистратор компаний AFSA. Заявку подают онлайн через портал Digital Resident: выбирают организационно-правовую форму, указывают сведения об участниках и бизнесе, загружают учредительные документы, участники проходят проверку KYC.<sup><a href="#s2">[2]</a></sup><sup><a href="#s3">[3]</a></sup> Если компания будет вести регулируемую финансовую деятельность, дополнительно нужна лицензия AFSA.<sup><a href="#s4">[4]</a></sup> Юристы Vega Legal сопровождают все этапы; решение принимает AFSA.</p>
   <div class="btns">
-    <a class="btn btn-cu" href="https://wa.me/77021686733?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8E%20%D0%B2%20%D0%9C%D0%A4%D0%A6%D0%90%20%28AIFC%29.%20%D0%9D%D1%83%D0%B6%D0%BD%D0%B0%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8F%20%D1%8E%D1%80%D0%B8%D1%81%D1%82%D0%B0." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg>Написать в WhatsApp</a>
-    <a class="btn" href="#contact">Оставить заявку</a>
+    <a class="btn btn-light" href="https://wa.me/77021686733?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8E%20%D0%B2%20%D0%9C%D0%A4%D0%A6%D0%90%20%28AIFC%29.%20%D0%9D%D1%83%D0%B6%D0%BD%D0%B0%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8F%20%D1%8E%D1%80%D0%B8%D1%81%D1%82%D0%B0." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.7-4.7A8.5 8.5 0 1 1 21 11.5z"/></svg>Написать в WhatsApp</a>
+    <a class="link-arrow" href="#contact">Оставить заявку <span aria-hidden="true">→</span></a>
   </div>
 </div></section>
 
@@ -209,7 +216,7 @@
     <li><b>Суд МФЦА.</b> Независим и не входит в судебную систему Республики Казахстан; разбирательство ведётся на английском языке; решения исполняются в Казахстане так же, как акты казахстанских судов.<sup><a href="#s1">[1]</a></sup></li>
     <li><b>Международный арбитражный центр.</b> Рассматривает споры на основании арбитражного соглашения сторон.<sup><a href="#s1">[1]</a></sup></li>
   </ul>
-  <h2 style="margin-top:48px">Как проходит регистрация</h2>
+  <h2>Как проходит регистрация</h2>
   <ol>
     <li>Определить организационно-правовую форму и вид деятельности; если деятельность регулируемая — заранее обсудить с AFSA лицензию. По руководству AFSA, название со словами вроде «bank» или «investments» не зарегистрируют без письма о предварительном одобрении (In-Principle Approval).<sup><a href="#s2">[2]</a></sup></li>
     <li>Создать заявку на портале Digital Resident, заполнить сведения об акционерах, бизнесе и персонале, загрузить учредительные документы в PDF.<sup><a href="#s2">[2]</a></sup></li>
@@ -218,7 +225,7 @@
     <li>Получить свидетельство о регистрации (Certificate of Incorporation).<sup><a href="#s2">[2]</a></sup></li>
   </ol>
   <p>Порядок может меняться: перед подачей сверяйтесь с актуальными руководствами AFSA.</p>
-  <h2 style="margin-top:48px">Чем помогает Vega Legal</h2>
+  <h2>Чем помогает Vega Legal</h2>
   <ul>
     <li>Проверка, подходит ли МФЦА под вашу задачу, и выбор формы компании.</li>
     <li>Подготовка учредительных документов и заявки, ответы на запросы Регистратора.</li>
@@ -229,7 +236,7 @@
   <p class="note">Информация не является юридической консультацией. Решения о регистрации и лицензиях принимает AFSA; Vega Legal не гарантирует результат.</p>
 </div></section>
 
-<section id="faq"><div class="wrap">
+<section id="faq"><div class="wrap split">
   <h2>Частые вопросы о регистрации в МФЦА</h2>
   <div class="faq"><details><summary>Кто регистрирует компании в МФЦА?</summary><div><p>Регистратор компаний AFSA (Комитет МФЦА по регулированию финансовых услуг, Astana Financial Services Authority).<sup>[2]</sup></p></div></details><details><summary>Можно ли зарегистрировать компанию в МФЦА онлайн?</summary><div><p>Да. Регистратор компаний AFSA принимает заявки через портал Digital Resident (digitalresident.kz).<sup>[2][3]</sup> По руководству AFSA, бумажная подача тоже возможна.</p></div></details><details><summary>Какие проверки проходят учредители?</summary><div><p>По руководству AFSA, проверка KYC обязательна для акционеров — физических лиц, конечных бенефициаров, директоров, руководителя (CEO) и секретаря компании.<sup>[2]</sup></p></div></details><details><summary>Нужна ли лицензия AFSA?</summary><div><p>Для регулируемой финансовой деятельности, кроме регистрации компании, нужна авторизация (лицензия) AFSA.<sup>[4]</sup> Нужна ли она вашему бизнесу, юрист определит на консультации.</p></div></details><details><summary>Какое право применяется в МФЦА?</summary><div><p>Акты МФЦА могут основываться на принципах, законодательстве и прецедентах права Англии и Уэльса.<sup>[1]</sup> Споры рассматривают Суд МФЦА и Международный арбитражный центр МФЦА.</p></div></details><details><summary>Сколько стоит и сколько длится регистрация?</summary><div><p>Официальные сборы и сроки рассмотрения публикует AFSA, и они меняются, поэтому на этой странице их нет — проверяйте актуальные данные на сайте AFSA. Стоимость услуг Vega Legal называется после консультации.</p></div></details><details><summary>Кто поможет с регистрацией в МФЦА?</summary><div><p>Юридическая фирма Vega Legal (Астана, ул. Сауран 18, блок Д, офис 68) сопровождает регистрацию компаний в МФЦА, получение лицензий AFSA и договоры по английскому праву. WhatsApp: +7 702 168 67 33, почта admin@vegalegal.kz.</p></div></details><details><summary>Гарантирует ли юрист регистрацию?</summary><div><p>Нет. Решение о регистрации и лицензии принимает AFSA. Юрист помогает подготовить документы так, чтобы они отвечали требованиям, и отвечает на запросы регулятора.</p></div></details></div>
 </div></section>
@@ -241,15 +248,15 @@
 </div></section>
 <section id="contact"><div class="wrap lead-box">
   <div>
-    <h2>Зарегистрировать компанию в МФЦА</h2>
+    <h2>Зарегистрировать компанию <em>в МФЦА</em></h2>
     <p class="lead">Опишите задачу в WhatsApp или оставьте контакты — юрист Vega Legal подскажет, подходит ли МФЦА, и объяснит следующий шаг.</p>
-    <div class="btns"><a class="btn btn-cu" href="https://wa.me/77021686733?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8E%20%D0%B2%20%D0%9C%D0%A4%D0%A6%D0%90%20%28AIFC%29.%20%D0%9D%D1%83%D0%B6%D0%BD%D0%B0%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8F%20%D1%8E%D1%80%D0%B8%D1%81%D1%82%D0%B0." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg>Написать в WhatsApp</a></div>
-    <ul class="contacts">
-      <li><div><b>WhatsApp и телефон</b><a href="https://wa.me/77021686733">+7 702 168 67 33</a> · <a href="tel:+77021686733">позвонить</a></div></li>
-      <li><div><b>Почта</b><a href="mailto:admin@vegalegal.kz">admin@vegalegal.kz</a></div></li>
-      <li><div><b>Офис</b>г. Астана, ул. Сауран 18, блок Д, офис 68</div></li>
-      <li><div><b>Сайт</b><a href="https://vegalegal.kz">vegalegal.kz</a></div></li>
-    </ul>
+    <div class="tiles">
+      <a class="tile tile-cu" href="https://wa.me/77021686733?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8E%20%D0%B2%20%D0%9C%D0%A4%D0%A6%D0%90%20%28AIFC%29.%20%D0%9D%D1%83%D0%B6%D0%BD%D0%B0%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8F%20%D1%8E%D1%80%D0%B8%D1%81%D1%82%D0%B0." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.7-4.7A8.5 8.5 0 1 1 21 11.5z"/></svg><span>WhatsApp</span><svg class="ur" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
+      <a class="tile" href="tel:+77021686733" aria-label="Позвонить: +7 702 168 67 33"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.1 4.2 2 2 0 0 1 3.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L7 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg><span>+7 702 168 67 33</span></a>
+      <a class="tile wide" href="mailto:admin@vegalegal.kz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>admin@vegalegal.kz</span></a>
+    </div>
+    <p class="addr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>г. Астана, ул. Сауран 18, блок Д, офис 68</span></p>
+    <p class="small site">Сайт фирмы: <a href="https://vegalegal.kz">vegalegal.kz</a></p>
   </div>
   <form class="lead" id="leadForm" novalidate>
     <label>Имя<input name="name" autocomplete="name" maxlength="80" required></label>
@@ -263,13 +270,21 @@
 </div></section>
 </main>
 <footer><div class="wrap">
-  <p><a class="logo" href="../" style="font-size:18px">VEGA <b>LEGAL</b></a></p>
-  <p style="margin-top:14px">Vega Legal — ТОО «SciCom», БИН 250640020511, юридический адрес: г. Астана, пр. Мангилик Ел 55/7.</p>
-  <p>г. Астана, ул. Сауран 18, блок Д, офис 68 · <a href="https://wa.me/77021686733">+7 702 168 67 33</a> · <a href="mailto:admin@vegalegal.kz">admin@vegalegal.kz</a></p>
-  <p>Информация не является юридической консультацией. Решения о регистрации компаний и лицензиях в МФЦА принимает AFSA, о статусе участника — Astana Hub; Vega Legal не гарантирует результат.</p>
-  <p>Страница о Vega Legal для быстрого ответа на частые вопросы. Основной сайт фирмы — <a href="https://vegalegal.kz">vegalegal.kz</a>.</p>
+  <div class="foot">
+    <div class="foot-brand">
+      <a class="logo-f" href="../"><img src="../logo.png" width="98" height="40" alt="Vega Legal" loading="lazy"></a>
+      <p>Юридическая фирма в Астане: право МФЦА, Astana Hub, споры и арбитраж, M&amp;A.</p>
+    </div>
+    <div><p class="foot-h">Страницы</p><nav class="foot-links" aria-label="Страницы"><a href="../">Главная</a><a href="../mfca/">МФЦА</a><a href="../astana-hub/">Astana Hub</a><a href="#contact">Контакты</a></nav></div>
+    <div><p class="foot-h">Контакты</p><div class="foot-links"><a href="https://wa.me/77021686733">+7 702 168 67 33</a><a href="mailto:admin@vegalegal.kz">admin@vegalegal.kz</a><a href="https://vegalegal.kz">vegalegal.kz</a><span>г. Астана, ул. Сауран 18, блок Д, офис 68</span></div></div>
+  </div>
+  <div class="foot-legal">
+    <p>Vega Legal — ТОО «SciCom», БИН 250640020511, юридический адрес: г. Астана, пр. Мангилик Ел 55/7.</p>
+    <p>Информация не является юридической консультацией. Решения о регистрации компаний и лицензиях в МФЦА принимает AFSA, о статусе участника — Astana Hub; Vega Legal не гарантирует результат.</p>
+    <p>Страница о Vega Legal для быстрого ответа на частые вопросы. Основной сайт фирмы — <a href="https://vegalegal.kz">vegalegal.kz</a>.</p>
+  </div>
 </div></footer>
-<a class="btn btn-cu wa-float" aria-hidden="true" tabindex="-1" href="https://wa.me/77021686733?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8E%20%D0%B2%20%D0%9C%D0%A4%D0%A6%D0%90%20%28AIFC%29.%20%D0%9D%D1%83%D0%B6%D0%BD%D0%B0%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8F%20%D1%8E%D1%80%D0%B8%D1%81%D1%82%D0%B0." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5z"/></svg>Написать в WhatsApp</a>
+<a class="wa-float" aria-hidden="true" tabindex="-1" href="https://wa.me/77021686733?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D1%8E%20%D0%B2%20%D0%9C%D0%A4%D0%A6%D0%90%20%28AIFC%29.%20%D0%9D%D1%83%D0%B6%D0%BD%D0%B0%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8F%20%D1%8E%D1%80%D0%B8%D1%81%D1%82%D0%B0." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3.5 20.5l1.7-4.7A8.5 8.5 0 1 1 21 11.5z"/></svg><span class="vh">Написать в WhatsApp</span></a>
 <script src="../vega.js" defer></script>
 </body>
 </html>

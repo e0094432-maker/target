@@ -64,7 +64,15 @@ const slug = pg => (pg.replace(/\/$/, '') || 'home');
           await p.evaluate(() => scrollTo(0, innerHeight * 2)); await p.waitForTimeout(400);
           assert(await on(), `${tag}: floating WhatsApp shown after scrolling`);
           await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(300);
+          // меню-«гамбургер» работает на CSS (checkbox), скрипт закрывает его после выбора пункта
+          const navShown = () => p.evaluate(() => getComputedStyle(document.querySelector('.top .nav')).display !== 'none');
+          assert(!(await navShown()), `${tag}: phone menu closed at start`);
+          await p.click('.burger'); assert(await navShown(), `${tag}: burger opens the menu`);
+          await p.click('.top .nav a[href="#contact"]'); await p.waitForTimeout(200);
+          assert(!(await navShown()), `${tag}: menu closes after choosing an item`);
+          await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(300);
         }
+        assert(!(await p.$('.hero .eyebrow')), `${tag}: no eyebrow label above the hero heading`);
         if (pg === '' ) {
           // форма: проверки и отправка в таблицу
           await p.click('#leadForm button');
