@@ -2,4 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://kenesai.asia/</loc></url>
   <url><loc>https://kenesai.asia/korin/</loc></url>
+  <url><loc>https://kenesai.asia/vega/</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://kenesai.asia/vega/mfca/</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://kenesai.asia/vega/astana-hub/</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://kenesai.asia/vega/kz/</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://kenesai.asia/vega/en/</loc><lastmod>2026-11-26</lastmod></url>
 </urlset>
