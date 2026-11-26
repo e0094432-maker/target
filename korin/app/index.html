@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="ru" data-theme="dark">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Körin — кабинет</title>
 <meta name="robots" content="noindex">
-<script>try{document.documentElement.dataset.theme=localStorage.getItem('korin-theme-v4')||'dark'}catch(e){}</script>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('korin-theme-v4')||'light'}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
@@ -119,6 +119,11 @@ tr.me td{background:var(--acc-bg);font-weight:600;color:var(--ink)}
 .sw input:focus-visible+i{outline:2px solid var(--acc);outline-offset:2px}
 .conn{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;transition:border-color .15s}
 .conn:hover{border-color:var(--line2)}
+.prog.wake i{width:30%!important;animation:wake 1.4s ease-in-out infinite alternate}
+@keyframes wake{from{margin-left:0}to{margin-left:70%}}
+@media (prefers-reduced-motion:reduce){.prog.wake i{animation:none}}
+.tag.how{font-weight:500;color:var(--muted);background:var(--sub)}
+.conn.soon{border-style:dashed;background:transparent}.conn.soon .lg{filter:grayscale(1);opacity:.45}.conn.soon h4{color:var(--muted)}
 .conn p{font-size:13px;color:var(--muted);margin:2px 0 10px}
 .lg{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;color:#fff;font:700 13px var(--sans);letter-spacing:-.02em}
 .lg svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -576,6 +581,14 @@ h1,.head h1,.ch h1{font-weight:600}
 .logo i{background:#fff}.logo i::before{background:#000}
 .sl.on svg{color:var(--ink)}
 
+/* ---------- light with blue: the default look (dark stays a choice) ---------- */
+[data-theme=light]{--bg:#f7f9fc;--side:#fff;--card:#fff;--sub:#f1f4f9;--line:#e3e8f0;--line2:#cfd7e4;--acc:#2563eb;--acc-bg:rgba(37,99,235,.09);--lime:rgba(37,99,235,.1);--lime-ink:#1d4ed8;--g:linear-gradient(#2563eb,#2563eb);--btn:#2563eb;--btn-ink:#fff;color-scheme:light}
+[data-theme=light] .btn-p,[data-theme=light] .btn-p:hover{background:#2563eb;color:#fff;border-color:#2563eb}
+[data-theme=light] .btn-p:hover{background:#1d4ed8;border-color:#1d4ed8;opacity:1}
+[data-theme=light] .logo i{background:#2563eb}[data-theme=light] .logo i::before{background:#fff}
+[data-theme=light] .sl.on svg{color:#2563eb}
+.btn-p:disabled{opacity:.55;cursor:default}
+
 /* ---------- breakdown ---------- */
 .why{display:grid;gap:14px}
 .why .verdict{font-size:17px;line-height:1.45;color:var(--ink);font-weight:500}
@@ -616,19 +629,20 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const KEY = 'korin-v3';
 const API = 'https://korin-api.onrender.com';  // сервер Körin (server/app.py)
 let AI = false, SRV = false, THREADS = false;  // SRV: сервер ответил; AI: на сервере есть ключ нейросети
+let HEALTH = 'wait', checking = false;  // wait: бесплатный сервер просыпается (до минуты); ok: ответил; down: не ответил после повторов
 const store = { load(){ try{ return JSON.parse(localStorage.getItem(KEY)) }catch(e){ return null } }, save(v){ try{ localStorage.setItem(KEY, JSON.stringify(v)) }catch(e){} }, clear(){ try{ localStorage.removeItem(KEY) }catch(e){} } };
 /* Настоящая проверка: вопросы по одному, чтобы человек видел ход и ничего не зависало */
 async function realCheck(say){
-  const qs = questionsFor(), names = [st.company, ...st.rivals], grid = [], answers = [], src = {}; let errors = 0, model = null, lastErr = '';
+  const qs = questionsFor(), names = [st.company, ...st.rivals], grid = [], answers = [], how = [], src = {}; let errors = 0, model = null, engine = null, lastErr = '';
   for (let i = 0; i < qs.length; i++) {
     say(`Вопрос ${i + 1} из ${qs.length}`, (i + .2) / qs.length);
     try { const d = await call('/api/check-one', { company: st.company, rivals: st.rivals, city: st.city, question: qs[i] });
-      grid.push(d.row); answers.push(d.answer); model = d.model; d.sources.forEach(x => src[x] = (src[x] || 0) + 1) }
-    catch (e) { errors++; lastErr = e.message; grid.push(null); answers.push(null); if (errors >= 2 && errors === i + 1) throw e }
+      grid.push(d.row); answers.push(d.answer); how.push({ engine: d.engine || null, search: d.search ?? null, model: d.model || null }); model = d.model; engine = d.engine || engine; d.sources.forEach(x => src[x] = (src[x] || 0) + 1) }
+    catch (e) { errors++; lastErr = e.message; grid.push(null); answers.push(null); how.push(null); if (errors >= 2 && errors === i + 1) throw e }
   }
   if (errors === qs.length) throw new Error(lastErr || 'Нейросеть не ответила.');
   say('Считаю, кого назвали', 1);
-  return { names, questions: qs, grid, answers, sources: Object.entries(src).sort((a, b) => b[1] - a[1]).slice(0, 8), errors, model };
+  return { names, questions: qs, grid, answers, how, sources: Object.entries(src).sort((a, b) => b[1] - a[1]).slice(0, 8), errors, model, engine };
 }
 async function call(path, body){ const r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Ошибка сервера'); return d }
 
@@ -660,16 +674,16 @@ const logo = c => { const L = LOGOS[c[1]], W = WORD[c[1]];
   if (W) return `<span class="lg" style="background:${W[0]}">${W[1]}</span>`;
   return `<span class="lg own"><svg viewBox="0 0 24 24">${P[c[4]] || P.globe}</svg></span>` };
 
-/* ИИ-агенты: каждый делает одну работу по расписанию или по кнопке */
+/* ИИ-агенты: каждый делает одну работу по кнопке. Расписаний для клиента пока нет — и мы их не обещаем */
 const AGENTS = [
-  ['watch', 'Проверка ответов', 'eye', 'Каждый понедельник, 09:00', [], 'Спрашивает нейросеть, как ваши клиенты, и считает, кого она назвала.'],
-  ['why', 'Объяснение', 'chart', 'После каждого проверки', [], 'Объясняет простыми словами, почему называют конкурентов.'],
-  ['audit', 'Проверка сайта', 'globe', 'Каждый понедельник, 09:10', ['site'], 'Проверяет, видит ли нейросеть ваш сайт.'],
+  ['watch', 'Проверка ответов', 'eye', 'По кнопке', [], 'Спрашивает нейросеть, как ваши клиенты, и считает, кого она назвала.'],
+  ['why', 'Объяснение', 'chart', 'По кнопке', [], 'Объясняет простыми словами, почему называют конкурентов.'],
+  ['audit', 'Проверка сайта', 'globe', 'По кнопке', ['site'], 'Проверяет, видит ли нейросеть ваш сайт.'],
   ['reviews', 'Отзывы', 'star', 'По кнопке', ['gis', 'gmaps'], 'Пишет клиенту просьбу оставить отзыв.'],
   ['faq', 'Тексты для сайта', 'file', 'По кнопке', ['site'], 'Пишет для сайта страницу с ответами на вопросы клиентов.'],
   ['pitch', 'Письма', 'send', 'По кнопке', [], 'Пишет письмо в каталог или издание, где уже есть конкуренты.'],
   ['narrow', 'Точные запросы', 'list', 'По кнопке', ['site'], 'Подбирает точные запросы клиентов и план страницы под них.'],
-  ['marketer', 'Маркетолог', 'send', 'Каждый день, 10:40', [], 'Каждый день сам пишет пост, рисует три картинки и публикует в Threads. Здесь можно попросить пост в любой момент.'],
+  ['marketer', 'Маркетолог', 'send', 'По кнопке', [], 'Пишет пост для ваших соцсетей. Опубликовать его нужно самому: сам он ничего не публикует.'],
   ['bio', 'Instagram', 'cam', 'По кнопке', ['ig'], 'Пишет описание профиля, понятное нейросети.']
 ];
 
@@ -688,10 +702,20 @@ function sample(){
   }
   return { names, qs, eng, engines: Object.keys(ENG), sample: true, label: 'Hello Kids' };
 }
-function fromReal(r){ const e = /gemini/i.test(r.model || '') ? 'gemini' : /sonar|perplexity/i.test(r.model || '') ? 'perplexity' : 'chatgpt'; return { names: r.names, qs: r.questions, engines: [e], sample: false, label: r.names[0], at: r.at, eng: { [e]: { grid: r.grid.map(g => g || r.names.map(() => false)), answers: r.answers || [], src: r.sources || [], model: r.model || 'ChatGPT' } } } }
+function fromReal(r){ const e = r.engine === 'gemini' || /gemini/i.test(r.model || '') ? 'gemini' : r.engine === 'openai' || /gpt/i.test(r.model || '') ? 'chatgpt' : /sonar|perplexity/i.test(r.model || '') ? 'perplexity' : 'gemini'; return { names: r.names, qs: r.questions, engines: [e], sample: false, label: r.names[0], at: r.at, eng: { [e]: { grid: r.grid.map(g => g || r.names.map(() => false)), answers: r.answers || [], how: r.how || [], src: r.sources || [], model: r.model || ENG[e] } } } }
+/* метка ответа: нейросеть и был ли поиск в интернете. В примере — честно «пример» */
+const howText = (e, qi) => { const h = data.sample ? null : (data.eng[e].how || [])[qi]; return !h ? '' : h.search === true ? 'с поиском в Google' : h.search === false ? 'без поиска' : '' };
+const howTag = (e, qi) => data.sample || !(data.eng[e].how || [])[qi] ? '' : `<span class="tag how">${ENG[e]}${howText(e, qi) ? ' · ' + howText(e, qi) : ''}</span>`;
 
 let st = store.load(), engine = 'all', data;
-fetch(API + '/api/health').then(r => r.json()).then(d => { SRV = true; AI = !!d.ai; THREADS = !!d.threads; if (st && st.ready && !window.onWelcome) render() }).catch(() => {});
+/* Сервер на Render засыпает. Первый запрос его будит: ждём ответа и пробуем снова, а шаг 3 перерисовываем, когда он ответил */
+const refresh = () => { if (st.ready) { if (!window.onWelcome) render() } else if ((st.step || 1) === 3 && !checking) onboarding() };
+function health(tries = 0){
+  const ac = 'AbortController' in window ? new AbortController() : null, tm = ac && setTimeout(() => ac.abort(), 70000);
+  fetch(API + '/api/health', ac ? { signal: ac.signal } : {}).then(r => r.json()).then(d => { clearTimeout(tm); SRV = true; AI = !!d.ai; THREADS = !!d.threads; HEALTH = 'ok'; refresh() })
+    .catch(() => { clearTimeout(tm); if (tries < 5) setTimeout(() => health(tries + 1), 4000 * (tries + 1)); else { HEALTH = 'down'; refresh() } });
+}
+health();
 const param = new URLSearchParams(location.search).get('company');
 if (!st) st = { company: param ? param.slice(0, 40) : '', niche: '', city: 'Алматы', rivals: [], conn: {}, notify: {}, agents: {}, runs: [], done: {}, ready: false, step: 1 };
 const load = () => { data = st.real ? fromReal(st.real) : sample(); if (engine !== 'all' && !data.engines.includes(engine)) engine = 'all'; if (data.engines.length < 2) engine = data.engines[0] };
@@ -706,7 +730,7 @@ const gaps = () => data.qs.map((q, qi) => { const who = new Set(), me = engs().s
 const sources = () => { const m = {}; engs().forEach(e => data.eng[e].src.forEach(([d, n]) => m[d] = (m[d] || 0) + n)); return Object.entries(m).filter(x => !/vertexaisearch/.test(x[0])).sort((a, b) => b[1] - a[1]) };
 const meta = () => data.sample ? 'пример · вымышленные компании' : `${total()} ответов · ${data.qs.length} вопросов · ${new Date(data.at).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`;
 const segHtml = () => data.engines.length < 2 ? '' : `<div class="seg" role="group" aria-label="Нейросеть">${['all', ...data.engines].map(e => `<button type="button" data-eng="${e}" aria-pressed="${e === engine}">${e === 'all' ? 'Все' : ENG[e]}</button>`).join('')}</div>`;
-const banner = () => data.sample ? `<div class="note">Пример кабинета на вымышленной школе «Hello Kids». ${AI ? `Нейросеть подключена: можно сделать настоящую проверку для «${esc(st.company)}». <button class="btn btn-p" data-run="watch" style="margin-left:8px">Запустить настоящую проверку</button>` : st.company ? `Проверка для «${esc(st.company)}» появится, когда сервис начнёт опрашивать нейросети.` : ''}</div>` : '';
+const banner = () => data.sample ? `<div class="note">Пример кабинета на вымышленной школе «Hello Kids». ${AI ? `Нейросеть подключена: можно сделать настоящую проверку для «${esc(st.company)}». <button class="btn btn-p" data-run="watch" style="margin-left:8px">Запустить настоящую проверку</button>` : st.company ? (HEALTH === 'ok' ? `Проверка для «${esc(st.company)}» появится, когда сервис начнёт опрашивать нейросети.` : `Сервер Körin ${HEALTH === 'wait' ? 'просыпается' : 'пока не ответил'}. Когда ответит, здесь появится кнопка настоящей проверки для «${esc(st.company)}».`) : ''}</div>` : '';
 const me = () => data.sample ? (st.company || 'Ваша компания') : data.label;
 const agentOn = id => st.agents[id] !== false;
 const connected = id => !!st.conn[id];
@@ -726,7 +750,13 @@ function onboarding(){
     <div class="field"><label for="o4">Название конкурента</label><div class="add"><input class="inp" id="o4" maxlength="40" placeholder="Например, Lingua Plus"><button class="btn" id="addr" style="height:38px">Добавить</button></div></div>
     <div class="chips">${st.rivals.map((r, i) => `<span>${esc(r)}<button data-del="${i}" aria-label="Убрать">×</button></span>`).join('')}</div>
     <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="next">Дальше</button></div>`;
-  if (s === 3) b = AI ? `<h1>Запускаем первую проверку</h1><p class="muted" style="margin-top:8px">Зададим нейросети 10 вопросов про «${esc(st.niche)}» в городе ${esc(st.city)}. Это займёт пару минут.</p>
+  const live = HEALTH === 'ok' && AI;  // что нарисовано, то и запускается: кнопка не опирается на устаревшее состояние
+  if (s === 3 && HEALTH === 'wait') b = `<h1>Запускаем первую проверку</h1><p class="muted" style="margin-top:8px">Будим сервер Körin: после перерыва он просыпается до минуты. Кнопка включится сама.</p>
+    <div class="prog wake"><i id="pg"></i></div><p class="muted" id="pgt">Подключаемся к серверу…</p>
+    <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="run" disabled>Ждём сервер…</button></div>`;
+  else if (s === 3 && HEALTH === 'down') b = `<h1>Сервер не отвечает</h1><p style="margin-top:10px">Сервер Körin сейчас не ответил, поэтому настоящих цифр для «${esc(st.company)}» нет. Выдумывать их мы не будем.</p><p class="muted" style="margin-top:10px">Попробуйте ещё раз через минуту или откройте пример кабинета на вымышленной школе.</p>
+    <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-lg" id="retry">Попробовать снова</button><button class="btn btn-p btn-lg" id="run">Открыть пример</button></div>`;
+  else if (s === 3) b = live ? `<h1>Запускаем первую проверку</h1><p class="muted" style="margin-top:8px">Зададим нейросети 10 вопросов про «${esc(st.niche)}» в городе ${esc(st.city)}. Это займёт пару минут.</p>
     <div class="prog"><i id="pg"></i></div><p class="muted" id="pgt">Готово к запуску</p>
     <div class="acts"><button class="btn btn-lg" id="back">Назад</button><button class="btn btn-p btn-lg" id="run">Запустить проверку</button></div>`
     : `<h1>Проверка пока не запущена</h1><p style="margin-top:10px">Сервис ещё не опрашивает нейросети, поэтому настоящих цифр для «${esc(st.company)}» нет. Выдумывать их мы не будем.</p><p class="muted" style="margin-top:10px">Покажем пример кабинета на вымышленной школе: помощники и отчёт выглядят так же.</p>
@@ -746,17 +776,19 @@ function onboarding(){
     $$('[data-del]').forEach(x => x.onclick = () => { st.rivals.splice(+x.dataset.del, 1); store.save(st); onboarding() });
     $('#next').onclick = () => { if (!st.rivals.length) return err('Добавьте хотя бы одного конкурента.'); st.step = 3; store.save(st); onboarding() };
   }
+  if (s === 3 && $('#retry')) $('#retry').onclick = () => { HEALTH = 'wait'; onboarding(); health() };
   if (s === 3) $('#run').onclick = async () => {
-    const done = () => { st.ready = true; store.save(st); load(); if (!data.sample) pushHist(); location.hash = '#/overview'; app() };
-    if (!AI) return done();
-    $('#run').disabled = true; $('#pg').style.width = '35%'; $('#pgt').textContent = 'Спрашиваем нейросеть…';
-    try { const r = await realCheck((t, k) => { $('#pgt').textContent = t; $('#pg').style.width = Math.round(8 + k * 92) + '%' }); st.real = { ...r, at: Date.now() }; done() }
-    catch (e) { $('#run').disabled = false; $('#pg').style.width = '0'; $('#pgt').textContent = ''; err('Проверка не удалась: ' + e.message + ' Можно открыть пример кабинета.'); $('#run').textContent = 'Открыть кабинет'; $('#run').onclick = done }
+    const done = () => { checking = false; st.ready = true; store.save(st); load(); if (!data.sample) pushHist(); location.hash = '#/overview'; app() };
+    if (!live) return done();
+    const pg = w => { const el = $('#pg'); if (el) el.style.width = w }, say = t => { const el = $('#pgt'); if (el) el.textContent = t };
+    checking = true; $('#run').disabled = true; pg('35%'); say('Спрашиваем нейросеть…');
+    try { const r = await realCheck((t, k) => { say(t); pg(Math.round(8 + k * 92) + '%') }); st.real = { ...r, at: Date.now() }; done() }
+    catch (e) { checking = false; $('#run').disabled = false; pg('0'); say(''); err('Проверка не удалась: ' + (e.message === 'Failed to fetch' ? 'сервер не ответил.' : e.message) + ' Можно открыть пример кабинета.'); $('#run').textContent = 'Открыть пример'; $('#run').onclick = done }
   };
 }
 
 /* ---------- Экраны ---------- */
-const dotsHtml = qi => data.engines.map(e => `<span class="tag ${data.eng[e].grid[qi][0] ? 'ok' : 'no'}">${ENG[e]} ${data.eng[e].grid[qi][0] ? '✓' : '✕'}</span>`).join('');
+const dotsHtml = qi => data.engines.map(e => `<span class="tag ${data.eng[e].grid[qi][0] ? 'ok' : 'no'}">${ENG[e]} ${data.eng[e].grid[qi][0] ? '✓' : '✕'}</span>${howText(e, qi) ? `<span class="tag how">${howText(e, qi)}</span>` : ''}`).join('');
 const todos = () => { const g = gaps()[0], src = sources(), lead = ranked().find(x => !x[2]); return [...(st.custom || []).map(c => ({ id: c.id, icon: 'check', t: c.t, d: c.d })),
   { id: 'site', icon: 'globe', t: 'Проверить, видит ли нейросеть ваш сайт', d: 'Если сайт закрыт, нейросеть о вас ничего не узнает.', agent: 'audit' },
   { id: 'reviews', icon: 'star', t: (rv => rv ? `Собрать отзывы на ${rv[0]}` : 'Собрать отзывы на 2ГИС и Google Картах')(src.find(x => /2gis|google|yandex|zoon|flamp/i.test(x[0]))), d: 'Отсюда нейросети чаще всего берут ответы про местный бизнес.', agent: 'reviews' },
@@ -837,7 +869,7 @@ const needReg = () => !st.user && !data.sample;
 function regModal(next){
   if ($('#rg')) return;
   const m = document.createElement('div'); m.className = 'rg'; m.id = 'rg';
-  m.innerHTML = `<form class="rg-box" id="rgForm" novalidate><h2>Сохраним ваш кабинет</h2><p class="muted">Проверка готова. Оставьте имя и WhatsApp — откроются план, помощники и отчёт. В следующий раз вы войдёте в свой кабинет.</p>
+  m.innerHTML = `<form class="rg-box" id="rgForm" novalidate><h2>Сохраним ваш кабинет</h2><p class="muted">Проверка готова. Оставьте имя и WhatsApp — откроются план, помощники и отчёт.</p>
     <div class="field"><label for="rgN">Имя</label><input class="inp" id="rgN" maxlength="40" autocomplete="name"></div>
     <div class="field"><label for="rgW">WhatsApp</label><input class="inp" id="rgW" maxlength="20" inputmode="tel" autocomplete="tel" placeholder="+7 7__ ___ __ __"></div>
     <p id="rgErr" style="color:var(--bad);font-size:13px;min-height:18px;margin-top:8px"></p>
@@ -853,6 +885,9 @@ function regModal(next){
     fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name, business: [st.company, st.niche, st.city].filter(Boolean).join(' · '), whatsapp: phone, lang: 'korin · регистрация · ' + TRK.src + ' · посетитель ' + TRK.vid }) }).catch(() => {});
     close(); if (next) location.hash = next; render() };
 }
+/* «Сообщить, когда появится»: строка в ту же таблицу, чтобы команда видела, какие подключения ждут */
+function waitsFor(id){ const c = cById(id); if (!c) return;
+  fetch(SHEET, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: 'Körin: ждёт подключение', business: [c[2], st.company, st.niche, st.city].filter(Boolean).join(' · '), whatsapp: st.user ? st.user.phone : '', lang: 'korin · подключение · ' + TRK.src + ' · посетитель ' + TRK.vid }) }).catch(() => {}) }
 /* Повторный визит: войти в кабинет с прошлыми данными или сделать новую проверку */
 function welcome(){
   window.onWelcome = true; const r = ranked(), mine = hits(0);
@@ -891,7 +926,7 @@ function drawCard(cv, p, i){
 function viewSocial(){
   const so = st.social || {}, posts = so.posts || [], log = so.log || [], about = so.about ?? st.niche, r = so.reply;
   return `<div class="head"><div><h1>Соцсети</h1><p>Посты для Threads и X на неделю. Вы проверяете — публикуется в одно нажатие.</p></div></div>
-  <div class="box" style="margin-bottom:12px"><h2>ИИ-маркетолог <span class="tag ok">работает каждый день</span></h2><p class="muted" style="font-size:13.5px">Каждый день в 10:40 он сам выбирает тему, пишет пост с интересным фактом и хэштегами, рисует три картинки и публикует в Threads. Ничего нажимать не нужно. Ниже — ручной режим: свои посты и ответы в ветки.</p><div class="meta" style="margin-top:10px"><a class="btn" href="#/agents/marketer">Попросить пост сейчас</a><a class="btn" target="_blank" rel="noopener" href="https://www.threads.net/@korin.kz">Открыть @korin.kz</a></div></div>
+  <div class="box" style="margin-bottom:12px"><h2>ИИ-маркетолог</h2><p class="muted" style="font-size:13.5px">Пишет посты по кнопке. Сам он ничего не публикует: вы читаете текст и публикуете его сами — кнопка откроет Threads или X с готовым текстом.</p><div class="meta" style="margin-top:10px"><a class="btn" href="#/agents/marketer">Попросить пост сейчас</a></div></div>
   <div class="box"><h2>О чём писать</h2><div class="field" style="margin-top:0"><label for="socAbout">Чем занимается «${esc(st.company)}»</label><input class="inp" id="socAbout" maxlength="300" value="${esc(about || '')}" placeholder="Например: запускаем рекламу в нейросетях для малого бизнеса"></div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px"><button class="btn btn-p" id="socRun">${posts.length ? 'Составить новый план' : 'Составить план на неделю'}</button><span class="muted" id="socMsg" style="font-size:13px">${AI ? 'Посты пишет нейросеть. Перед публикацией их читаете вы.' : 'Нейросеть не отвечает: покажу готовые заготовки.'}</span></div></div>
   ${posts.length ? `<div class="sect" style="margin-top:22px"><h2>План на неделю</h2><span class="mono">${posts.filter(p => p.status === 'done').length} из ${posts.length} опубликовано</span></div><div class="soc">${posts.map((p, i) => `<article class="post${p.status === 'done' ? ' done' : ''}"><div><canvas data-card="${i}"></canvas><div class="meta"><button class="btn" data-dl="${i}">Скачать картинку</button></div></div>
@@ -965,7 +1000,8 @@ const TASK = { chat: 'chat', why: 'why', reviews: 'review', faq: 'faq', pitch: '
 const KIND = { live: 'ответ нейросети', tpl: 'заготовка, без нейросети', audit: 'настоящая проверка сайта', err: 'ошибка', need: 'нужно подключение' };
 const md = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 const stepsHtml = list => list && list.length ? `<ul class="steps">${list.map(x => `<li class="${x.ok === false ? 'no' : ''}">${esc(x.text)}</li>`).join('')}</ul>` : '';
-const auditHtml = d => `<div class="chk"><p class="mono">${esc(d.url)}</p><h4>Доступ ботов нейросетей</h4>${d.bots.map(b => `<div><span>${esc(b.bot)}<small>${esc(b.what)}</small></span><span class="tag ${b.allowed ? 'ok' : 'no'}">${b.allowed ? 'открыт' : 'закрыт'}</span></div>`).join('')}<h4>Главная страница</h4>${d.checks.map(c => `<div><span>${esc(c.label)}<small>${esc(c.detail)}</small></span><span class="tag ${c.ok ? 'ok' : 'no'}">${c.ok ? 'в порядке' : 'исправить'}</span></div>`).join('')}</div>`;
+const botTag = b => b.allowed == null ? '<span class="tag warn">не удалось прочитать robots.txt</span>' : `<span class="tag ${b.allowed ? 'ok' : 'no'}">${b.allowed ? 'открыт' : 'закрыт'}</span>`;
+const auditHtml = d => `<div class="chk"><p class="mono">${esc(d.url)}</p><h4>Доступ ботов нейросетей</h4>${d.bots.map(b => `<div><span>${esc(b.bot)}<small>${esc(b.what)}</small></span>${botTag(b)}</div>`).join('')}<h4>Главная страница</h4>${d.checks.map(c => `<div><span>${esc(c.label)}<small>${esc(c.detail)}</small></span><span class="tag ${c.ok ? 'ok' : 'no'}">${c.ok ? 'в порядке' : 'исправить'}</span></div>`).join('')}</div>`;
 let busy = null, typeLast = false;
 function viewAgents(sel){
   const a = TEAM.find(x => x[0] === sel) || CHAT, id = a[0], th = (st.threads || {})[id] || [], work = busy && busy.id === id;
@@ -988,7 +1024,7 @@ const cstat = id => { const i = (st.cinfo || {})[id]; return !i || i.err ? '<spa
 function viewConnectors(){
   const cats = [...new Set(CONNECTORS.map(c => c[0]))];
   return `<div class="head"><div><h1>Подключения</h1><p>Подключите площадки, чтобы агенты работали с вашими данными</p></div></div>
-  ${cats.map(cat => `<p class="cat">${cat}</p><div class="cards">${CONNECTORS.filter(c => c[0] === cat).map(c => `<div class="conn">${logo(c)}<div><h4>${c[2]} ${connected(c[1]) ? cstat(c[1]) : c[5] === 'soon' ? '<span class="tag">скоро</span>' : ''}</h4><p>${connected(c[1]) && (st.cinfo || {})[c[1]] && st.cinfo[c[1]].title ? 'Прочитано: «' + esc(st.cinfo[c[1]].title) + '»' : c[6]}</p>${c[5] === 'link' ? `<button class="btn${connected(c[1]) ? '' : ' btn-p'}" data-conn="${c[1]}">${connected(c[1]) ? 'Изменить ссылку' : 'Подключить'}</button>` : `<button class="btn" data-notify="${c[1]}">${st.notify[c[1]] ? 'Сообщим, когда появится ✓' : 'Сообщить, когда появится'}</button>`}</div></div>`).join('')}</div>`).join('')}
+  ${cats.map(cat => `<p class="cat">${cat}</p><div class="cards">${CONNECTORS.filter(c => c[0] === cat).map(c => `<div class="conn${c[5] === 'soon' ? ' soon' : ''}">${logo(c)}<div><h4>${c[2]} ${connected(c[1]) ? cstat(c[1]) : c[5] === 'soon' ? '<span class="tag warn">скоро · пока не работает</span>' : ''}</h4><p>${connected(c[1]) && (st.cinfo || {})[c[1]] && st.cinfo[c[1]].title ? 'Прочитано: «' + esc(st.cinfo[c[1]].title) + '»' : c[6]}</p>${c[5] === 'link' ? `<button class="btn${connected(c[1]) ? '' : ' btn-p'}" data-conn="${c[1]}">${connected(c[1]) ? 'Изменить ссылку' : 'Подключить'}</button>` : `<button class="btn" data-notify="${c[1]}">${st.notify[c[1]] ? 'Сообщим, когда появится ✓' : 'Сообщить, когда появится'}</button>`}</div></div>`).join('')}</div>`).join('')}
   <p class="muted" style="font-size:13.5px;margin-top:18px">Сейчас подключение работает по открытой ссылке: входа в ваши аккаунты нет, читается только то, что видно всем. Вход через аккаунт появится для сервисов с пометкой «скоро».</p>`;
 }
 function viewSite(){
@@ -1079,7 +1115,7 @@ function openConnector(id){
 }
 function openAnswer(qi){
   const marks = text => { let h = esc(text); data.names.forEach((n, i) => { h = h.split(esc(n)).join(i === 0 ? `<span class="mark">${esc(n)}</span>` : `<b>${esc(n)}</b>`) }); return h };
-  drawer(data.qs[qi], data.engines.map(e => { const a = data.eng[e].answers[qi]; return `<div><p class="mono" style="margin-bottom:6px">${ENG[e]} · ${data.sample ? 'пример ответа, составлен для демонстрации' : esc(data.eng[e].model)} · ${data.eng[e].grid[qi][0] ? 'вас назвали' : 'вас не назвали'}</p><div class="ans">${a ? marks(a) : '<span class="muted">Текст ответа не сохранён.</span>'}</div></div>` }).join(''));
+  drawer(data.qs[qi], data.engines.map(e => { const a = data.eng[e].answers[qi]; return `<div><p class="mono" style="margin-bottom:6px">${ENG[e]} · ${data.sample ? 'пример ответа, составлен для демонстрации' : esc(data.eng[e].model)} · ${data.eng[e].grid[qi][0] ? 'вас назвали' : 'вас не назвали'}</p>${howTag(e, qi) ? `<p style="margin-bottom:8px">${howTag(e, qi)}</p>` : ''}<div class="ans">${a ? marks(a) : '<span class="muted">Текст ответа не сохранён.</span>'}</div></div>` }).join(''));
 }
 function drawer(title, html, foot){ $('#dtitle').textContent = title; $('#db').innerHTML = html; $('#df').innerHTML = foot || ''; $('#drawer').classList.add('open'); $('#scrim').classList.add('open') }
 function closeDrawer(){ runSeq++; $('#drawer').classList.remove('open'); $('#scrim').classList.remove('open') }
@@ -1125,7 +1161,7 @@ function render(){
   $$('[data-eng]').forEach(b => b.onclick = () => { engine = b.dataset.eng; render() });
   $$('[data-run]').forEach(b => b.onclick = () => runAgent(b.dataset.run));
   $$('[data-conn]').forEach(b => b.onclick = () => openConnector(b.dataset.conn));
-  $$('[data-notify]').forEach(b => b.onclick = () => { st.notify[b.dataset.notify] = !st.notify[b.dataset.notify]; store.save(st); render() });
+  $$('[data-notify]').forEach(b => b.onclick = () => { const id = b.dataset.notify; st.notify[id] = !st.notify[id]; store.save(st); if (st.notify[id]) waitsFor(id); render() });
   $$('[data-agent]').forEach(c => c.onchange = () => { st.agents[c.dataset.agent] = c.checked; store.save(st); render() });
   $$('[data-ans]').forEach(b => b.onclick = () => openAnswer(+b.dataset.ans));
   $$('[data-move]').forEach(b => b.onclick = () => { const [id, k] = b.dataset.move.split(':'); st.stat = st.stat || {}; st.doneAt = st.doneAt || {}; st.stat[id] = k; st.done[id] = k === 'done'; if (k === 'done') st.doneAt[id] = Date.now(); store.save(st); render() });
@@ -1137,7 +1173,7 @@ function render(){
   const au = $('#audit'); if (au) au.onsubmit = async e => { e.preventDefault(); const v = au.querySelector('input').value.trim(); st.conn.site = v; store.save(st); const out = $('#auditOut');
     if (!API) { out.innerHTML = `<div class="empty">Сайт ${esc(v)} не проверялся: сервер Körin ещё не запущен. Адрес сохранён в подключениях.</div>`; return }
     out.innerHTML = '<div class="empty">Проверяем…</div>';
-    try { const d = await call('/api/site-audit', { url: v }); out.innerHTML = `<p class="mono" style="margin-bottom:10px">проверено: ${esc(d.url)}</p><div class="grid two" style="margin-top:0"><div class="box"><h2>Доступ ботов</h2><div class="tw"><table>${d.bots.map(b => `<tr><td><b style="font-weight:500;color:var(--ink)">${esc(b.bot)}</b><div class="muted" style="font-size:13px">${esc(b.what)}</div></td><td class="n"><span class="tag ${b.allowed ? 'ok' : 'no'}">${b.allowed ? 'открыт' : 'закрыт'}</span></td></tr>`).join('')}</table></div></div><div class="box"><h2>Главная страница</h2><div class="tw"><table>${d.checks.map(c => `<tr><td>${esc(c.label)}<div class="muted" style="font-size:13px">${esc(c.detail)}</div></td><td class="n"><span class="tag ${c.ok ? 'ok' : 'no'}">${c.ok ? 'в порядке' : 'исправить'}</span></td></tr>`).join('')}</table></div></div></div><p class="muted" style="font-size:13.5px;margin-top:12px">Открытый доступ ботам не гарантирует, что нейросеть вас назовёт: это условие, без которого она не прочитает сайт.</p>` }
+    try { const d = await call('/api/site-audit', { url: v }); out.innerHTML = `<p class="mono" style="margin-bottom:10px">проверено: ${esc(d.url)}</p><div class="grid two" style="margin-top:0"><div class="box"><h2>Доступ ботов</h2><div class="tw"><table>${d.bots.map(b => `<tr><td><b style="font-weight:500;color:var(--ink)">${esc(b.bot)}</b><div class="muted" style="font-size:13px">${esc(b.what)}</div></td><td class="n">${botTag(b)}</td></tr>`).join('')}</table></div></div><div class="box"><h2>Главная страница</h2><div class="tw"><table>${d.checks.map(c => `<tr><td>${esc(c.label)}<div class="muted" style="font-size:13px">${esc(c.detail)}</div></td><td class="n"><span class="tag ${c.ok ? 'ok' : 'no'}">${c.ok ? 'в порядке' : 'исправить'}</span></td></tr>`).join('')}</table></div></div></div><p class="muted" style="font-size:13.5px;margin-top:12px">Открытый доступ ботам не гарантирует, что нейросеть вас назовёт: это условие, без которого она не прочитает сайт.</p>` }
     catch (err) { out.innerHTML = `<div class="empty" style="color:var(--bad)">Не получилось проверить: ${esc(err.message)}</div>` } };
 }
 const app = render;

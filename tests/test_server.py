@@ -98,6 +98,7 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(checks["robots"] and checks["open"] and checks["price"])
         self.assertFalse(checks["sitemap"])
         self.assertTrue(bots["bingbot"])
+        self.assertEqual(data["robots"], "read")
         self.assertEqual(headers["Access-Control-Allow-Origin"], "https://kenesai.asia")
 
     def test_foreign_origin_gets_no_cors_header(self):
@@ -478,6 +479,73 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(all(app.allowed("1.2.3.4", limit=3) for _ in range(3)))
         self.assertFalse(app.allowed("1.2.3.4", limit=3))
         self.assertTrue(app.allowed("5.6.7.8", limit=3))
+        # the cheap bucket is separate: a visitor out of AI calls still reads pages and audits the site
+        self.assertTrue(app.allowed("1.2.3.4", limit=3, bucket="cheap"))
+        app._hits.clear()
+
+    def test_active_visitor_is_not_locked_out_but_ai_calls_are_capped(self):
+        """The audit walk: one visitor made 30 POSTs in an hour and every button stopped working.
+        Now 40 cheap requests and 40 AI requests in an hour pass; the AI bucket still ends at its limit."""
+        app._hits.clear()
+        p = self.api.server_port
+        site = f"http://127.0.0.1:{self.site.server_port}"
+        for _ in range(40):
+            self.assertEqual(post(p, "/api/site-audit", {"url": site})[0], 200)
+        for _ in range(40):  # no key in tests: 503, but not 429
+            self.assertEqual(post(p, "/api/agent", {"task": "faq", "context": {"company": "A"}})[0], 503)
+        self.assertEqual(app.bucket_of("/api/check-one"), "ai")
+        self.assertEqual(app.bucket_of("/api/connect"), "cheap")
+        real = app.AI_PER_HOUR
+        app.AI_PER_HOUR = 41
+        try:
+            self.assertEqual(post(p, "/api/agent", {"task": "faq", "context": {"company": "A"}})[0], 503)
+            code, data, _ = post(p, "/api/agent", {"task": "faq", "context": {"company": "A"}})
+            self.assertEqual(code, 429)
+            self.assertIn("нейросети", data["error"])
+            self.assertEqual(post(p, "/api/site-audit", {"url": site})[0], 200)  # cheap routes still work
+        finally:
+            app.AI_PER_HOUR = real
+            app._hits.clear()
+
+    def test_unreadable_robots_is_not_shown_as_open(self):
+        """robots.txt answered 403 / 500 / nothing: we do not know the rules, so no bot is «открыт»."""
+        state = {"code": 403}
+
+        class Locked(BaseHTTPRequestHandler):
+            def do_GET(self):
+                code = state["code"] if self.path == "/robots.txt" else 200 if self.path == "/" else 404
+                body = PAGE.encode() if self.path == "/" else b""
+                self.send_response(code)
+                self.end_headers()
+                self.wfile.write(body)
+
+            def log_message(self, *a):
+                pass
+
+        srv = serve(Locked)
+        try:
+            for code in (403, 500):
+                state["code"] = code
+                data = app.audit_site(f"http://127.0.0.1:{srv.server_port}")
+                self.assertEqual(data["robots"], "unreadable")
+                self.assertEqual({b["allowed"] for b in data["bots"]}, {None})
+                robots = next(c for c in data["checks"] if c["id"] == "robots")
+                self.assertFalse(robots["ok"])
+                self.assertIn("не удалось прочитать robots.txt", robots["detail"])
+            # no file at all (404): no rule closes anything, and that is what we say
+            state["code"] = 404
+            data = app.audit_site(f"http://127.0.0.1:{srv.server_port}")
+            self.assertEqual(data["robots"], "missing")
+            self.assertTrue(all(b["allowed"] is True for b in data["bots"]))
+        finally:
+            srv.shutdown()
+        # nothing answers at all
+        dead = serve(Locked)
+        port = dead.server_port
+        dead.shutdown()
+        dead.server_close()
+        data = app.audit_site(f"http://127.0.0.1:{port}")
+        self.assertEqual((data["robots"], {b["allowed"] for b in data["bots"]}), ("unreadable", {None}))
 
 
 if __name__ == "__main__":

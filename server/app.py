@@ -137,18 +137,22 @@ def analyse_page(status, html, seconds):
 def audit_site(raw_url):
     base = safe_url(raw_url)
     rstatus, robots, _, _ = fetch(base + "/robots.txt")
+    # 200: the rules are read. 404/410: the site has no file, so no rule closes anything. Anything else (no answer,
+    # 401/403, 429, 5xx) means we do not know the rules: the bots get "allowed": None, never a false «открыт».
+    robots_state = "read" if rstatus == 200 else "missing" if rstatus in (404, 410) else "unreadable"
     rp = urllib.robotparser.RobotFileParser()
     rp.parse(robots.splitlines() if rstatus == 200 else [])
-    bots = [{"bot": b, "what": w, "allowed": rp.can_fetch(b, base + "/")} for b, w in BOTS]
+    bots = [{"bot": b, "what": w, "allowed": None if robots_state == "unreadable" else rp.can_fetch(b, base + "/")} for b, w in BOTS]
     status, html, seconds, final = fetch(base + "/")
     checks = [{"id": i, "label": l, "ok": ok, "detail": d} for i, l, ok, d in analyse_page(status, html, seconds)]
-    checks.insert(0, {"id": "robots", "label": "Файл robots.txt найден", "ok": rstatus == 200, "detail": f"код ответа {rstatus or 'нет ответа'}"})
+    rdetail = f"код ответа {rstatus or 'нет ответа'}" + (" — не удалось прочитать robots.txt" if robots_state == "unreadable" else " — файла нет, правил для ботов нет" if robots_state == "missing" else "")
+    checks.insert(0, {"id": "robots", "label": "Файл robots.txt найден", "ok": rstatus == 200, "detail": rdetail})
     # Bing finds pages through the sitemap: either the standard address or the one named in robots.txt
     listed = re.findall(r"(?im)^\s*sitemap:\s*(\S+)", robots if rstatus == 200 else "")
     sstatus, sbody, _, _ = fetch(base + "/sitemap.xml")
     has_map = sstatus == 200 and bool(re.search(r"<(urlset|sitemapindex)\b", sbody))
     checks.append({"id": "sitemap", "label": "Есть карта сайта для Bing и других поисковиков", "ok": has_map or bool(listed), "detail": "sitemap.xml найден" if has_map else "адрес карты указан в robots.txt" if listed else "sitemap.xml не найден"})
-    return {"url": final, "bots": bots, "checks": checks}
+    return {"url": final, "bots": bots, "checks": checks, "robots": robots_state}
 
 
 # ---------- connectors ----------
@@ -1140,17 +1144,35 @@ def run_agent(body):
 
 
 # ---------- HTTP ----------
-_hits = {}
+_hits = {}  # (bucket, ip) -> times of recent requests
+# Routes that may call a neural network (each costs money or free-tier quota) get their own, tighter bucket.
+# Everything else (site audit, reading a connector page, owner-only Threads and marketer routes) is cheap
+# and gets a wide one, so an active visitor is never locked out of the cabinet for an hour.
+AI_ROUTES = {"/api/quick", "/api/check-one", "/api/check", "/api/suggest", "/api/analyze", "/api/agent", "/api/social-plan", "/api/social-reply"}
+AI_PER_HOUR = int(os.environ.get("KORIN_AI_PER_HOUR", "60"))  # a full first visit is ~25-30 calls: landing 3, check 10, breakdown 1, agents
+CHEAP_PER_HOUR = int(os.environ.get("KORIN_POST_PER_HOUR", "300"))
+HITS_KEEP = 5000  # bounded: old addresses are dropped
+_hlock = threading.Lock()
 
 
-def allowed(ip, limit=30, window=3600):
+def allowed(ip, limit=None, window=3600, bucket="ai"):
     now = time.time()
-    hits = [t for t in _hits.get(ip, []) if now - t < window]
-    if len(hits) >= limit:
-        _hits[ip] = hits
-        return False
-    _hits[ip] = hits + [now]
-    return True
+    limit = limit if limit is not None else AI_PER_HOUR if bucket == "ai" else CHEAP_PER_HOUR
+    key = (bucket, ip)
+    with _hlock:
+        if len(_hits) > HITS_KEEP:
+            for k in [k for k, v in _hits.items() if not v or now - v[-1] >= window]:
+                del _hits[k]
+        hits = [t for t in _hits.get(key, []) if now - t < window]
+        if len(hits) >= limit:
+            _hits[key] = hits
+            return False
+        _hits[key] = hits + [now]
+        return True
+
+
+def bucket_of(path):
+    return "ai" if path in AI_ROUTES else "cheap"
 
 
 ROUTES = {"/api/site-audit": lambda b: audit_site(b.get("url")), "/api/check": run_check, "/api/agent": run_agent, "/api/connect": connect, "/api/quick": quick_check, "/api/suggest": suggest, "/api/check-one": check_one, "/api/analyze": analyze, "/api/social-plan": social_plan, "/api/social-reply": social_reply, "/api/threads-post": threads_post, "/api/threads-search": threads_search, "/api/threads-me": threads_me, "/api/marketer-plan": marketer_plan, "/api/marketer-publish": marketer_publish, "/api/marketer-replies": marketer_replies}
@@ -1185,8 +1207,9 @@ class Handler(BaseHTTPRequestHandler):
         route = ROUTES.get(self.path)
         if not route:
             return self._send(404, {"error": "Не найдено."})
-        if not allowed((self.headers.get("X-Forwarded-For") or self.client_address[0]).split(",")[0].strip()):
-            return self._send(429, {"error": "Слишком много запросов. Попробуйте через час."})
+        bucket = bucket_of(self.path)
+        if not allowed((self.headers.get("X-Forwarded-For") or self.client_address[0]).split(",")[0].strip(), bucket=bucket):
+            return self._send(429, {"error": "Слишком много вопросов к нейросети с вашего адреса за час. Попробуйте позже — остальной кабинет работает." if bucket == "ai" else "Слишком много запросов. Попробуйте через час."})
         try:
             length = int(self.headers.get("Content-Length", "0"))
             if length > 20_000:
